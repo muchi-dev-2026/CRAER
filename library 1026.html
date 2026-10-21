@@ -1861,7 +1861,7 @@ if (recapBg && !recapBg.src) {
 // ※ 未来の自分へ：エンディングを解禁したい時は、下の「20」を「10」などに変える
 const endingBtn = document.getElementById("lib_endingButton");
 if (endingBtn) {
-  if (defeatedScenes.length >= 20) {
+  if (defeatedScenes.length >= 3) {
     endingBtn.style.display = "block";
     endingBtn.onclick = () => {
       window.idx.playEndingSequence();
@@ -2553,6 +2553,24 @@ if (currentAction.nextStage !== undefined) {
 
 // ★ goto 処理
 if (currentAction.goto === 'library') {
+  // 図書館へ戻る前にバトル状態を完全停止（裏でタイマーが走り続けるのを防ぐ）
+  clearTimeout(gameState.enemyTimer);
+  clearInterval(gameState.passiveTimer);
+  clearInterval(gameState.attackTimerInterval);
+  clearInterval(gameState.defeatLoopTimer);
+  gameState.enemyTimer = null;
+  gameState.passiveTimer = null;
+  gameState.attackTimerInterval = null;
+  gameState.defeatLoopTimer = null;
+  gameState.battleStarted = false;
+  gameState.battleEnded = true; // 誤発火防止
+  gameState.nextAttackTime = 0;
+  gameState.countdownValue = 0;
+  gameState.currentClip = null;
+  attackTimerBox.style.display = "none";
+  setCrisisMode(false);
+  showCommands(false);
+  video.pause();
   if (window.lib && window.lib.showLibrary) {
     window.lib.showLibrary();
   }
@@ -3094,22 +3112,25 @@ if (resultSub) {
   resultSub.style.transition = "opacity 1s ease 2s";
   requestAnimationFrame(() => { resultSub.style.opacity = "1"; });
   
-  resultSub.onclick = () => {
-    resultSub.style.display = "none";
-    
-    // ★追加：エンディング中なら次のループへ
-    if (isEndingSequence && endingResolve) {
-      const resolveFn = endingResolve;
-      endingResolve = null;
-      resolveFn();
-      return;
-    }
-    
-    // 通常時は図書館へ
-    if (window.lib && window.lib.showLibrary) {
-      window.lib.showLibrary();
-    }
-  };
+resultSub.onclick = () => {
+  resultSub.style.display = "none";
+  
+  // ★追加：エンディング中なら次のループへ
+  if (isEndingSequence && endingResolve) {
+    const resolveFn = endingResolve;
+    endingResolve = null;
+    resolveFn();
+    return;
+  }
+  
+  // ★追加：回想再生フラグをOFFに戻す
+  gameState.isRecapPlayback = false;
+  
+  // 通常時は図書館へ
+  if (window.lib && window.lib.showLibrary) {
+    window.lib.showLibrary();
+  }
+};
 }
 
 }
@@ -3136,7 +3157,12 @@ function loadDefeatedScenes(){
 }
 
 // ★追加：敗北を記録
-function recordDefeat(){
+function recordDefeat() {
+  // ★追加：エンディング中、または回想再生中は履歴に追加しない
+  if (isEndingSequence || gameState.isRecapPlayback) {
+    return;
+  }
+  
   const enemyId = window.lib?.state?.currentEnemy?.name || "unknown";
   
   // ★変更：動画ファイル名ではなく「敵名」と「ステージ名」を記録する
@@ -3213,23 +3239,26 @@ updateHeroAvatar();
 loadDefeatedScenes();
 
 // ★⑤：単体の敗北を再生（そのステージへ飛んで敗北処理を走らせる）
-async function playSingleDefeat(index){
-  const record = gameState.defeatedScenes[index];
-  if (!record) {
-    console.warn("記録なし:", index);
-    return;
-  }
-  
-  const enemies = window.lib?.state?.enemies || [];
-  const enemy = enemies.find(e => e.name === record.enemyId);
-  if (!enemy) {
-    console.warn("敵が見つかりません:", record.enemyId);
-    return;
-  }
-  
-  
-  // ゲーム状態のロード（「入る」ボタンを押した時と同じ処理）
-  gameState.videoURLs = enemy.videoURLs;
+async function playSingleDefeat(index) {
+    const record = gameState.defeatedScenes[index];
+    if (!record) {
+      console.warn("記録なし:", index);
+      return;
+    }
+    
+    const enemies = window.lib?.state?.enemies || [];
+    const enemy = enemies.find(e => e.name === record.enemyId);
+    if (!enemy) {
+      console.warn("敵が見つかりません:", record.enemyId);
+      return;
+    }
+    
+    // ★追加：回想再生フラグをON（履歴の汚染防止）
+    gameState.isRecapPlayback = true;
+    
+    // ゲーム状態のロード（「入る」ボタンを押した時と同じ処理）
+    gameState.videoURLs = enemy.videoURLs;
+    
   gameState.parsedTimeline = window.idx.parseNewTimeline(enemy.timelineText);
   gameState.serifPools = window.idx.parseSerifFile(enemy.serifText);
   if (enemy.sfxText && window.idx.parseSfxFile) {
