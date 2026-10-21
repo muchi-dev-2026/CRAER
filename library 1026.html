@@ -1418,6 +1418,9 @@ const state = {
   screen: "intro",
 };
 
+// ★追加：エンディング解禁に必要な敗北回数（ここを変えるだけでゲージとボタンが連動します）
+const REQUIRED_DEFEATS = 20;
+
 // ===== 要素 =====
 const introScreen = document.getElementById("lib_introScreen");
 const startScreen = document.getElementById("lib_startScreen");
@@ -1606,7 +1609,7 @@ async function showLibrary() {
 const recapBtn = document.getElementById("lib_defeatRecapButton");
 if (recapBtn) {
   const defeatedCount = window.idx?.gameState?.defeatedScenes?.length || 0;
-  const maxGauge = 20; // エンディング解禁条件（現在は20件）
+  const maxGauge = REQUIRED_DEFEATS; // ★共通定数を参照
   
   if (defeatedCount > 0) {
     // 侵食率を計算（0% 〜 100%）
@@ -1920,10 +1923,10 @@ if (recapBg && !recapBg.src) {
 }
 
 // ★追加：エンディングボタンの表示判定
-// ※ 未来の自分へ：エンディングを解禁したい時は、下の「20」を「10」などに変える
 const endingBtn = document.getElementById("lib_endingButton");
 if (endingBtn) {
-  if (defeatedScenes.length >= 3) {
+  // ★共通定数（REQUIRED_DEFEATS）と比較する
+  if (defeatedScenes.length >= REQUIRED_DEFEATS) {
     endingBtn.style.display = "block";
     endingBtn.onclick = () => {
       window.idx.playEndingSequence();
