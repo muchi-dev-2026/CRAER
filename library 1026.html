@@ -1183,6 +1183,46 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
   letter-spacing: 0.5px;
 }
 
+/* ===== 敗北回想ボタン（侵食ゲージ） ===== */
+#lib_defeatRecapButton {
+  transition: border-color 0.5s ease, box-shadow 0.5s ease;
+}
+#lib_defeatRecapButton.gauge-full {
+  box-shadow: 0 0 15px rgba(255, 0, 85, 0.8), inset 0 0 10px rgba(255, 0, 85, 0.5);
+  animation: gaugePulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes gaugePulse {
+  0% { box-shadow: 0 0 10px rgba(255, 0, 85, 0.6); }
+  100% { box-shadow: 0 0 25px rgba(255, 0, 85, 1); }
+}
+
+/* ゲージの背景（ドクドク光るピンク） */
+.recap-gauge-fill {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  background: linear-gradient(90deg, #400015, #ff0055, #ff66aa);
+  background-size: 200% 100%;
+  opacity: 0.4;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+  animation: gaugeFlow 3s linear infinite;
+}
+
+@keyframes gaugeFlow {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 200% 0%; }
+}
+
+/* テキストをゲージの上に表示する */
+.recap-gauge-text {
+  position: relative;
+  z-index: 1;
+  display: block;
+  color: #fff;
+  text-shadow: 0 0 4px #000, 1px 1px 2px #000;
+}
+
 </style>
 <style id="dynamicStyle"></style>
 </head>
@@ -1562,17 +1602,39 @@ async function showLibrary() {
   });
   
   
-  // ★追加：敗北記録があればボタン表示
-  const recapBtn = document.getElementById("lib_defeatRecapButton");
-  if (recapBtn) {
-    const defeatedCount = window.idx?.gameState?.defeatedScenes?.length || 0;
-    if (defeatedCount > 0) {
-      recapBtn.textContent = `▶ 敗北回想 (${defeatedCount})`;
-      recapBtn.style.display = "block";
+// ★追加：敗北記録があればボタン表示（侵食ゲージ付き）
+const recapBtn = document.getElementById("lib_defeatRecapButton");
+if (recapBtn) {
+  const defeatedCount = window.idx?.gameState?.defeatedScenes?.length || 0;
+  const maxGauge = 20; // エンディング解禁条件（現在は20件）
+  
+  if (defeatedCount > 0) {
+    // 侵食率を計算（0% 〜 100%）
+    const erosionPercent = Math.min((defeatedCount / maxGauge) * 100, 100);
+    
+    // HTML構造を書き換えてゲージを追加
+    recapBtn.innerHTML = `
+        <div class="recap-gauge-fill" style="width: ${erosionPercent}%;"></div>
+        <span class="recap-gauge-text">▶ 敗北回想 <span style="font-size:10px;opacity:0.7;">(${defeatedCount}/${maxGauge})</span></span>
+      `;
+    
+    // ボタン自体のスタイルを更新
+    recapBtn.style.display = "block";
+    recapBtn.style.position = "relative";
+    recapBtn.style.overflow = "hidden"; // ゲージをボタン内に収める
+    recapBtn.style.borderColor = erosionPercent >= 100 ? "#ff0055" : "rgba(255,105,180,0.6)";
+    
+    // もし既存のCSSクラスを付けたいならここで付与（下記のCSSと連動）
+    if (erosionPercent >= 100) {
+      recapBtn.classList.add("gauge-full");
     } else {
-      recapBtn.style.display = "none";
+      recapBtn.classList.remove("gauge-full");
     }
+  } else {
+    recapBtn.style.display = "none";
   }
+}
+
 }
 
 // ===== 敵を選択 =====
