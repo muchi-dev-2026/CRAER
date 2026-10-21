@@ -1621,11 +1621,18 @@ if (recapBtn) {
         <span class="recap-gauge-text">▶ 敗北回想 <span style="font-size:10px;opacity:0.7;">(${defeatedCount}/${maxGauge})</span></span>
       `;
     
-    // ボタン自体のスタイルを更新
-    recapBtn.style.display = "block";
-    recapBtn.style.position = "relative";
-    recapBtn.style.overflow = "hidden"; // ゲージをボタン内に収める
-    recapBtn.style.borderColor = erosionPercent >= 100 ? "#ff0055" : "rgba(255,105,180,0.6)";
+// ボタン自体のスタイルを更新
+recapBtn.style.display = "block";
+// ★ここを修正：画面右下に固定する
+recapBtn.style.position = "absolute";
+recapBtn.style.bottom = "20px";
+recapBtn.style.right = "20px";
+recapBtn.style.overflow = "hidden";
+recapBtn.style.borderColor = erosionPercent >= 100 ? "#ff0055" : "rgba(255,105,180,0.6)";
+
+// 念のため幅とテキストの中央揃えも安定させる
+recapBtn.style.textAlign = "center";
+
     
     // もし既存のCSSクラスを付けたいならここで付与（下記のCSSと連動）
     if (erosionPercent >= 100) {
