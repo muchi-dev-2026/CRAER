@@ -1983,15 +1983,8 @@ if (recapBg && !recapBg.src) {
 // ★追加：エンディングボタンの表示判定
 const endingBtn = document.getElementById("lib_endingButton");
 if (endingBtn) {
-  // ★共通定数（REQUIRED_DEFEATS）と比較する
-  if (defeatedScenes.length >= REQUIRED_DEFEATS) {
-    endingBtn.style.display = "block";
-    endingBtn.onclick = () => {
-      window.idx.playEndingSequence();
-    };
-  } else {
-    endingBtn.style.display = "none";
-  }
+  // ★図書館画面側に移動したため、ここでは常に非表示にする
+  endingBtn.style.display = "none";
 }
 
 showScreen("recap");
