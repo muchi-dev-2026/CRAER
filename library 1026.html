@@ -1246,27 +1246,69 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
     </div>
   </div>
 
-  <!-- ② 図書館画面 -->
+<!-- ② 図書館画面 -->
 <div id="lib_libraryScreen" class="lib_screen">
   <video id="lib_bgVideo" muted loop playsinline preload="auto"></video>
   <div id="lib_commandLayer"></div>
+  
+  <!-- ★追加：左右に分けるためのコンテナ -->
+  <div id="lib_libraryButtons" style="
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    pointer-events: none;
+  ">
+<!-- ★左端：エンディングボタン -->
+<button id="lib_libraryEndingButton" style="
+      position: relative;
+      width: 120px;               /* ★横幅を固定 */
+      height: 36px;               /* ★高さを固定 */
+      padding: 0;                 /* ★paddingをリセットして中央揃えに */
+      display: none;              /* JSで block に切り替わります */
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg,#ff0055,#500825);
+      border: 1.5px solid #ff3366;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(255,0,80,0.8);
+      animation: gaugePulse 1.5s ease-in-out infinite alternate;
+      pointer-events: auto;
+      box-sizing: border-box;
+    ">▶ 侵食の記憶</button>
+
+<!-- ★右端：敗北回想ボタン -->
 <button id="lib_defeatRecapButton" style="
-  position:absolute;
-  bottom:20px;
-  right:20px;
-  z-index:10;
-  padding:8px 14px;
-  background:rgba(0,0,0,0.4);
-  border:1px solid rgba(255,105,180,0.6);
-  border-radius:4px;
-  color:#ffe6f2;
-  font-size:11px;
-  letter-spacing:2px;
-  cursor:pointer;
-  backdrop-filter:blur(4px);
-  -webkit-backdrop-filter:blur(4px);
-  display:none;
-">▶ 敗北回想</button>
+      position: relative;
+      width: 120px;               /* ★横幅を固定 */
+      height: 36px;               /* ★高さを固定 */
+      padding: 0;                 /* ★paddingをリセット */
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,105,180,0.6);
+      border-radius: 4px;
+      color: #ffe6f2;
+      font-size: 11px;
+      letter-spacing: 1px;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      overflow: hidden;
+      pointer-events: auto;
+      box-sizing: border-box;
+    ">▶ 敗北回想</button>
+  </div>
 </div>
 
 
@@ -1607,8 +1649,9 @@ async function showLibrary() {
   
 // ★追加：敗北記録があればボタン表示（侵食ゲージ付き）
 const recapBtn = document.getElementById("lib_defeatRecapButton");
+const defeatedCount = window.idx?.gameState?.defeatedScenes?.length || 0; // ★ifの外で宣言
+
 if (recapBtn) {
-  const defeatedCount = window.idx?.gameState?.defeatedScenes?.length || 0;
   const maxGauge = REQUIRED_DEFEATS; // ★共通定数を参照
   
   if (defeatedCount > 0) {
@@ -1621,20 +1664,14 @@ if (recapBtn) {
         <span class="recap-gauge-text">▶ 敗北回想 <span style="font-size:10px;opacity:0.7;">(${defeatedCount}/${maxGauge})</span></span>
       `;
     
-// ボタン自体のスタイルを更新
-recapBtn.style.display = "block";
-// ★ここを修正：画面右下に固定する
-recapBtn.style.position = "absolute";
-recapBtn.style.bottom = "20px";
-recapBtn.style.right = "20px";
-recapBtn.style.overflow = "hidden";
-recapBtn.style.borderColor = erosionPercent >= 100 ? "#ff0055" : "rgba(255,105,180,0.6)";
-
-// 念のため幅とテキストの中央揃えも安定させる
-recapBtn.style.textAlign = "center";
-
+    // ボタン自体のスタイルを更新
+    recapBtn.style.display = "block";
+    recapBtn.style.position = "relative";
+    recapBtn.style.overflow = "hidden";
+    recapBtn.style.borderColor = erosionPercent >= 100 ? "#ff0055" : "rgba(255,105,180,0.6)";
+    recapBtn.style.textAlign = "center";
     
-    // もし既存のCSSクラスを付けたいならここで付与（下記のCSSと連動）
+    // ゲージ満タン（100%）の時のクラス付与
     if (erosionPercent >= 100) {
       recapBtn.classList.add("gauge-full");
     } else {
@@ -1645,6 +1682,20 @@ recapBtn.style.textAlign = "center";
   }
 }
 
+// ★追加：図書館画面でのエンディングボタン表示（両端レイアウト用）
+const libEndingBtn = document.getElementById("lib_libraryEndingButton");
+if (libEndingBtn) {
+  if (defeatedCount >= REQUIRED_DEFEATS) {
+  libEndingBtn.style.display = "flex"; // ★中央揃えにするためflexに変更
+    libEndingBtn.onclick = () => {
+      if (window.idx && window.idx.playEndingSequence) {
+        window.idx.playEndingSequence();
+      }
+    };
+  } else {
+    libEndingBtn.style.display = "none";
+  }
+}
 }
 
 // ===== 敵を選択 =====
