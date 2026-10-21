@@ -1513,13 +1513,22 @@ async function showStartScreen() {
 }
 
 // ===== 図書館画面 =====
-async function showLibrary(){
-  startBgVideo.pause();
-  
-  const gameEl = document.getElementById("game");
-  if (gameEl) gameEl.style.display = "none";
-  
-  showScreen("library");
+async function showLibrary() {
+    startBgVideo.pause();
+    
+    const gameEl = document.getElementById("game");
+    if (gameEl) gameEl.style.display = "none";
+    
+    // ★追加：演出動画プレイヤーを完全にリセットする
+    const tv = document.getElementById("lib_transitionVideo");
+    if (tv) {
+      tv.pause();
+      tv.removeAttribute('src'); // URLを空にする
+      tv.load(); // プレイヤーを初期状態に戻す
+    }
+    
+    showScreen("library");
+    
   
   if (bgVideo.src.indexOf("library_loop.mp4") === -1){
     bgVideo.src = "library_loop.mp4";
@@ -1658,6 +1667,15 @@ enterButton.onclick = () => {
   }
   
   if (window.idx && window.idx.startBattle) {
+    // ★追加：前回のバトルや回想のタイマー・状態を完全にリセットする
+    clearTimeout(window.idx.gameState.enemyTimer);
+    clearInterval(window.idx.gameState.passiveTimer);
+    clearInterval(window.idx.gameState.attackTimerInterval);
+    clearInterval(window.idx.gameState.defeatLoopTimer);
+    window.idx.gameState.battleStarted = false;
+    window.idx.gameState.battleEnded = false;
+    
+    // データの読み込み
     window.idx.gameState.videoURLs = enemy.videoURLs;
     window.idx.gameState.parsedTimeline = window.idx.parseNewTimeline(enemy.timelineText);
     window.idx.gameState.serifPools = window.idx.parseSerifFile(enemy.serifText);
@@ -1674,12 +1692,15 @@ enterButton.onclick = () => {
     const dynamicStyleEl = document.getElementById("dynamicStyle");
     if (dynamicStyleEl) dynamicStyleEl.textContent = enemy.cssText || "";
     
-  document.getElementById("game").style.display = "flex";
-enemyScreen.classList.remove("active");
-
-window.dispatchEvent(new Event("resize")); // ★ これ追加
-
-window.idx.startBattle();
+    document.getElementById("game").style.display = "flex";
+    enemyScreen.classList.remove("active");
+    
+    window.dispatchEvent(new Event("resize"));
+    
+    // ★追加：Safariのバグ対策。少しだけ待ってからバトルを開始する
+    setTimeout(() => {
+      window.idx.startBattle();
+    }, 100);
   }
 };
 
