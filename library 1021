@@ -1,0 +1,3093 @@
+<!DOCTYPE html>
+
+<!--
+  CRAER
+  © 2026 muchi-dev-2026
+  無断転載・再配布・改変を禁止します。
+  https://muchi-dev-2026.github.io/CRAER/
+-->
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>CRAER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{
+  width:100%;height:100%;overflow:hidden;
+  background:#020005;color:#f0d0e8;
+  font-family:'RocknRoll One',-apple-system,sans-serif;
+}
+
+#lib_game{
+  position:relative;
+  width:100%;height:100dvh;
+  max-width:480px;margin:0 auto;
+  background:#05020a;
+  overflow:hidden;
+  
+}
+@media (min-width: 768px){
+  #lib_game{ max-width:720px; }
+}
+
+.lib_screen{
+  position:absolute;inset:0;
+  display:none;
+}
+.lib_screen.active{display:block}
+
+/* ===== イントロ画面 ===== */
+#lib_introScreen{
+  background:#000;
+  z-index:200;
+}
+#lib_introVideo{
+  width:100%;height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+/* ===== 起動画面 ===== */
+#lib_startScreen{
+  background:#000;
+}
+#lib_startBgVideo{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  z-index:0;
+  opacity:1;
+}
+
+#lib_startUI {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 15vh;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  pointer-events: none;
+}
+#lib_startUI.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+#lib_startUI h1,
+#lib_startUI p {
+  display: none;
+}
+
+#lib_folderButton {
+  position: relative;
+  padding: 18px 44px;
+  border-radius: 4px;
+  background: rgba(20, 10, 15, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 105, 180, 0.4);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.7),
+    inset 0 0 15px rgba(255, 20, 147, 0.15);
+  color: #ffe6f2;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 6px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+#lib_folderButton::before {
+  content: "";
+  position: absolute;
+  top: -3px; left: -3px;
+  width: 6px; height: 6px;
+  border-top: 1px solid #ff69b4;
+  border-left: 1px solid #ff69b4;
+}
+#lib_folderButton::after {
+  content: "";
+  position: absolute;
+  bottom: -3px; right: -3px;
+  width: 6px; height: 6px;
+  border-bottom: 1px solid #ff69b4;
+  border-right: 1px solid #ff69b4;
+}
+#lib_folderButton:hover {
+  background: rgba(40, 15, 25, 0.85);
+  border-color: rgba(255, 20, 147, 0.9);
+  color: #ffffff;
+  box-shadow:
+    0 6px 25px rgba(0, 0, 0, 0.8),
+    0 0 20px rgba(255, 20, 147, 0.4),
+    inset 0 0 20px rgba(255, 20, 147, 0.3);
+  letter-spacing: 8px;
+}
+#lib_folderButton:active {
+  transform: scale(0.96);
+  background: rgba(60, 20, 35, 0.95);
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.9),
+    0 0 10px rgba(255, 20, 147, 0.6);
+}
+
+/* ===== 図書館画面 ===== */
+#lib_libraryScreen{
+  background:#000;
+}
+#lib_bgVideo{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  z-index:0;
+}
+
+#lib_commandLayer{
+  position:absolute;inset:0;
+  z-index:2;
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:3vh;
+  padding:5vh 5vw;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  justify-items:center;
+  align-content:flex-start;
+}
+
+.lib_command{
+  width:24vh;
+  height:26vh;
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  transition:transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.lib_command:active{
+  transform:scale(1.15);
+}
+
+.lib_command-name {
+  color: #ffffff;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 5px;
+  text-shadow: none;
+  opacity: 1.0;
+  transition: color 0.4s ease, opacity 0.4s ease;
+  white-space: nowrap;
+  animation: lib_float 2s ease-in-out infinite;
+  display: inline-block;
+}
+@keyframes lib_float{
+  0%   { transform:translate(0, 0) rotate(-2deg) scale(1); opacity:0.8; }
+  25%  { transform:translate(5px, -8px) rotate(2deg) scale(1.05); opacity:1; }
+  50%  { transform:translate(0, -12px) rotate(-2deg) scale(1); opacity:0.8; }
+  75%  { transform:translate(-5px, -8px) rotate(2deg) scale(1.05); opacity:1; }
+  100% { transform:translate(0, 0) rotate(-2deg) scale(1); opacity:0.8; }
+}
+
+.lib_command:hover .lib_command-name,
+.lib_command:active .lib_command-name {
+  color: #ff69b4;
+  opacity: 1;
+}
+.lib_command.selected .lib_command-name {
+  color: #ffffff;
+  opacity: 1;
+  text-shadow: 0 0 20px rgba(255, 0, 120, 1);
+}
+/* ===== 敵画面 ===== */
+#lib_enemyScreen{
+  background:#0a0208;
+  display:none;
+  flex-direction:column;
+}
+#lib_enemyScreen.active{display:flex}
+
+#lib_battleLoop{
+  width:100%;
+  height:55%;
+  object-fit:cover;
+  background:#000;
+  flex-shrink:0;
+}
+
+#lib_enemyInfo{
+  flex:1;
+  padding:24px 28px 24px 36px;
+  overflow-y:auto;
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  position:relative;
+  background:
+    linear-gradient(135deg, #2a1a25, #1a0a15);
+}
+#lib_enemyInfo::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 31px,
+      rgba(255,100,180,0.07) 31px,
+      rgba(255,100,180,0.07) 32px
+    );
+  pointer-events:none;
+  z-index:0;
+}
+#lib_enemyInfo::after{
+  content:"";
+  position:absolute;
+  left:0;top:0;bottom:0;
+  width:18px;
+  background:linear-gradient(90deg, rgba(0,0,0,0.55), transparent);
+  pointer-events:none;
+  z-index:0;
+}
+
+#lib_enemyName{
+  position:relative;
+  z-index:1;
+  font-family:'Yuji Syuku', 'Shippori Mincho', serif;
+  font-size:22px;
+  color:#ff69b4;
+  letter-spacing:3px;
+  margin-bottom:8px;
+  text-shadow:0 0 12px rgba(255,0,120,0.6);
+}
+#lib_enemyMeta{
+  position:relative;
+  z-index:1;
+  font-family:'Shippori Mincho', serif;
+  font-size:11px;
+  color:#ff99cc;
+  letter-spacing:1px;
+  margin-bottom:14px;
+  opacity:0.8;
+}
+#lib_enemyDescription{
+  position:relative;
+  z-index:1;
+  font-family:'Shippori Mincho', serif;
+  font-size:14px;
+  line-height:1.9;
+  color:#ffcce6;
+  letter-spacing:0.5px;
+}
+#lib_enemyButtons{
+  display:flex;
+  gap:10px;
+  padding:12px 16px;
+  background:rgba(0,0,0,0.7);
+  border-top:1px solid rgba(255,100,180,0.2);
+}
+#lib_enemyButtons button{
+  flex:1;
+  padding:14px;
+  border:1.5px solid #ff66aa;
+  border-radius:4px;
+  background:linear-gradient(180deg,#c01860,#500825);
+  color:#fff;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  letter-spacing:2px;
+}
+#lib_enemyButtons button:active{transform:scale(0.97)}
+#lib_backButton{
+  background:linear-gradient(180deg,#402030,#1a0a12) !important;
+  border-color:#804060 !important;
+}
+
+/* ===== 選択演出画面 ===== */
+#lib_transitionScreen{
+  background:#000;
+  z-index:100;
+}
+#lib_transitionVideo{
+  width:100%;height:100%;
+  object-fit:cover;
+}
+
+/* ===== エラー表示 ===== */
+#lib_errorDisplay{
+  position:absolute;top:10px;left:10px;right:10px;
+  background:rgba(220,0,0,0.9);color:#fff;
+  padding:12px;border-radius:6px;
+  z-index:9999;
+  font-weight:bold;font-family:sans-serif;
+  font-size:12px;white-space:pre-wrap;
+  display:none;
+}
+
+:root {
+  --avatar-size: 96px;
+  --avatar-left: 12px;
+  --avatar-bottom: 10px;
+  --hud-left: calc(var(--avatar-left) + var(--avatar-size) + 10px);
+  --hud-right: 12px;
+  --temptation-bottom: calc(var(--avatar-bottom) + var(--avatar-size) + 2px);
+  --main-color-pink: #ff007f;
+  --main-color-accent: #ff1493;
+  --gauge-bottom: 86px;
+  --hero-serif-height: 76px;
+  --hero-serif-color: #66ffff;
+  --hero-serif-border: #00ff66;
+  --enemy-serif-color: #ffffff;
+  --system-text-color: #e6f7ff;
+  --system-accent: #00e6ff;
+  --enemy-serif-size: 16px;
+  --hero-serif-size: 14px;
+  --system-label-size: 10px;
+  --system-text-size: 11.5px;
+  --btn-text-size: 11px;
+  --gauge-title-size: 11px;
+  --gauge-percent-size: 12px;
+  --timer-size-vw: 55vw;
+  --font-enemy: 'Yuji Syuku', 'Shippori Mincho', serif;
+  --font-hero: 'RocknRoll One', 'Shippori Mincho', sans-serif;
+  --font-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-btn: 'Shippori Mincho', serif;
+  --font-timer: 'Shippori Mincho', 'Impact', serif;
+  --ono-font: 'Potta One', Impact, sans-serif;
+  --ono-size-base: 26px;
+  --ono-color: #ffffff;
+  --ono-shadow-pink: #ff0055;
+  --ono-shadow-main: var(--main-color-pink);
+  --ono-shadow-outline: #000000;
+  --ono-opacity: 0.8;
+  --ono-duration: 1.3s;
+  --ono-lifetime-ms: 1300;
+  --btn-bg: #ffffff;
+  --btn-border: #ff99cc;
+  --btn-border-active: #ff007f;
+  --btn-radius: 6px;
+  --btn-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  --btn-active-scale: 1.02;
+  --btn-stage1-color: #222222;
+  --btn-stage2-color: #d00060;
+  --btn-stage3-color: #b00040;
+  --btn-stage4-color: #e00000;
+  --pink-filter-opacity: 0.7;
+  --select-bg: radial-gradient(circle at center, rgba(35,5,25,0.98), rgba(5,0,8,0.99));
+  --select-title-color: #ff69b4;
+  --select-btn-bg: linear-gradient(180deg, #2a0818, #14030b);
+  --defeat-title-color: #ff3399;
+  --defeat-title-size: 36px;
+  --defeat-sub-color: #ffcce6;
+  --start-btn-bg: linear-gradient(180deg, #c01860, #500825);
+  --start-btn-border: #ff66aa;
+  --timer-notice-color: #ffb3d9;
+  --timer-notice-font-size: 9px;
+  --timer-notice-sec-size: 10px;
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'RocknRoll One','Potta One',-apple-system,sans-serif;overflow:hidden}
+
+#game {
+  display: none;
+  width:100%;height:100dvh;max-width:480px;margin:0 auto;
+  background:#05020a;
+  flex-direction:column;
+  position:relative;
+  box-shadow:0 0 50px rgba(0,0,0,0.9);
+}
+
+#screen{
+  position:relative;flex:1;min-height:0;background:#000;overflow:hidden;
+}
+#canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#video{display:none}
+
+#pinkFilter{
+  position:absolute;inset:0;z-index:4;pointer-events:none;
+  background:radial-gradient(ellipse at center, transparent 10%, rgba(140,0,70,0.5) 60%, rgba(15,0,20,0.95) 100%);
+  opacity:0;transition:opacity .4s ease;
+}
+#edgePulse{
+  position:absolute;inset:0;z-index:5;pointer-events:none;
+  opacity:0;transition:opacity .35s ease;
+  box-shadow:inset 0 0 60px rgba(255,20,120,0.35);
+}
+#edgePulse.active{
+  opacity:1;
+  animation:edgeThrob 1s ease-in-out infinite alternate;
+}
+@keyframes edgeThrob{
+  0%{box-shadow:inset 0 0 40px rgba(255,20,120,0.3), inset 0 0 90px rgba(255,0,80,0.15)}
+  100%{box-shadow:inset 0 0 80px rgba(255,20,120,0.6), inset 0 0 140px rgba(255,0,80,0.35)}
+}
+#flash{position:absolute;inset:0;z-index:9;pointer-events:none;background:rgba(255,0,100,0.5);opacity:0;transition:opacity .2s}
+#shockwave{
+  position:absolute;top:42%;left:50%;width:8px;height:8px;border-radius:50%;
+  border:3px solid var(--main-color-accent);transform:translate(-50%,-50%) scale(0);
+  pointer-events:none;z-index:8;opacity:0;
+}
+#shockwave.active{animation:waveExpand .5s ease-out forwards}
+@keyframes waveExpand{
+  0%{transform:translate(-50%,-50%) scale(1);opacity:1;border-width:6px}
+  100%{transform:translate(-50%,-50%) scale(50);opacity:0;border-width:1px;border-color:#ff66cc}
+}
+
+#damageContainer{position:absolute;inset:0;z-index:12;pointer-events:none;overflow:hidden}
+.shriftOno{
+  position:absolute;
+  font-family:var(--ono-font);
+  font-size:calc(var(--ono-size-base) * var(--intensity,1));
+  font-weight:900;color:var(--ono-color);
+  text-shadow:0 0 8px var(--ono-shadow-pink),0 0 16px var(--ono-shadow-main),2px 2px 0 var(--ono-shadow-outline);
+  white-space:nowrap;
+  opacity:var(--ono-opacity);
+  animation:damageShrift var(--ono-duration) cubic-bezier(.15,.85,.35,1.2) forwards;
+}
+@keyframes damageShrift{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-10deg);filter:blur(4px)}
+  20%{opacity:0.8;transform:translate(-50%,-50%) scale(1.1) rotate(3deg);filter:blur(0)}
+  70%{opacity:0.8}
+  100%{opacity:0;transform:translate(-50%,-70%) scale(.7);filter:blur(3px)}
+}
+
+#serifArea{
+  position:absolute;left:6%;right:6%;bottom:190px;
+  z-index:28;pointer-events:none;
+  display:flex;justify-content:center;align-items:center;
+  min-height:40px;
+}
+#messageWrap{
+  display:inline-block;
+  animation:enemyWhisper 3.5s ease-in-out infinite alternate;
+  transform-origin: center center;
+}
+#messageWrap.zoom-out {
+  animation: zoomFadeOut 2.5s ease-out forwards !important;
+}
+@keyframes zoomFadeOut {
+  0% { transform: scale(1); opacity: 0.85; filter: blur(0px); }
+  100% { transform: scale(2.2); opacity: 0; filter: blur(6px); }
+}
+
+#message{
+  max-width:100%;
+  font-family:var(--font-enemy);
+  font-size:var(--enemy-serif-size);
+  font-weight:700;line-height:1.35;
+  color:var(--enemy-serif-color);
+  text-align:center;
+  text-shadow:
+    0 0 6px var(--main-color-pink),
+    0 0 14px #ff0055,
+    0 0 22px rgba(255,0,100,0.8),
+    1px 1px 3px #000,
+    -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+  opacity:0.85;
+  white-space:pre-wrap;
+  word-break:break-word;
+  letter-spacing:1px;
+}
+@keyframes enemyWhisper{
+  0%{ transform: scale(1) translateY(0px) rotate(-0.5deg); }
+  50%{ transform: scale(1.02) translateY(-2px) rotate(0.5deg); }
+  100%{ transform: scale(0.98) translateY(2px) rotate(-0.5deg); }
+}
+
+#heroSerifArea{
+  position:absolute;
+  left:var(--hud-left);
+  right:var(--hud-right);
+  bottom:var(--avatar-bottom);
+  height:var(--hero-serif-height);
+  z-index:28;
+  pointer-events:none;
+  display:flex;align-items:center;justify-content:flex-start;
+  background:rgba(10,2,15,0.85);
+  border:1px solid var(--hp-color, var(--hero-serif-border));
+  border-radius:8px;
+  padding:4px 8px;
+  box-shadow:0 0 10px var(--hp-color, rgba(0,0,0,0.8));
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+#heroMessageWrap{
+  width:100%;
+  height:100%;
+  display:flex !important;
+  align-items:center;
+  background:transparent;
+  border:none;
+  padding:0;
+  box-shadow:none;
+}
+#heroMessage{
+  width:100%;
+  font-family:var(--font-hero);
+  font-size:var(--hero-serif-size);
+  font-weight:700;line-height:1.25;
+  color:var(--hero-serif-color);
+  text-align:left;
+  text-shadow:
+    0 0 5px rgba(0,200,255,0.8),
+    1px 1px 2px #000, -1px -1px 0 #000;
+  opacity:1;
+  white-space:pre-wrap;
+  word-break:break-word;
+  letter-spacing:0.5px;
+  overflow:hidden;
+  max-height:100%;
+}
+
+.typing-cursor {
+  display:inline-block;
+  width:2px;height:1em;
+  background:#ff66cc;
+  margin-left:2px;
+  vertical-align:bottom;
+  box-shadow:0 0 6px var(--main-color-pink);
+  animation:cursorBlink 0.6s infinite alternate;
+}
+.hero-typing-cursor {
+  display:inline-block;
+  width:2px;height:1em;
+  background:#66ffff;
+  margin-left:2px;
+  vertical-align:bottom;
+  box-shadow:0 0 6px #00ffff;
+  animation:cursorBlink 0.6s infinite alternate;
+}
+@keyframes cursorBlink{ 0%{opacity:0.2} 100%{opacity:1} }
+
+#temptationPopup{
+  position:absolute;
+  left:var(--avatar-left);
+  right:var(--hud-right);
+  bottom: var(--temptation-bottom);
+  transform:scale(0.95);
+  transform-origin:bottom center;
+  z-index:26;
+  width:auto;
+  max-width:none;
+  padding:6px 12px;
+  background: rgba(8, 12, 20, 0.45);
+  border: 1px solid rgba(0, 230, 255, 0.4);
+  border-left: 3px solid var(--system-accent);
+  border-radius: 4px;
+  box-shadow: 0 0 12px rgba(0, 230, 255, 0.2);
+  backdrop-filter: blur(2px);
+  text-align:left;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+}
+#temptationPopup.visible{
+  opacity:0.9;
+  transform:scale(1);
+}
+#temptationLabel{
+  font-family: 'Share Tech Mono', monospace;
+  font-size: var(--system-label-size);
+  font-weight: 700;
+  color: var(--system-accent);
+  letter-spacing: 1.5px;
+  margin-bottom: 2px;
+  text-shadow: 0 0 4px rgba(0, 230, 255, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+#temptationLabel::before {
+  content: "■";
+  font-size: 8px;
+}
+#temptationText{
+  font-family: var(--font-system);
+  font-size: var(--system-text-size);
+  font-weight: 600;
+  color: var(--system-text-color);
+  line-height: 1.3;
+  text-shadow: 0 1px 2px #000;
+  letter-spacing: 0.5px;
+}
+
+#attackTimer{
+  position:absolute;inset:0;bottom:25%;z-index:15;
+  display:none;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+#timerValue{
+  font-family:var(--font-timer);
+  font-size:clamp(180px, var(--timer-size-vw), 300px);
+  font-weight:900;
+  line-height:1;
+  background: linear-gradient(180deg, #ffffff 0%, #ff3399 65%, #880044 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 25px rgba(255,0,100,0.9));
+  opacity:0;
+}
+#attackTimer.show #timerValue{
+  animation:superCountFade 0.95s ease-out forwards;
+}
+@keyframes superCountFade{
+  0%{opacity:0;transform:scale(1.3)}
+  20%{opacity:0.9;transform:scale(1)}
+  75%{opacity:0.85;transform:scale(0.96)}
+  100%{opacity:0;transform:scale(0.9)}
+}
+
+#commands{
+  position:absolute;
+  left:calc(var(--avatar-left) + var(--avatar-size) + 12px);
+  right:var(--hud-right);
+  bottom:var(--avatar-bottom);
+  height:var(--avatar-size);
+  z-index:35;
+  display:flex;flex-direction:column;justify-content:space-between;gap:3px;
+  width:auto;max-width:none;
+  padding:0;
+  background:transparent;
+  align-items:stretch;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.35s ease, transform 0.35s ease;
+}
+#commands.visible{
+  opacity:1;pointer-events:auto;
+}
+
+.command-btn{
+  width:100%;
+  height:calc((100% - 6px) / 3);
+  background:var(--btn-bg) !important;
+  border:1px solid var(--btn-border) !important;
+  border-radius:var(--btn-radius);
+  position:relative;
+  display:flex;align-items:center;justify-content:flex-start;
+  cursor:pointer;
+  padding:0 8px 0 12px;
+  box-shadow:var(--btn-shadow);
+  overflow:visible !important;
+  transition:border-color .2s ease, box-shadow .2s ease, transform 0.15s ease;
+}
+.command-btn::before{
+  content:"";
+  position:absolute;
+  left:-6px;
+  top:50%;
+  transform:translateY(-50%);
+  width:0;height:0;
+  border-right:6px solid var(--btn-bg);
+  border-top:4px solid transparent;
+  border-bottom:4px solid transparent;
+}
+.command-btn:disabled{opacity:0.3;pointer-events:none}
+
+.command-btn:active,
+.command-btn:focus,
+.command-btn:hover {
+  background:var(--btn-bg) !important;
+  border-color:var(--btn-border-active) !important;
+  box-shadow:0 0 10px rgba(255, 0, 127, 0.5);
+  transform:scale(var(--btn-active-scale));
+}
+
+.cmd-title{
+  font-size:var(--btn-text-size);
+  font-weight:700;
+  letter-spacing:0.5px;
+  text-align:left;
+  white-space:nowrap;
+  line-height:1;
+  display:inline-block;
+  transition:transform 0.2s ease, color 0.2s ease;
+}
+
+.command-btn:active .cmd-title,
+.command-btn:focus .cmd-title,
+.command-btn:hover .cmd-title {
+  transform:scale(1.05);
+}
+
+.cmd-stage1{ color:var(--btn-stage1-color); font-family:var(--font-btn); text-shadow:none; }
+.cmd-stage2{ color:var(--btn-stage2-color); text-shadow:none; }
+.cmd-stage3{ color:var(--btn-stage3-color); font-weight:bold; text-shadow:none; }
+.cmd-stage4{ color:var(--btn-stage4-color); font-family:'Potta One', 'RocknRoll One', sans-serif; font-size:var(--btn-text-size); letter-spacing:1px; text-shadow:none; }
+
+#bottomHUD{
+  position:absolute;
+  inset:0;
+  z-index:25;
+  pointer-events:none;
+}
+
+#nextAttackNotice{
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  z-index:2;
+  display:flex; align-items:center; justify-content:center; gap:2px;
+  font-family:'Share Tech Mono', 'RocknRoll One', sans-serif;
+  font-size:var(--timer-notice-font-size); color:var(--timer-notice-color);
+  background:rgba(0, 0, 0, 0.55);
+  backdrop-filter:blur(1px);
+  padding:2px 0;
+  text-shadow:0 0 4px rgba(255,0,127,0.9), 1px 1px 1px #000;
+  margin:0; opacity:0; transition:opacity 0.3s ease;
+  pointer-events:none;
+}
+#nextAttackNotice.active{ opacity:1; }
+#nextAttackSec{
+  font-family:'Share Tech Mono', monospace;
+  font-size:var(--timer-notice-sec-size); font-weight:700; color:#ffffff;
+  text-shadow:0 0 6px var(--main-color-pink);
+}
+
+#mainGaugeContainer{
+  position:absolute;
+  left:var(--hud-left);
+  right:var(--hud-right);
+  bottom:var(--gauge-bottom);
+  z-index:27;
+  pointer-events: auto;
+  cursor: pointer;
+  --hp: 100;
+  --hp-color: #00ff66;
+}
+.main-bar-bg{
+  width:100%; height:20px;
+  background:rgba(10,2,8,0.85);
+  border:0px solid rgba(255,100,180,0.85);
+  border-radius:6px; padding:2px;
+  box-shadow:0 0 12px rgba(255,0,100,0.5); position:relative;
+  overflow:hidden;
+}
+
+#mainGaugeFill{
+  height:100%;
+  width:calc(var(--hp, 100) * 1%);
+  border-radius:3px;
+  background:var(--hp-color, #00ff66);
+  box-shadow:0 0 10px var(--hp-color, #00ff66);
+  transition:width .3s ease, background-color .3s ease, box-shadow .3s ease;
+}
+.gauge-label-wrap{
+  position:absolute;
+  inset:0;
+  z-index:3;
+  padding:0 8px;
+  display:flex; justify-content:space-between; align-items:center;
+  pointer-events:none;
+}
+.gauge-title-group{ display:flex; align-items:center; gap:6px; }
+
+.gauge-title{
+  font-family:'Shippori Mincho', serif;
+  font-size:var(--gauge-title-size); font-weight:700; color:#ffffff;
+  letter-spacing:0.5px;
+  text-shadow:
+    1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
+    1px 0 0 #000, -1px 0 0 #000, 0 1px 0 #000, 0 -1px 0 #000,
+    0 0 4px #000;
+  opacity:1;
+}
+#stageHearts{
+  font-size:11px; color:#ff3399; opacity:0.8;
+  filter:drop-shadow(0 0 4px var(--main-color-pink)); letter-spacing:1px;
+}
+#gaugePercent{
+  font-family:'Shippori Mincho', serif;
+  font-size:var(--gauge-percent-size); font-weight:700; color:#ffffff;
+  letter-spacing:0.5px;
+  text-shadow:
+    1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
+    1px 0 0 #000, -1px 0 0 #000, 0 1px 0 #000, 0 -1px 0 #000,
+    0 0 4px #000;
+  opacity:1;
+}
+
+#heroAvatarWrap{
+  position:absolute;
+  left:var(--avatar-left);
+  bottom:var(--avatar-bottom);
+  z-index:26;
+  width:var(--avatar-size);height:var(--avatar-size);
+  border-radius:12px; border:2px solid #00ff66;
+  background:rgba(15, 5, 20, 0.85);
+  box-shadow:0 0 16px rgba(0,255,102,0.6), inset 0 0 10px rgba(0,0,0,0.8);
+  overflow:hidden; transition:border-color 0.3s ease, box-shadow 0.3s ease;
+}
+#heroAvatarWrap.stage-1{ border-color:#00ff66; }
+#heroAvatarWrap.stage-2{ border-color:#ffff00; box-shadow:0 0 18px rgba(255,255,0,0.8); }
+#heroAvatarWrap.stage-3{ border-color:#ff6600; box-shadow:0 0 22px rgba(255,102,0,0.9); animation:avatarGlow 1s ease-in-out infinite alternate; }
+#heroAvatarWrap.stage-4{ border-color:#ff0033; box-shadow:0 0 25px rgba(255,0,51,1); animation:avatarGlow 0.3s ease-in-out infinite alternate; }
+
+@keyframes avatarGlow{ 0%{ transform: scale(1); } 100%{ transform: scale(1.04); } }
+#heroAvatarSprite {
+  width: 192px; height: 192px;
+  background-size: 192px 192px; background-repeat: no-repeat;
+  transition: background-position 0.25s ease-out;
+}
+
+#resultOverlay{
+  position:absolute;inset:0;z-index:30;display:none;
+  flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(5,0,3,0);pointer-events:none;
+}
+#resultTitle{
+  font-size:var(--defeat-title-size);font-weight:900;color:var(--defeat-title-color);
+  text-shadow:0 0 10px #ff0055,0 0 20px #000; letter-spacing:4px;
+}
+#resultSub{font-size:14px;color:var(--defeat-sub-color);margin-top:8px;font-weight:bold;letter-spacing:1px;text-shadow:1px 1px 2px #000;}
+
+.continuous-shake-1 { animation: contShake1 0.15s ease-in-out infinite alternate; }
+.continuous-shake-2 { animation: contShake2 0.12s ease-in-out infinite alternate; }
+.continuous-shake-3 { animation: contShake3 0.08s ease-in-out infinite alternate; }
+
+@keyframes contShake1 {
+  0% { transform: translate(2px, 1px) rotate(0deg); }
+  100% { transform: translate(-2px, -2px) rotate(-0.5deg); }
+}
+@keyframes contShake2 {
+  0% { transform: translate(4px, 2px) rotate(0.5deg); }
+  100% { transform: translate(-4px, -3px) rotate(-1deg); }
+}
+@keyframes contShake3 {
+  0% { transform: translate(7px, -5px) rotate(1.5deg); }
+  100% { transform: translate(-7px, 5px) rotate(2deg); }
+}
+
+.glitch-heavy{animation:heatWobble .65s ease-in-out infinite alternate}
+@keyframes heatWobble{
+  0%{filter:blur(0);transform:scale(1)}
+  50%{filter:blur(0.4px);transform:scale(1.005)}
+  100%{filter:blur(0);transform:scale(1)}
+}
+
+#errorDisplay {
+  position: absolute; top: 10px; left: 10px; right: 10px;
+  background: rgba(220, 0, 0, 0.9); color: #fff;
+  padding: 12px; border-radius: 6px; z-index: 9999;
+  font-weight: bold; font-family: sans-serif;
+  white-space: pre-wrap; display: none;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.lib_skipToggle {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 99999;
+  padding: 8px 14px;
+  background: rgba(0, 0, 0, 0.1);
+  border: 0px solid rgba(255, 105, 180, 0.6);
+  border-radius: 4px;
+  color: #ffe6f2;
+  font-size: 11px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.lib_skipToggle.on {
+  background: rgba(255, 20, 147, 0.8);
+  border-color: #ff69b4;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(255, 20, 147, 0.8);
+}
+
+/* ============================================
+   回想後コマンドバリアント：横並び
+   ============================================ */
+#commands[data-variant="kaiso_choice"] {
+  left: 5%;
+  right: 5%;
+  bottom: 12%;
+  height: 64px;
+  flex-direction: row;
+  gap: 8px;
+  justify-content: center;
+  align-items: stretch;
+}
+
+#commands[data-variant="kaiso_choice"] .command-btn {
+  flex: 1;
+  width: auto;
+  height: 100%;
+  justify-content: center;
+  padding: 0 8px;
+  background: linear-gradient(135deg, #1a0010, #0a0005) !important;
+  border: 1px solid #ff3366 !important;
+  border-radius: 2px;
+  box-shadow:
+    0 0 10px rgba(255, 0, 100, 0.5),
+    inset 0 0 8px rgba(255, 0, 100, 0.15);
+}
+
+#commands[data-variant="kaiso_choice"] .command-btn::before {
+  display: none;
+}
+
+#commands[data-variant="kaiso_choice"] .cmd-title {
+  color: #ffccdd !important;
+  font-family: 'Yuji Syuku', 'Shippori Mincho', serif !important;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-align: center;
+  text-shadow:
+    0 0 6px rgba(255, 0, 100, 0.8),
+    1px 1px 2px #000;
+  white-space: nowrap;
+}
+
+#commands[data-variant="kaiso_choice"] .command-btn:hover,
+#commands[data-variant="kaiso_choice"] .command-btn:active {
+  border-color: #ff6699 !important;
+  box-shadow:
+    0 0 16px rgba(255, 0, 150, 0.9),
+    inset 0 0 12px rgba(255, 0, 100, 0.4);
+}
+
+#commands[data-variant="kaiso_choice"] .command-btn:hover .cmd-title,
+#commands[data-variant="kaiso_choice"] .command-btn:active .cmd-title {
+  color: #ffffff !important;
+  text-shadow:
+    0 0 10px rgba(255, 0, 150, 1),
+    1px 1px 2px #000;
+}
+
+/* ============================================
+   回想後コマンドバリアント：縦並び
+   ============================================ */
+#commands[data-variant="kaiso_choice_v"] {
+  left: 12%;
+  right: 12%;
+  bottom: 15%;
+  height: auto;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+  align-items: stretch;
+}
+
+#commands[data-variant="kaiso_choice_v"] .command-btn {
+  width: 100%;
+  height: 56px;
+  justify-content: center;
+  padding: 0 12px;
+  background: linear-gradient(135deg, #1a0010, #0a0005) !important;
+  border: 1px solid #ff3366 !important;
+  border-radius: 2px;
+  box-shadow:
+    0 0 10px rgba(255, 0, 100, 0.5),
+    inset 0 0 8px rgba(255, 0, 100, 0.15);
+}
+
+#commands[data-variant="kaiso_choice_v"] .command-btn::before {
+  display: none;
+}
+
+#commands[data-variant="kaiso_choice_v"] .cmd-title {
+  color: #ffccdd !important;
+  font-family: 'Yuji Syuku', 'Shippori Mincho', serif !important;
+  font-size: 13px;
+  letter-spacing: 3px;
+  text-align: center;
+  text-shadow:
+    0 0 6px rgba(255, 0, 100, 0.8),
+    1px 1px 2px #000;
+  white-space: nowrap;
+}
+
+#commands[data-variant="kaiso_choice_v"] .command-btn:hover,
+#commands[data-variant="kaiso_choice_v"] .command-btn:active {
+  border-color: #ff6699 !important;
+  box-shadow:
+    0 0 16px rgba(255, 0, 150, 0.9),
+    inset 0 0 12px rgba(255, 0, 100, 0.4);
+}
+
+#commands[data-variant="kaiso_choice_v"] .command-btn:hover .cmd-title,
+#commands[data-variant="kaiso_choice_v"] .command-btn:active .cmd-title {
+  color: #ffffff !important;
+  text-shadow:
+    0 0 10px rgba(255, 0, 150, 1),
+    1px 1px 2px #000;
+}
+
+
+/* ホバー/タップ */
+#commands[data-variant="kaiso_choice"] .command-btn:active {
+  border-color: #ff6699 !important;
+  box-shadow:
+    0 0 16px rgba(255, 0, 150, 0.9),
+    inset 0 0 12px rgba(255, 0, 100, 0.4);
+}
+
+#commands[data-variant="kaiso_choice"] .command-btn:active .cmd-title {
+  color: #ffffff !important;
+  text-shadow:
+    0 0 10px rgba(255, 0, 150, 1),
+    1px 1px 2px #000;
+}
+
+/* デフォルト復帰用バリアント */
+#commands[data-variant="default"] .command-btn {
+  background: var(--btn-bg) !important;
+  border: 1px solid var(--btn-border) !important;
+  border-radius: var(--btn-radius);
+}
+#commands[data-variant="default"] .cmd-title {
+  color: var(--btn-stage1-color) !important;
+  font-family: var(--font-btn) !important;
+  font-size: var(--btn-text-size);
+  letter-spacing: 0.5px;
+}
+
+</style>
+<style id="dynamicStyle"></style>
+</head>
+<body>
+  <div id="lib_game">
+    
+    <button id="lib_skipToggle" class="lib_skipToggle">SKIP OFF</button>
+    
+    <!-- ⓪ イントロ画面 -->
+  <div id="lib_introScreen" class="lib_screen active">
+    <video id="lib_introVideo" playsinline muted preload="auto"></video>
+  </div>
+
+  <!-- ① 起動画面 -->
+  <div id="lib_startScreen" class="lib_screen">
+    <video id="lib_startBgVideo" muted loop playsinline preload="auto"></video>
+    <div id="lib_startUI">
+      <h1>CRAER</h1>
+      <p>WHAT YOU CREATE, ERODES YOU</p>
+      <button id="lib_folderButton">物語を選ぶ</button>
+    </div>
+  </div>
+
+  <!-- ② 図書館画面 -->
+<div id="lib_libraryScreen" class="lib_screen">
+  <video id="lib_bgVideo" muted loop playsinline preload="auto"></video>
+  <div id="lib_commandLayer"></div>
+<button id="lib_defeatRecapButton" style="
+  position:absolute;
+  bottom:20px;
+  right:20px;
+  z-index:10;
+  padding:8px 14px;
+  background:rgba(0,0,0,0.4);
+  border:1px solid rgba(255,105,180,0.6);
+  border-radius:4px;
+  color:#ffe6f2;
+  font-size:11px;
+  letter-spacing:2px;
+  cursor:pointer;
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+  display:none;
+">▶ 敗北回想</button>
+</div>
+
+
+  <!-- ★追加：敗北回想メニュー画面 -->
+  <div id="lib_recapScreen" class="lib_screen">
+    <video id="lib_recapBgVideo" muted loop playsinline preload="auto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;"></video>
+    <div style="position:absolute;inset:0;z-index:1;background:rgba(0,0,0,0.7);padding:40px 20px;overflow-y:auto;">
+      <h2 style="color:#ff69b4;text-align:center;margin-bottom:24px;font-family:'Shippori Mincho',serif;letter-spacing:4px;">敗北回想</h2>
+      <div id="lib_recapList" style="display:flex;flex-direction:column;gap:12px;max-width:400px;margin:0 auto;"></div>
+      <button id="lib_recapCloseButton" style="
+        display:block;
+        margin:30px auto 0;
+        padding:12px 32px;
+        background:linear-gradient(180deg,#402030,#1a0a12);
+        border:1.5px solid #804060;
+        border-radius:4px;
+        color:#ffcce6;
+        font-size:12px;
+        font-weight:700;
+        letter-spacing:2px;
+        cursor:pointer;
+      ">閉じる</button>
+      
+      <!-- ★追加：データリセットボタン -->
+      <button id="lib_recapClearButton" style="
+        display:block;
+        margin:15px auto 0;
+        padding:8px 24px;
+        background:transparent;
+        border:1px solid #ff3366;
+        border-radius:4px;
+        color:#ff3366;
+        font-size:11px;
+        letter-spacing:2px;
+        cursor:pointer;
+      ">敗北データをリセット</button>
+    </div>
+  </div>
+
+  <!-- ③ 敵画面 -->
+  <div id="lib_enemyScreen" class="lib_screen">
+    <video id="lib_battleLoop" muted loop playsinline preload="auto"></video>
+    <div id="lib_enemyInfo">
+      <h2 id="lib_enemyName"></h2>
+      <div id="lib_enemyMeta"></div>
+      <p id="lib_enemyDescription"></p>
+    </div>
+    <div id="lib_enemyButtons">
+      <button id="lib_backButton">選び直す</button>
+      <button id="lib_enterButton">入る</button>
+    </div>
+  </div>
+
+  <!-- ④ 選択演出 -->
+  <div id="lib_transitionScreen" class="lib_screen">
+    <video id="lib_transitionVideo" playsinline muted preload="auto"></video>
+  </div>
+
+  <div id="lib_errorDisplay"></div>
+  
+  <div id="game">
+    <div id="screen">
+<canvas id="canvas"></canvas>
+<video id="video" muted playsinline webkit-playsinline preload="auto"></video>
+<img id="imageDisplay" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:1;background:#000;" alt="">
+<div id="errorDisplay"></div>
+
+      <div id="pinkFilter"></div>
+      <div id="edgePulse"></div>
+      <div id="flash"></div>
+      <div id="shockwave"></div>
+      <div id="damageContainer"></div>
+
+      <div id="serifArea">
+        <div id="messageWrap"><div id="message"></div></div>
+      </div>
+
+      <div id="heroSerifArea">
+        <div id="heroMessageWrap"><div id="heroMessage"></div></div>
+      </div>
+
+      <div id="temptationPopup">
+        <div id="temptationLabel">SYSTEM MESSAGE</div>
+        <div id="temptationText"></div>
+      </div>
+
+      <div id="attackTimer"><span id="timerValue">3</span></div>
+
+      <div id="commands">
+        <button id="btn1" class="command-btn" disabled><span id="title1" class="cmd-title"></span></button>
+        <button id="btn2" class="command-btn" disabled><span id="title2" class="cmd-title"></span></button>
+        <button id="btn3" class="command-btn" disabled><span id="title3" class="cmd-title"></span></button>
+      </div>
+
+      <div id="bottomHUD">
+        <div id="mainGaugeContainer">
+          <div class="main-bar-bg">
+            <div id="mainGaugeFill"></div>
+            <div class="gauge-label-wrap">
+              <div class="gauge-title-group">
+                <span class="gauge-title">理性</span><span id="stageHearts">☠️</span>
+              </div>
+              <span id="gaugePercent">100%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="heroAvatarWrap" class="stage-1">
+        <div id="nextAttackNotice">
+          <span>次の攻撃:</span><span id="nextAttackSec">0.0秒</span>
+        </div>
+        <div id="heroAvatarSprite"></div>
+      </div>
+
+      <div id="resultOverlay">
+        <div id="resultTitle" style="background: rgba(0,0,0,0.4); padding: 10px 20px; border-radius: 8px;"></div>
+        <div id="resultSub"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+(function(){
+
+// ===== 状態 =====
+const state = {
+  enemies: [],
+  currentEnemy: null,
+  screen: "intro",
+};
+
+// ===== 要素 =====
+const introScreen = document.getElementById("lib_introScreen");
+const startScreen = document.getElementById("lib_startScreen");
+const libraryScreen = document.getElementById("lib_libraryScreen");
+const enemyScreen = document.getElementById("lib_enemyScreen");
+const transitionScreen = document.getElementById("lib_transitionScreen");
+
+const introVideo = document.getElementById("lib_introVideo");
+const startBgVideo = document.getElementById("lib_startBgVideo");
+const startUI = document.getElementById("lib_startUI");
+const folderButton = document.getElementById("lib_folderButton");
+
+const commandLayer = document.getElementById("lib_commandLayer");
+const bgVideo = document.getElementById("lib_bgVideo");
+
+const battleLoop = document.getElementById("lib_battleLoop");
+const enemyName = document.getElementById("lib_enemyName");
+const enemyMeta = document.getElementById("lib_enemyMeta");
+const enemyDescription = document.getElementById("lib_enemyDescription");
+const backButton = document.getElementById("lib_backButton");
+const enterButton = document.getElementById("lib_enterButton");
+
+const transitionVideo = document.getElementById("lib_transitionVideo");
+const errorDisplay = document.getElementById("lib_errorDisplay");
+
+// ===== 画面切替 =====
+function showScreen(name){
+  document.querySelectorAll(".lib_screen").forEach(el => el.classList.remove("active"));
+  const el = document.getElementById("lib_" + name + "Screen");
+  if (el) el.classList.add("active");
+  state.screen = name;
+}
+
+// ===== エラー表示 =====
+function showError(msg){
+  errorDisplay.textContent = msg;
+  errorDisplay.style.display = "block";
+  setTimeout(() => { errorDisplay.style.display = "none"; }, 6000);
+}
+
+// ===== スリープ =====
+function sleep(ms){
+  return new Promise(r => setTimeout(r, ms));
+}
+
+// ===== ファイル読み込み =====
+function readFileText(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsText(file);
+  });
+}
+// ===== スキップトグル =====
+const skipState = { on: false };
+const skipToggleBtn = document.getElementById("lib_skipToggle");
+skipToggleBtn.onclick = () => {
+  skipState.on = !skipState.on;
+  skipToggleBtn.textContent = skipState.on ? "SKIP ON" : "SKIP OFF";
+  skipToggleBtn.classList.toggle("on", skipState.on);
+};
+
+// ===== イントロ再生 =====
+async function playIntro() {
+  if (skipState.on) { await showStartScreen(); return; }
+  
+  showScreen("intro");
+  
+  startBgVideo.src = "library_loop.mp4";
+  startBgVideo.muted = true;
+  startBgVideo.playsInline = true;
+  startBgVideo.loop = true;
+  startBgVideo.load();
+  
+  introVideo.src = "intro.mp4";
+  introVideo.muted = true;
+  introVideo.playsInline = true;
+  introVideo.currentTime = 0;
+  introVideo.load();
+  
+  try {
+    await introVideo.play();
+  } catch (err) {
+    console.warn("イントロ失敗:", err);
+    await showStartScreen();
+    return;
+  }
+  
+  await new Promise((resolve) => {
+    let resolved = false;
+    const finish = () => {
+      if (resolved) return;
+      resolved = true;
+      introVideo.onended = null;
+      introVideo.ontimeupdate = null;
+      resolve();
+    };
+    introVideo.onended = finish;
+    introVideo.ontimeupdate = () => {
+      if (introVideo.duration && introVideo.currentTime >= introVideo.duration - 0.1) {
+        finish();
+      }
+    };
+    setTimeout(finish, 30000);
+  });
+  
+  await showStartScreen();
+}
+
+// ===== 起動画面 =====
+async function showStartScreen() {
+  try {
+    introVideo.pause();
+    introVideo.removeAttribute("src");
+    introVideo.load();
+  } catch (e) {}
+  
+  showScreen("start");
+  
+  startBgVideo.currentTime = 0;
+  try {
+    await startBgVideo.play();
+  } catch (err){
+    console.warn("背景ループ失敗:", err);
+    await sleep(300);
+    await startBgVideo.play().catch(()=>{});
+  }
+  
+  setTimeout(() => {
+    startUI.classList.add("visible");
+  }, 100);
+}
+
+// ===== 図書館画面 =====
+async function showLibrary(){
+  startBgVideo.pause();
+  
+  const gameEl = document.getElementById("game");
+  if (gameEl) gameEl.style.display = "none";
+  
+  showScreen("library");
+  
+  if (bgVideo.src.indexOf("library_loop.mp4") === -1){
+    bgVideo.src = "library_loop.mp4";
+    bgVideo.load();
+  }
+  bgVideo.currentTime = 0;
+  
+  try {
+    await bgVideo.play();
+  } catch (err){
+    console.warn("bgVideo 失敗:", err);
+    await sleep(300);
+    await bgVideo.play().catch(()=>{});
+  }
+  
+  libraryScreen.style.opacity = "1";
+  libraryScreen.style.transition = "none";
+  
+  commandLayer.innerHTML = "";
+  state.enemies.forEach(enemy => {
+    const btn = document.createElement("button");
+    btn.className = "lib_command";
+    const nameEl = document.createElement("span");
+    nameEl.className = "lib_command-name";
+    nameEl.textContent = enemy.name;
+    nameEl.style.animationDelay = (Math.random() * 4).toFixed(2) + "s";
+    nameEl.style.animationDuration = (1.5 + Math.random() * 2).toFixed(2) + "s";
+    btn.appendChild(nameEl);
+    btn.onclick = () => selectEnemy(enemy, btn);
+    commandLayer.appendChild(btn);
+  });
+  
+  
+  // ★追加：敗北記録があればボタン表示
+  const recapBtn = document.getElementById("lib_defeatRecapButton");
+  if (recapBtn) {
+    const defeatedCount = window.idx?.gameState?.defeatedScenes?.length || 0;
+    if (defeatedCount > 0) {
+      recapBtn.textContent = `▶ 敗北回想 (${defeatedCount})`;
+      recapBtn.style.display = "block";
+    } else {
+      recapBtn.style.display = "none";
+    }
+  }
+}
+
+// ===== 敵を選択 =====
+async function selectEnemy(enemy, btn) {
+  if (skipState.on) {
+    state.currentEnemy = enemy;
+    showEnemyPage(enemy);
+    return;
+  }
+  if (state.screen !== "library") return;
+  state.currentEnemy = enemy;
+  
+  btn.classList.add("selected");
+  await sleep(300);
+  
+  libraryScreen.style.transition = "opacity 0.5s";
+  libraryScreen.style.opacity = "0";
+  await sleep(500);
+  
+  bgVideo.pause();
+  
+  showScreen("transition");
+  
+  const tv = transitionVideo;
+  tv.muted = true;
+  tv.playsInline = true;
+  tv.src = "select_sequence.mp4";
+  tv.currentTime = 0;
+  tv.load();
+  
+  let finished = false;
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    tv.onended = null;
+    tv.ontimeupdate = null;
+    tv.onerror = null;
+    tv.src = "";
+    showEnemyPage(enemy);
+  };
+  
+  tv.onended = finish;
+  tv.ontimeupdate = () => {
+    if (tv.duration && tv.currentTime >= tv.duration - 0.1) {
+      finish();
+    }
+  };
+  tv.onerror = () => {
+    console.warn("演出動画エラー");
+    finish();
+  };
+  
+  tv.play().catch((err) => {
+    console.warn("演出動画失敗:", err);
+    finish();
+  });
+}
+
+// ===== 敵画面 =====
+function showEnemyPage(enemy){
+  libraryScreen.style.opacity = "1";
+  libraryScreen.style.transition = "none";
+  
+  showScreen("enemy");
+  
+  if (enemy.videoURLs) {
+  const firstURL = Object.values(enemy.videoURLs)[0];
+  if (firstURL) {
+    battleLoop.src = firstURL;
+    battleLoop.play().catch(() => {});
+  }
+}
+  
+  enemyName.textContent = enemy.info.name || enemy.name;
+  enemyMeta.textContent = enemy.info.author ? `by ${enemy.info.author}` : "";
+  enemyDescription.textContent = enemy.info.description || "";
+}
+
+// ===== 選び直す =====
+backButton.onclick = () => {
+  battleLoop.pause();
+  battleLoop.src = "";
+  showLibrary();
+};
+
+// ===== 入る =====
+enterButton.onclick = () => {
+  const enemy = state.currentEnemy;
+  if (!enemy) {
+    showError("敵が選択されていません");
+    return;
+  }
+  
+  if (window.idx && window.idx.startBattle) {
+    window.idx.gameState.videoURLs = enemy.videoURLs;
+    window.idx.gameState.parsedTimeline = window.idx.parseNewTimeline(enemy.timelineText);
+    window.idx.gameState.serifPools = window.idx.parseSerifFile(enemy.serifText);
+    if (enemy.sfxText && window.idx.parseSfxFile) {
+      window.idx.gameState.sfxTexts = window.idx.parseSfxFile(enemy.sfxText);
+    } else {
+      window.idx.gameState.sfxTexts = { attack: null, defeat: null };
+    }
+    
+    if (enemy.charaURL) {
+      window.idx.heroAvatarSprite.style.backgroundImage = `url("${enemy.charaURL}")`;
+    }
+    
+    const dynamicStyleEl = document.getElementById("dynamicStyle");
+    if (dynamicStyleEl) dynamicStyleEl.textContent = enemy.cssText || "";
+    
+  document.getElementById("game").style.display = "flex";
+enemyScreen.classList.remove("active");
+
+window.dispatchEvent(new Event("resize")); // ★ これ追加
+
+window.idx.startBattle();
+  }
+};
+
+// ===== フォルダ選択 =====
+folderButton.onclick = () => {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.webkitdirectory = true;
+  input.directory = true;
+  input.multiple = true;
+  
+  input.onchange = async (e) => {
+    try {
+      const files = Array.from(e.target.files);
+      input.value = "";
+      if (files.length === 0){
+        showError("ファイルが選択されていません");
+        return;
+      }
+      
+      const folderMap = {};
+      files.forEach(f => {
+        const relPath = f.webkitRelativePath || f.name;
+        const parts = relPath.split("/");
+        if (parts.length >= 3){
+          const name = parts[1];
+          if (!folderMap[name]) folderMap[name] = {};
+          folderMap[name][parts.slice(2).join("/")] = f;
+        }
+      });
+      
+      const names = Object.keys(folderMap);
+      if (names.length === 0){
+        showError("サブフォルダが見つかりません");
+        return;
+      }
+      
+      state.enemies = [];
+      for (const name of names){
+        const folder = folderMap[name];
+        
+        const timelineFile = folder["timeline.txt"];
+        const serifFile = folder["セリフ.txt"];
+        const charaFile = folder["chara.png"];
+        const sfxFile = folder["擬音.txt"];
+        const styleFile = folder["style.css"];
+        let videoFile = folder["battle.mp4"];
+        if (!videoFile) {
+          const mp4Key = Object.keys(folder).find(k => k.toLowerCase().endsWith(".mp4"));
+          if (mp4Key) videoFile = folder[mp4Key];
+        }
+        
+        const timelineText = timelineFile ? await readFileText(timelineFile) : "";
+        const serifText = serifFile ? await readFileText(serifFile) : "";
+        const sfxText = sfxFile ? await readFileText(sfxFile) : "";
+        const cssText = styleFile ? await readFileText(styleFile) : "";
+        
+        const allVideoURLs = {};
+        Object.entries(folder).forEach(([k, f]) => {
+          if (/\.(mp4|webm|jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(k)) {   // ★拡張子を拡張
+            allVideoURLs[k] = URL.createObjectURL(f);
+          }
+        });
+        
+        state.enemies.push({
+          name,
+          info: parseInfo(timelineText),
+          timelineText,
+          serifText,
+          videoURLs: allVideoURLs,
+          charaURL: charaFile ? URL.createObjectURL(charaFile) : null,
+          sfxText: sfxText,
+          cssText: cssText,
+        });
+      }
+      
+      await showLibrary();
+      
+    } catch (err){
+      console.error(err);
+      showError("読み込みエラー: " + err.message);
+    }
+  };
+  
+  input.click();
+};
+
+// ===== [INFO] パース =====
+function parseInfo(text){
+  const info = { name: "", author: "", description: "" };
+  if (!text) return info;
+  const lines = text.split("\n");
+  let inInfo = false;
+  for (const rawLine of lines){
+    const line = rawLine.trim();
+    if (line.match(/^\[INFO\]$/i)){ inInfo = true; continue; }
+    if (line.match(/^\[/)){ inInfo = false; continue; }
+    if (inInfo){
+      const m = line.match(/^(\w+)\s*[:：]\s*(.+)$/);
+      if (m){
+        const key = m[1].toLowerCase();
+        if (key in info) info[key] = m[2].trim();
+      }
+    }
+  }
+  return info;
+}
+
+// ===== 起動 =====
+playIntro();
+
+// ★追加：敗北回想ボタンクリック → メニュー画面へ
+document.getElementById("lib_defeatRecapButton")?.addEventListener("click", () => {
+  showDefeatRecapMenu();
+});
+
+// ★追加：敗北回想メニューを表示
+function showDefeatRecapMenu(){
+  const defeatedScenes = window.idx?.gameState?.defeatedScenes || [];
+  if (defeatedScenes.length === 0) return;
+  
+  const list = document.getElementById("lib_recapList");
+  list.innerHTML = "";
+  
+  defeatedScenes.forEach((record, i) => {
+    const btn = document.createElement("button");
+    btn.style.cssText = `
+      padding:14px 20px;
+      background:linear-gradient(135deg,#1a0010,#0a0005);
+      border:1px solid #ff3366;
+      border-radius:2px;
+      color:#ffccdd;
+      font-size:13px;
+      font-family:'Yuji Syuku','Shippori Mincho',serif;
+      letter-spacing:2px;
+      cursor:pointer;
+      text-align:left;
+    `;
+    btn.textContent = `▶ ${i+1}回目 ─ ${record.enemyId} (${record.stage})`;
+    btn.onclick = () => {
+      // メニュー閉じて、バトル画面で単体再生
+      showScreen("library");
+      if (window.idx && window.idx.playSingleDefeat) {
+        window.idx.playSingleDefeat(i);   // ← ★window.idx 経由で呼ぶ
+      }
+    };
+    list.appendChild(btn);
+  });
+  
+  // 背景動画
+  const recapBg = document.getElementById("lib_recapBgVideo");
+  if (recapBg && !recapBg.src) {
+    recapBg.src = "library_loop.mp4";
+    recapBg.play().catch(()=>{});
+  }
+  
+  showScreen("recap");
+}
+
+// ★追加：閉じるボタン
+document.getElementById("lib_recapCloseButton")?.addEventListener("click", () => {
+  const recapBg = document.getElementById("lib_recapBgVideo");
+  if (recapBg) recapBg.pause();
+  showLibrary();
+});
+
+// ★追加：データリセットボタンの処理
+document.getElementById("lib_recapClearButton")?.addEventListener("click", () => {
+  // 本当に消していいか確認
+  const answer = confirm("敗北回想のデータをすべて削除します。よろしいですか？");
+  if (!answer) return;
+
+  // localStorageから削除
+  localStorage.removeItem('craer_defeated');
+  
+  // メモリ上のデータも空にする
+  if (window.idx && window.idx.gameState) {
+    window.idx.gameState.defeatedScenes = [];
+  }
+  
+  alert("データを削除しました。");
+  
+  // 図書館に戻る（メニューを閉じる）
+  const recapBg = document.getElementById("lib_recapBgVideo");
+  if (recapBg) recapBg.pause();
+  showLibrary();
+});
+
+// ===== 外部公開 =====
+window.lib = {
+  state: state,
+  showScreen: showScreen,
+  showLibrary: showLibrary,
+};
+
+})();
+</script>
+
+<script>
+"use strict";
+
+(function(){
+
+const CONFIG = {
+  MAX_PLEASURE: 100,
+  PASSIVE_AMOUNT: 1,
+  PASSIVE_INTERVAL: 2500,
+  ENEMY_ATTACK_ADD: 5,
+  STAGE_THRESHOLDS: {
+    stage2: 0.20,
+    stage3: 0.40,
+    stage4: 0.60
+  },
+  ATTACK_BASE_DELAY: 8,
+  ATTACK_MIN_DELAY: 6,
+  ATTACK_PLEASURE_RATIO: 80,
+  ATTACK_VARIANCE: 0.2,
+  COUNTDOWN_THRESHOLD: 5.2,
+  COUNTDOWN_START: 5,
+  TIMER_TICK_MS: 60,
+  ENEMY_TYPE_SPEED: 30,
+  HERO_TYPE_SPEED: 30,
+  ENEMY_HOLD_MS: 4000,
+  ENEMY_FADE_MS: 2000,
+  HERO_HOLD_MS: 4000,
+  FLASH_STRONG_COLOR: 'rgba(255,0,100,0.6)',
+  FLASH_WEAK_COLOR:   'rgba(255,40,140,0.4)',
+  FLASH_STRONG_MS: 360,
+  FLASH_WEAK_MS: 200,
+  CRISIS_THRESHOLD: 50,
+  PINK_FILTER_OPACITY: 0.7,
+  DEFEAT_LOOP_INTERVAL: 1350,
+  SFX_STAGGER_MS: 380,
+  DEFEAT_SFX_DEFAULT: 5,
+  GAZE_PAN_X: 36,
+  GAZE_PAN_Y: 24,
+  GAZE_ZOOM: 0.06,
+  GAZE_DURATION_MS: 2200,
+  ONO_LIFETIME_MS: 1300,
+  ONO_STAGGER_MS: 110,
+  SFX_TEXTS_ATTACK: ["", "", ""],
+  SFX_TEXTS_DEFEAT: ["", "", "", "", "", "", ""],
+  SFX_TEXT_PLEASURE_UP:   "+10 侵食",
+  SFX_TEXT_PLEASURE_DOWN: "-10 侵食",
+  DEFEAT_TITLE: '侵食完了',
+  DEFEAT_SUB: '',
+  START_BTN_TEXT: '▶ 侵蝕開始'
+};
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const video = document.getElementById("video");
+const imageDisplay = document.getElementById("imageDisplay");   // ★追加
+const screenElem = document.getElementById("screen");
+const messageEl = document.getElementById("message");
+const messageWrapEl = document.getElementById("messageWrap");
+const heroMessageEl = document.getElementById("heroMessage");
+const heroMessageWrap = document.getElementById("heroMessageWrap");
+
+const mainGaugeFill = document.getElementById("mainGaugeFill");
+const gaugePercent = document.getElementById("gaugePercent");
+const resultOverlay = document.getElementById("resultOverlay");
+const flash = document.getElementById("flash");
+const pinkFilter = document.getElementById("pinkFilter");
+const edgePulse = document.getElementById("edgePulse");
+const shockwave = document.getElementById("shockwave");
+const damageContainer = document.getElementById("damageContainer");
+const gameElem = document.getElementById("game");
+const attackTimerBox = document.getElementById("attackTimer");
+const timerValue = document.getElementById("timerValue");
+const commandsEl = document.getElementById("commands");
+const temptationPopup = document.getElementById("temptationPopup");
+const temptationTextEl = document.getElementById("temptationText");
+const nextAttackNotice = document.getElementById("nextAttackNotice");
+const nextAttackSec = document.getElementById("nextAttackSec");
+const stageHeartsEl = document.getElementById("stageHearts");
+const heroAvatarWrap = document.getElementById("heroAvatarWrap");
+const heroAvatarSprite = document.getElementById("heroAvatarSprite");
+const heroSerifArea = document.getElementById("heroSerifArea");
+const errorDisplay = document.getElementById("errorDisplay");
+const mainGaugeContainer = document.getElementById("mainGaugeContainer");
+
+const btn1 = document.getElementById("btn1");
+const btn2 = document.getElementById("btn2");
+const btn3 = document.getElementById("btn3");
+const title1 = document.getElementById("title1");
+const title2 = document.getElementById("title2");
+const title3 = document.getElementById("title3");
+
+const resultTitle = document.getElementById("resultTitle");
+const resultSub = document.getElementById("resultSub");
+
+if (resultTitle) resultTitle.textContent = CONFIG.DEFEAT_TITLE;
+if (resultSub) {
+  resultSub.textContent = CONFIG.DEFEAT_SUB;
+  resultSub.style.display = CONFIG.DEFEAT_SUB ? 'block' : 'none';
+}
+
+const gameState = {
+  videoURLs: {},
+  charaURL: null,
+  sfxTexts: { attack: null, defeat: null },
+  parsedTimeline: { stages: {}, defaultSerifs: {}, APPEAR: {}, DEFEAT: {} },
+  serifPools: {},
+  pleasure: 0, stage: null,
+  battleStarted: false, battleEnded: false,
+  currentClip: null, isGazing: false, gazeStart: 0, guardUntil: 0,
+  enemyTimer: null, passiveTimer: null, defeatLoopTimer: null,
+  nextAttackTime: 0, attackTimerInterval: null,
+  countdownValue: 0, crisisMode: false,
+  msgTimer: null, typewriterTimer: null,
+  heroMsgTimer: null, heroTypewriterTimer: null,
+  playSessionId: 0,
+  defeatedScenes: []   // ★追加：敗北記録
+};
+
+function showErrorGame(msg) {
+  errorDisplay.textContent = msg;
+  errorDisplay.style.display = 'block';
+  setTimeout(() => { errorDisplay.style.display = 'none'; }, 6000);
+}
+
+function startContinuousShake(level) {
+  stopContinuousShake();
+  if (level > 0) {
+    const shakeClass = `continuous-shake-${Math.min(level, 3)}`;
+    gameElem.classList.add(shakeClass);
+  }
+}
+
+function stopContinuousShake() {
+  gameElem.classList.remove("continuous-shake-1", "continuous-shake-2", "continuous-shake-3");
+}
+
+function parseSerifFile(text) {
+  const pools = {};
+  if (!text) return pools;
+  const lines = text.split('\n');
+  let currentTag = null;
+  let currentEntry = null;
+
+  function pushEntry() {
+    if (currentTag && currentEntry && (currentEntry.serif !== null || currentEntry.serif1 !== null)) {
+      if (!pools[currentTag]) pools[currentTag] = [];
+      pools[currentTag].push(currentEntry);
+      currentEntry = null;
+    }
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) { pushEntry(); continue; }
+    if (line.startsWith('#')) {
+      pushEntry();
+      currentTag = line.slice(1).trim();
+      if (currentTag && !pools[currentTag]) pools[currentTag] = [];
+      continue;
+    }
+    if (!currentTag) continue;
+    if (line.toLowerCase().startsWith('serif:')) {
+      const val = line.slice(6).trim();
+      if (currentEntry && currentEntry.serif !== null) pushEntry();
+      if (!currentEntry) currentEntry = { serif: null, serif1: null };
+      currentEntry.serif = val;
+    } else if (line.toLowerCase().startsWith('serif1:')) {
+      const val = line.slice(7).trim();
+      if (!currentEntry) currentEntry = { serif: null, serif1: null };
+      currentEntry.serif1 = val;
+    }
+  }
+  pushEntry();
+  return pools;
+}
+
+function parseSfxFile(text) {
+  const data = { attack: null, defeat: null };
+  if (!text) return data;
+  const lines = text.split('\n');
+  let currentSection = null;
+  const attackList = [];
+  const defeatList = [];
+
+  lines.forEach(rawLine => {
+    const line = rawLine.trim();
+    if (!line) return;
+    if (line.startsWith('#')) {
+      const tag = line.slice(1).trim().toUpperCase();
+      if (tag === 'ATTACK') currentSection = 'attack';
+      else if (tag === 'DEFEAT') currentSection = 'defeat';
+      else currentSection = null;
+      return;
+    }
+    if (currentSection === 'attack') attackList.push(line);
+    else if (currentSection === 'defeat') defeatList.push(line);
+  });
+
+  if (attackList.length > 0) data.attack = attackList;
+  if (defeatList.length > 0) data.defeat = defeatList;
+  return data;
+}
+
+function parseNewTimeline(text) {
+  const data = { stages: {}, defaultSerifs: {}, APPEAR: {}, DEFEAT: {} };
+  let currentContext = 'GLOBAL'; 
+  let currentStage = null;
+  let currentEventObj = null;
+  let currentDefaultKey = null;
+
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line || line.startsWith('#')) continue;
+    const upperLine = line.toUpperCase();
+
+    if (upperLine.startsWith('STAGE ')) {
+      const match = line.match(/^STAGE\s+(.+)$/i);
+      if (match) {
+        currentStage = match[1].trim();
+        if (!data.stages[currentStage]) data.stages[currentStage] = {};
+        currentContext = 'STAGE';
+currentEventObj = null;
+}
+continue;
+}
+
+// ★ここから追加
+if (currentContext === 'STAGE' && currentStage) {
+  if (upperLine === 'COMMAND') {
+    data.stages[currentStage]['FORCE_COMMAND'] = true;
+    continue;
+  }
+  if (upperLine === 'HIDE') {
+    data.stages[currentStage]['HIDE_COUNTDOWN'] = true;
+    continue;
+  }
+}
+// ★ここまで追加
+
+    if (upperLine === 'DEFAULT SERIFS' || upperLine === 'DEFAULT_SERIFS') {
+      currentContext = 'DEFAULT_SERIFS';
+      currentEventObj = null;
+      currentDefaultKey = null;
+      continue;
+    }
+
+    if (currentContext === 'DEFAULT_SERIFS') {
+      let keyPart = line;
+      let valPart = "";
+      if (line.includes(':')) {
+        const colonIdx = line.indexOf(':');
+        keyPart = line.slice(0, colonIdx).trim();
+        valPart = line.slice(colonIdx + 1).trim();
+      }
+      const upperKeyPart = keyPart.toUpperCase().replace(/\s+/g, '_');
+      if (['COMMAND_GUIDE', 'BUTTON1', 'BUTTON2', 'BUTTON3', 'DEFAULT', 'WAIT', 'ENEMY_ATTACK', 'APPEAR', 'DEFEAT'].includes(upperKeyPart)) {
+        currentDefaultKey = upperKeyPart;
+        if (valPart) {
+          let cleanVal = valPart;
+          if (cleanVal.toLowerCase().startsWith('serif:')) cleanVal = cleanVal.slice(6).trim();
+          else if (cleanVal.toLowerCase().startsWith('serif1:')) cleanVal = cleanVal.slice(7).trim();
+          else if (cleanVal.toLowerCase().startsWith('text:')) cleanVal = cleanVal.slice(5).trim();
+          data.defaultSerifs[currentDefaultKey] = cleanVal;
+        }
+      } else if ((upperKeyPart === 'TEXT' || upperKeyPart === 'SERIF' || upperKeyPart === 'SERIF1') && currentDefaultKey) {
+        if (typeof data.defaultSerifs[currentDefaultKey] !== 'object') {
+          const oldVal = data.defaultSerifs[currentDefaultKey];
+          data.defaultSerifs[currentDefaultKey] = {};
+          if (oldVal) data.defaultSerifs[currentDefaultKey].serif = oldVal;
+        }
+        data.defaultSerifs[currentDefaultKey][upperKeyPart.toLowerCase()] = valPart;
+      }
+      continue;
+    }
+
+    const upperKey = upperLine.replace(/\s+/g, '_').replace(/:$/, '');
+    if (['WAIT', 'ENEMY_ATTACK', 'BUTTON1', 'BUTTON2', 'BUTTON3', 'COMMAND_GUIDE', 'DEFAULT'].includes(upperKey)) {
+      if (currentContext === 'STAGE') {
+        if (!data.stages[currentStage][upperKey]) data.stages[currentStage][upperKey] = { actions: [] };
+        currentEventObj = data.stages[currentStage][upperKey];
+      }
+      continue;
+    }
+    if (['APPEAR', 'DEFEAT'].includes(upperKey)) {
+      if (!data[upperKey]) data[upperKey] = { actions: [] };
+      currentEventObj = data[upperKey];
+      continue;
+    }
+
+    if (line.includes(':') && currentEventObj) {
+      if (!currentEventObj.actions) currentEventObj.actions = [];
+      const colonIdx = line.indexOf(':');
+      const key = line.slice(0, colonIdx).trim();
+      const val = line.slice(colonIdx + 1).trim();
+
+      if (key === 'video') {
+        let videoStr = val;
+        let speed = 1.0;
+        let shake = 0;
+        let holdSec = 0;
+
+        const speedMatch = videoStr.match(/スピード\s*([\d\.]+)/);
+        if (speedMatch) { speed = parseFloat(speedMatch[1]); videoStr = videoStr.replace(/スピード\s*[\d\.]+/, '').trim(); }
+        const shakeMatch = videoStr.match(/揺れ\s*(\d+)/);
+        if (shakeMatch) { shake = parseInt(shakeMatch[1], 10); videoStr = videoStr.replace(/揺れ\s*\d+/, '').trim(); }
+        const holdMatch = videoStr.match(/(?:ホールド|hold)\s*([\d\.]+)/i);
+        if (holdMatch) { holdSec = parseFloat(holdMatch[1]); videoStr = videoStr.replace(/(?:ホールド|hold)\s*[\d\.]+/i, '').trim(); }
+
+        let videoClip = null;
+        let inlineTag = null;
+        if (videoStr.startsWith('file:')) {
+          const fileContent = videoStr.slice(5).trim();
+          const fileRangeMatch = fileContent.match(/^(.+?\.mp4|\S+)\s+([\d\.]+)-([\d\.]+)(?:\s+(.+))?$/i);
+          const fileOnlyMatch = fileContent.match(/^(.+?\.mp4|\S+)(?:\s+(.+))?$/i);
+          if (fileRangeMatch) {
+            videoClip = { type: 'file', file: fileRangeMatch[1].trim(), start: parseFloat(fileRangeMatch[2]), end: parseFloat(fileRangeMatch[3]) };
+            inlineTag = fileRangeMatch[4] ? fileRangeMatch[4].trim() : fileRangeMatch[1].trim().replace(/\.[^/.]+$/, "");
+          } else if (fileOnlyMatch) {
+            videoClip = { type: 'file', file: fileOnlyMatch[1].trim() };
+            inlineTag = fileOnlyMatch[2] ? fileOnlyMatch[2].trim() : fileOnlyMatch[1].trim().replace(/\.[^/.]+$/, "");
+          }
+        } else {
+          const rangeMatch = videoStr.match(/^([\d\.]+)-([\d\.]+)(?:\s+(.+))?$/);
+          if (rangeMatch) {
+            videoClip = { type: 'range', start: parseFloat(rangeMatch[1]), end: parseFloat(rangeMatch[2]) };
+            if (rangeMatch[3]) inlineTag = rangeMatch[3].trim();
+          }
+        }
+
+        if (videoClip) {
+          let lastAction = currentEventObj.actions[currentEventObj.actions.length - 1];
+          if (lastAction && lastAction.video === null) {
+            lastAction.video = videoClip;
+            lastAction.speed = speed;
+            lastAction.shake = shake;
+            lastAction.holdSec = holdSec;
+            if (inlineTag) lastAction.tag = inlineTag;
+          } else {
+            currentEventObj.actions.push({
+              type: 'action', video: videoClip, speed, shake, holdSec,
+              tag: inlineTag || null, serif: null, serif1: null,
+              pleasureType: 'add', pleasureVal: 0, sfxCount: undefined, nextStage: undefined
+            });
+            if (inlineTag) currentEventObj.tag = inlineTag;
+          }
+        }
+      } else {
+        let currentAction = currentEventObj.actions[currentEventObj.actions.length - 1];
+        if (!currentAction) {
+          currentAction = { type: 'action', video: null, speed: 1.0, shake: 0, holdSec: 0, tag: null, serif: null, serif1: null, pleasureType: 'add', pleasureVal: 0 };
+          currentEventObj.actions.push(currentAction);
+        }
+        if (key === 'tag') { currentAction.tag = val; currentEventObj.tag = val; }
+        else if (key === 'serif' || key === 'serif1') { currentAction[key] = val; currentEventObj[key] = val; }
+        else if (key === 'pleasure') {
+          let pValStr = val.trim();
+          let pType = 'add';
+          let pNum = 0;
+          if (pValStr.startsWith('=')) { pType = 'set'; pNum = parseInt(pValStr.slice(1), 10); }
+          else if (pValStr.startsWith('+') || pValStr.startsWith('-')) { pType = 'add'; pNum = parseInt(pValStr, 10); }
+          else { pType = 'set'; pNum = parseInt(pValStr, 10); }
+          currentAction.pleasureType = pType;
+          currentAction.pleasureVal = pNum;
+          currentEventObj.pleasureType = pType;
+          currentEventObj.pleasureVal = pNum;
+        } else if (key === 'nextStage') {
+          currentAction.nextStage = val; currentEventObj.nextStage = val;
+        } else if (key === 'sfxCount') {
+  const sfxVal = parseInt(val);
+  currentAction.sfxCount = sfxVal; currentEventObj.sfxCount = sfxVal;
+} else if (key === 'ui') {
+  currentAction.ui = val; currentEventObj.ui = val;
+} else if (key === 'css') {                    // ★追加
+  currentAction.css = val; currentEventObj.css = val;
+} else if (key === 'goto') {
+  currentAction.goto = val; currentEventObj.goto = val;
+} else {
+  currentAction[key] = val; currentEventObj[key] = val;
+}
+      }
+    }
+  }
+  return data;
+}
+
+function getCommandGuideText() {
+  const stageData = gameState.parsedTimeline.stages[gameState.stage] || {};
+  const cgStage = stageData['COMMAND_GUIDE'];
+  if (cgStage && (cgStage.text || cgStage.serif || cgStage.serif1)) return cgStage.text || cgStage.serif || cgStage.serif1;
+  const defStage = stageData['DEFAULT'];
+  if (defStage && (defStage.text || defStage.serif || defStage.serif1)) return defStage.text || defStage.serif || defStage.serif1;
+  if (gameState.parsedTimeline.defaultSerifs['COMMAND_GUIDE']) {
+    const def = gameState.parsedTimeline.defaultSerifs['COMMAND_GUIDE'];
+    return typeof def === 'string' ? def : (def.text || def.serif || def.serif1 || "");
+  }
+  return "";
+}
+
+function resolveSerifs(actionData) {
+  let enemySerif = null, heroSerif = null;
+  if (!actionData) return { enemySerif, heroSerif };
+
+  if (actionData.tag && gameState.serifPools) {
+    const targetTag = actionData.tag.trim();
+    let matchedPool = gameState.serifPools[targetTag] || null;
+    if (!matchedPool) {
+      const poolKeys = Object.keys(gameState.serifPools);
+      let bestKey = poolKeys.find(k => targetTag.includes(k) || k.includes(targetTag));
+      if (bestKey) matchedPool = gameState.serifPools[bestKey];
+    }
+    if (matchedPool && matchedPool.length > 0) {
+      const picked = matchedPool[Math.floor(Math.random() * matchedPool.length)];
+      if (picked.serif != null) enemySerif = picked.serif;
+      if (picked.serif1 != null) heroSerif = picked.serif1;
+    }
+  }
+  if (actionData.serif) enemySerif = actionData.serif;
+  if (actionData.serif1) heroSerif = actionData.serif1;
+  return { enemySerif, heroSerif };
+}
+
+function handleEventSerifs(actionData) {
+  const { enemySerif, heroSerif } = resolveSerifs(actionData);
+  if (enemySerif) setMessage(enemySerif);
+  if (heroSerif) setHeroMessage(heroSerif);
+}
+
+let videoOffsetY = 20;
+function updateVideoOffsetY() {
+  videoOffsetY = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--video-offset-y')) || 0;
+}
+updateVideoOffsetY();
+
+function resizeCanvas(){
+  const rect = canvas.getBoundingClientRect();
+  const dpr = Math.min(window.devicePixelRatio||1,2);
+  canvas.width = rect.width*dpr; canvas.height = rect.height*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+window.addEventListener("resize",resizeCanvas);
+window.addEventListener("resize",updateVideoOffsetY);
+resizeCanvas();
+
+function spawnOno(text, intensity=1){
+  const el = document.createElement("div");
+  el.className = "shriftOno"; el.textContent = text;
+  el.style.top = (Math.random()*45+20)+"%";
+  el.style.left = (Math.random()*60+20)+"%";
+  el.style.setProperty("--intensity",intensity);
+  damageContainer.appendChild(el);
+  setTimeout(()=>el.remove(),CONFIG.ONO_LIFETIME_MS);
+}
+function showMultipleOno(list, intensity=1){
+  list.forEach((t,i)=>setTimeout(()=>spawnOno(t,intensity),i*CONFIG.ONO_STAGGER_MS));
+}
+function triggerShockwave(){
+  shockwave.classList.remove("active"); void shockwave.offsetWidth;
+  shockwave.classList.add("active");
+}
+function doFlash(strong=false){
+  flash.style.background = strong ? CONFIG.FLASH_STRONG_COLOR : CONFIG.FLASH_WEAK_COLOR;
+  flash.style.opacity = "1";
+  setTimeout(()=>flash.style.opacity="0", strong?CONFIG.FLASH_STRONG_MS:CONFIG.FLASH_WEAK_MS);
+}
+
+function typeWriterMessage(text, speed = CONFIG.ENEMY_TYPE_SPEED) {
+  clearTimeout(gameState.msgTimer);
+  clearInterval(gameState.typewriterTimer);
+  messageWrapEl.classList.remove("zoom-out");
+  messageEl.innerHTML = "";
+  if(!text) return;
+  
+  let index = 0;
+  const cursor = document.createElement("span");
+  cursor.className = "typing-cursor";
+  messageEl.appendChild(cursor);
+
+  gameState.typewriterTimer = setInterval(() => {
+    if (index < text.length) {
+      cursor.before(text.charAt(index));
+      index++;
+    } else {
+      clearInterval(gameState.typewriterTimer);
+      cursor.remove();
+      gameState.msgTimer = setTimeout(() => { 
+        messageWrapEl.classList.add("zoom-out");
+        setTimeout(() => { messageEl.innerHTML = ""; messageWrapEl.classList.remove("zoom-out"); }, CONFIG.ENEMY_FADE_MS);
+      }, CONFIG.ENEMY_HOLD_MS);
+    }
+  }, speed);
+}
+
+function typeWriterHeroMessage(text, speed = CONFIG.HERO_TYPE_SPEED) {
+  clearTimeout(gameState.heroMsgTimer);
+  clearInterval(gameState.heroTypewriterTimer);
+  heroMessageEl.innerHTML = "";
+  if(!text) { heroMessageWrap.style.display = "none"; return; }
+  heroMessageWrap.style.display = "inline-block";
+  let index = 0;
+  const cursor = document.createElement("span");
+  cursor.className = "hero-typing-cursor";
+  heroMessageEl.appendChild(cursor);
+
+  gameState.heroTypewriterTimer = setInterval(() => {
+    if (index < text.length) {
+      cursor.before(text.charAt(index));
+      index++;
+    } else {
+      clearInterval(gameState.heroTypewriterTimer);
+      cursor.remove();
+      gameState.heroMsgTimer = setTimeout(() => {
+        heroMessageEl.innerHTML = "";
+        heroMessageWrap.style.display = "none";
+      }, CONFIG.HERO_HOLD_MS);
+    }
+  }, speed);
+}
+
+function setMessage(text){ typeWriterMessage(text, CONFIG.ENEMY_TYPE_SPEED); }
+function setHeroMessage(text){ typeWriterHeroMessage(text, CONFIG.HERO_TYPE_SPEED); }
+
+function getCurrentStageLevel() {
+  const pct = gameState.pleasure / CONFIG.MAX_PLEASURE;
+  if (pct >= CONFIG.STAGE_THRESHOLDS.stage4) return 4;
+  if (pct >= CONFIG.STAGE_THRESHOLDS.stage3) return 3;
+  if (pct >= CONFIG.STAGE_THRESHOLDS.stage2) return 2;
+  return 1;
+}
+
+function updateHeroAvatar() {
+  const level = getCurrentStageLevel();
+  const currentStage = Math.min(level, 4);
+  heroAvatarWrap.classList.remove('stage-1','stage-2','stage-3','stage-4');
+  heroAvatarWrap.classList.add(`stage-${currentStage}`);
+  const positions = { 1: "0px 0px", 2: "-96px 0px", 3: "0px -96px", 4: "-96px -96px" };
+  heroAvatarSprite.style.backgroundPosition = positions[currentStage] || "0px 0px";
+}
+
+function updateCommandUI(){
+  const level = getCurrentStageLevel();
+  stageHeartsEl.textContent = "☠️".repeat(Math.min(level, 5));
+  updateHeroAvatar();
+
+  const elements = [title1, title2, title3];
+
+  const stageData = gameState.parsedTimeline.stages[gameState.stage] || {};
+  const b1 = stageData['BUTTON1'], b2 = stageData['BUTTON2'], b3 = stageData['BUTTON3'];
+
+  const getBtnText = (b, key) => {
+    if (b && b.text) return b.text;
+    if (gameState.parsedTimeline.defaultSerifs[key]) {
+      const def = gameState.parsedTimeline.defaultSerifs[key];
+      return typeof def === 'string' ? def : (def.text || "---");
+    }
+    return "---";
+  };
+
+  title1.textContent = `・${getBtnText(b1, 'BUTTON1')}`;
+  title2.textContent = `・${getBtnText(b2, 'BUTTON2')}`;
+  title3.textContent = `・${getBtnText(b3, 'BUTTON3')}`;
+  const styleClass = `cmd-stage${Math.min(level, 4)}`;
+  elements.forEach(el => el.className = `cmd-title ${styleClass}`);
+}
+
+function showCommands(flag){
+  if(flag){
+    updateCommandUI();
+    commandsEl.classList.add("visible");
+    [btn1, btn2, btn3].forEach(b => b.disabled = false);
+    const guideText = getCommandGuideText();
+    temptationTextEl.textContent = guideText;
+    if (guideText) temptationPopup.classList.add("visible");
+    else temptationPopup.classList.remove("visible");
+  } else {
+    commandsEl.classList.remove("visible");
+    [btn1, btn2, btn3].forEach(b => b.disabled = true);
+    temptationPopup.classList.remove("visible");
+  }
+}
+
+function playEventVideo(eventData, eventName, onComplete=null) {
+  if (!eventData) {
+    stopContinuousShake();
+    if(onComplete) onComplete();
+    return;
+  }
+
+  const sessionId = ++gameState.playSessionId;
+  const actions = eventData.actions || [];
+
+  if (actions.length === 0) {
+    stopContinuousShake();
+    handleEventSerifs(eventData);
+    if(onComplete) onComplete();
+    return;
+  }
+
+  let actionIndex = 0;
+  async function playNextAction() {
+    if (sessionId !== gameState.playSessionId) return;
+
+    if (actionIndex >= actions.length) {
+      stopContinuousShake();
+      if (onComplete) onComplete();
+      return;
+    }
+
+    const currentAction = actions[actionIndex];
+    actionIndex++;
+
+    if (currentAction.pleasureVal !== undefined) {
+      const pType = currentAction.pleasureType || 'add';
+      const pVal = currentAction.pleasureVal;
+      if (pType === 'set') {
+        gameState.pleasure = pVal;
+        updatePleasure();
+        spawnOno(`= ${pVal}`, 1);
+      } else {
+        gameState.pleasure += pVal;
+        updatePleasure();
+        if (pVal !== 0 && eventName !== 'ENEMY_ATTACK') {
+          const sign = pVal >= 0 ? '+' : '';
+          spawnOno(`${sign}${pVal}`, 1);
+        }
+      }
+    }
+
+if (currentAction.nextStage !== undefined) {
+  gameState.stage = currentAction.nextStage;
+}
+
+// ★ goto 処理
+if (currentAction.goto === 'library') {
+  if (window.lib && window.lib.showLibrary) {
+    window.lib.showLibrary();
+  }
+  return;
+}
+
+
+// ★ UI表示切替
+if (currentAction.ui !== undefined) {
+  const uiElements = [
+    'bottomHUD', 'heroAvatarWrap', 'mainGaugeContainer',
+    'commands', 'nextAttackNotice', 'attackTimer',
+    'damageContainer', 'serifArea', 'heroSerifArea', 'temptationPopup'
+  ];
+  
+  // 「all_hide」か「hide」だけの時は全部消す
+  const isAllHide = currentAction.ui === 'hide' || currentAction.ui === 'all_hide';
+  // 「all_show」か「show」だけの時は全部出す
+  const isAllShow = currentAction.ui === 'show' || currentAction.ui === 'all_show';
+  // ★追加：コマンドだけ表示
+  const isCommandOnly = currentAction.ui === 'command_only';
+  
+  uiElements.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    
+    if (isAllHide) {
+      el.style.display = 'none';
+    } else if (isAllShow) {
+      el.style.display = '';
+    } else if (isCommandOnly) {          // ★追加
+      if (id === 'commands') {
+        el.style.display = '';
+      } else {
+        el.style.display = 'none';
+      }
+    } else {
+      // 個別指定（例: gauge_show, serif_hide）
+      if (currentAction.ui.includes(`${id}_show`)) {
+        el.style.display = '';
+      } else if (currentAction.ui.includes(`${id}_hide`)) {
+        el.style.display = 'none';
+      }
+    }
+  });
+  
+  // ★追加：command_only のときは .visible を明示付与
+  if (isCommandOnly) {
+    showCommands(true);
+  }
+}
+
+// ★追加：css バリアント切り替え
+if (currentAction.css !== undefined) {
+  commandsEl.dataset.variant = currentAction.css || "";
+}
+
+
+const sfx = currentAction.sfxCount !== undefined ? currentAction.sfxCount : (actionIndex === 1 && eventData.sfxCount !== undefined ? eventData.sfxCount : 0);
+    for (let i = 0; i < sfx; i++) {
+      setTimeout(() => {
+        if (sessionId !== gameState.playSessionId) return;
+        doFlash(true); triggerShockwave();
+        showMultipleOno(gameState.sfxTexts.attack || CONFIG.SFX_TEXTS_ATTACK, 1 + i * 0.3);
+      }, i * CONFIG.SFX_STAGGER_MS);
+    }
+
+    handleEventSerifs(currentAction);
+    startContinuousShake(currentAction.shake || 0);
+
+    const targetSpeed = currentAction.speed || 1.0;
+    const holdDuration = (currentAction.holdSec || 0) * 1000;
+    const clip = currentAction.video;
+    if (!clip) {
+      setTimeout(() => {
+        if (sessionId !== gameState.playSessionId) return;
+        playNextAction();
+      }, holdDuration);
+      return;
+    }
+
+    const isLastAction = (actionIndex === actions.length);
+    const isLoop = isLastAction && (eventName === 'WAIT' || eventName === 'DEFEAT');
+    gameState.currentClip = { ...clip, loop: isLoop, sessionId };
+
+    const applySpeed = () => { video.playbackRate = targetSpeed; };
+
+    const waitForLoadedData = () => new Promise(resolve => {
+      if (video.readyState >= 2) resolve();
+      else {
+        const onLoaded = () => { video.removeEventListener('loadeddata', onLoaded); resolve(); };
+        video.addEventListener('loadeddata', onLoaded);
+      }
+    });
+
+    const seekTo = (targetTime) => new Promise(resolve => {
+      if (Math.abs(video.currentTime - targetTime) < 0.05) {
+        resolve();
+        return;
+      }
+      let resolved = false;
+      const onSeeked = () => {
+        if (resolved) return;
+        resolved = true;
+        video.removeEventListener('seeked', onSeeked);
+        resolve();
+      };
+      video.addEventListener('seeked', onSeeked);
+      video.currentTime = targetTime;
+      setTimeout(() => {
+        if (resolved) return;
+        resolved = true;
+        video.removeEventListener('seeked', onSeeked);
+        resolve();
+      }, 500);
+    });
+
+       let clipURL = null;
+    if (clip.type === 'file') {
+      clipURL = gameState.videoURLs[clip.file];
+      if (!clipURL) {
+        showErrorGame(`${clip.file} が見つかりません`);
+        stopContinuousShake();
+        if (onComplete) onComplete();
+        return;
+      }
+    } else if (clip.type === 'range') {
+      clipURL = gameState.videoURLs['battle.mp4'] || gameState.videoURLs[Object.keys(gameState.videoURLs)[0]];
+      if (!clipURL) {
+        showErrorGame("動画が見つかりません");
+        stopContinuousShake();
+        if (onComplete) onComplete();
+        return;
+      }
+    }
+
+    // ★追加：画像ファイル判定
+    const isImageFile = clip.type === 'file' && /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(clip.file);
+
+    if (isImageFile) {
+      // 動画を停止
+      video.pause();
+
+      // 画像を表示
+      imageDisplay.style.display = 'block';
+      imageDisplay.src = clipURL;
+
+      // 画像読み込み完了を待つ
+      const imgReady = new Promise(resolve => {
+        if (imageDisplay.complete && imageDisplay.naturalWidth > 0) {
+          resolve();
+        } else {
+          imageDisplay.onload = () => resolve();
+          imageDisplay.onerror = () => resolve();
+        }
+      });
+
+      await imgReady;
+      if (sessionId !== gameState.playSessionId) return;
+
+      // ホールド時間待って次へ
+      setTimeout(() => {
+        if (sessionId !== gameState.playSessionId) return;
+        imageDisplay.style.display = 'none';
+        playNextAction();
+      }, holdDuration);
+      return;
+    }
+
+    // ★追加：動画のときは画像を隠す
+    imageDisplay.style.display = 'none';
+
+    if (video.dataset.currentURL !== clipURL) {
+      video.src = clipURL;
+      video.dataset.currentURL = clipURL;
+      video.load();
+      await waitForLoadedData();
+      if (sessionId !== gameState.playSessionId) return;
+    }
+
+    const hasTimeRange = clip.start !== undefined && clip.end !== undefined;
+    video.loop = isLoop && !hasTimeRange;
+
+    await seekTo(hasTimeRange ? clip.start : 0);
+    if (sessionId !== gameState.playSessionId) return;
+
+    applySpeed();
+    video.play().then(() => { applySpeed(); }).catch(() => {
+      setTimeout(() => {
+        if (sessionId !== gameState.playSessionId) return;
+        playNextAction();
+      }, holdDuration);
+    });
+
+    if (hasTimeRange) {
+      const checkRange = () => {
+        if (sessionId !== gameState.playSessionId) {
+          video.removeEventListener("timeupdate", checkRange);
+          return;
+        }
+        if (video.currentTime >= clip.end || video.paused) {
+          video.removeEventListener("timeupdate", checkRange);
+          video.pause();
+          setTimeout(() => {
+            if (sessionId !== gameState.playSessionId) return;
+            if (isLoop) { video.currentTime = clip.start; video.play().catch(()=>{}); }
+            else { playNextAction(); }
+          }, holdDuration);
+        }
+      };
+      video.addEventListener("timeupdate", checkRange);
+    } else {
+      if (!isLoop) {
+        let endedCalled = false;
+        const handleFinish = () => {
+          if (endedCalled) return;
+          endedCalled = true;
+          video.removeEventListener("ended", handleFinish);
+          video.removeEventListener("timeupdate", checkTime);
+          video.pause();
+          setTimeout(() => {
+            if (sessionId !== gameState.playSessionId) return;
+            playNextAction();
+          }, holdDuration);
+        };
+        const checkTime = () => {
+          if (sessionId !== gameState.playSessionId) {
+            video.removeEventListener("timeupdate", checkTime);
+            return;
+          }
+          if (video.duration && video.currentTime >= video.duration - 0.15) {
+            handleFinish();
+          }
+        };
+        video.addEventListener("ended", handleFinish);
+        video.addEventListener("timeupdate", checkTime);
+      }
+    }
+  }
+  playNextAction();
+}
+
+video.addEventListener("timeupdate", () => {
+  const clip = gameState.currentClip;
+  if (!clip || clip.type !== 'range') return;
+  if (video.currentTime >= clip.end) {
+    if (clip.loop) { video.currentTime = clip.start; video.play().catch(()=>{}); }
+    else { video.pause(); }
+  }
+});
+
+function drawVideo(){
+  const w=canvas.clientWidth, h=canvas.clientHeight;
+  if(video.readyState>=2 && video.videoWidth>0){
+    ctx.fillStyle="#000"; ctx.fillRect(0,0,w,h);
+    const vr=video.videoWidth/video.videoHeight, cr=w/h;
+    let dw,dh; if(vr>cr){dw=w;dh=dw/vr;} else {dh=h;dw=dh*vr;}
+
+    ctx.save(); 
+    ctx.translate(w / 2, (h / 2) - videoOffsetY); 
+    if(gameState.isGazing){
+      const elapsed=(performance.now()-gameState.gazeStart)/1000;
+      if(elapsed > (CONFIG.GAZE_DURATION_MS / 1000)) gameState.isGazing=false;
+      else {
+        const panX=Math.sin(elapsed*4.5)*CONFIG.GAZE_PAN_X, panY=Math.cos(elapsed*3.5)*CONFIG.GAZE_PAN_Y;
+        const zoom=1.12+Math.sin(elapsed*3)*CONFIG.GAZE_ZOOM;
+        ctx.translate(panX,panY); ctx.scale(zoom,zoom);
+      }
+    }
+    ctx.drawImage(video,-dw/2,-dh/2,dw,dh); ctx.restore();
+  }
+  requestAnimationFrame(drawVideo);
+}
+requestAnimationFrame(drawVideo);
+
+function getWaitEvent() {
+  const stageData = gameState.parsedTimeline.stages[gameState.stage] || {};
+  return stageData.WAIT || null;
+}
+function getEnemyAttackEvent() {
+  const stageData = gameState.parsedTimeline.stages[gameState.stage] || {};
+  return stageData.ENEMY_ATTACK || null;
+}
+
+function updatePleasure(){
+  const v = Math.min(CONFIG.MAX_PLEASURE, Math.max(0, gameState.pleasure));
+  gameState.pleasure = v;
+  const sanityRatio = Math.max(0, Math.min(1, (CONFIG.MAX_PLEASURE - v) / CONFIG.MAX_PLEASURE));
+  const sanityPct = Math.floor(sanityRatio * 100);
+  
+  gaugePercent.textContent = sanityPct + "%";
+
+  let r, g, b;
+  if (sanityRatio >= 0.5) {
+    const t = (sanityRatio - 0.5) / 0.5;
+    r = Math.round(255 * (1 - t)); g = 255; b = Math.round(102 * t);
+  } else {
+    const t = sanityRatio / 0.5;
+    r = 255; g = Math.round(255 * t); b = 0;
+  }
+  const mainColor = `rgb(${r},${g},${b})`;
+
+  mainGaugeContainer.style.setProperty('--hp', sanityPct);
+  mainGaugeContainer.style.setProperty('--hp-color', mainColor);
+
+  const crisis = v >= CONFIG.CRISIS_THRESHOLD;
+  pinkFilter.style.opacity = crisis ? String(CONFIG.PINK_FILTER_OPACITY) : "0";
+  screenElem.classList.toggle("glitch-heavy", crisis);
+  updateCommandUI();
+}
+
+function showCountdownNumber(num) {
+  gameState.countdownValue = num;
+  timerValue.textContent = num;
+  attackTimerBox.style.display = "flex";
+  attackTimerBox.classList.remove("show");
+  void attackTimerBox.offsetWidth;
+  attackTimerBox.classList.add("show");
+}
+
+function updateAttackTimer() {
+  if (!gameState.battleStarted || !gameState.nextAttackTime) {
+    attackTimerBox.style.display = "none";
+    nextAttackNotice.classList.remove("active");
+    setCrisisMode(false);
+    return;
+  }
+  
+  const stageData = gameState.parsedTimeline.stages[gameState.stage] || {};
+  const hideCd = stageData['HIDE_COUNTDOWN'] === true;
+  const forceCmd = stageData['FORCE_COMMAND'] === true;
+  
+  const remain = Math.max(0, (gameState.nextAttackTime - Date.now()) / 1000);
+  nextAttackSec.textContent = remain.toFixed(1) + "秒";
+  nextAttackNotice.classList.add("active");
+  
+  // ★ コマンド制御
+  if (forceCmd || (remain <= CONFIG.COUNTDOWN_THRESHOLD && remain > 0)) {
+    showCommands(true);
+  } else {
+    showCommands(false);
+  }
+  
+  // ★ カウントダウン制御
+  if (!hideCd && remain <= CONFIG.COUNTDOWN_THRESHOLD && remain > 0) {
+    setCrisisMode(true);
+  } else {
+    setCrisisMode(false);
+  }
+  
+  const sec = Math.ceil(remain);
+  if (!hideCd && sec >= 1 && sec <= CONFIG.COUNTDOWN_START && sec !== gameState.countdownValue) {
+    showCountdownNumber(sec);
+  }
+  if (remain <= 0) {
+    gameState.countdownValue = 0;
+    attackTimerBox.style.display = "none";
+  }
+}
+
+function setCrisisMode(on){
+  if(on===gameState.crisisMode) return;
+  gameState.crisisMode=on;
+  if(on){
+    edgePulse.classList.add("active");
+    if (!gameState.battleEnded) showCommands(true);
+  } else {
+    edgePulse.classList.remove("active");
+    if (!gameState.battleEnded) showCommands(false);
+  }
+}
+
+function startPassive(){
+  clearInterval(gameState.passiveTimer);
+  gameState.passiveTimer=setInterval(()=>{
+    if(!gameState.battleStarted) return;
+    if(Date.now()<gameState.guardUntil) return;
+    gameState.pleasure+=CONFIG.PASSIVE_AMOUNT;
+    updatePleasure();
+    if(gameState.pleasure>=CONFIG.MAX_PLEASURE && !gameState.battleEnded) defeat();
+  },CONFIG.PASSIVE_INTERVAL);
+}
+
+function scheduleEnemyAttack(){
+  clearTimeout(gameState.enemyTimer);
+  clearInterval(gameState.attackTimerInterval);
+  gameState.countdownValue=0;
+  attackTimerBox.style.display="none";
+  setCrisisMode(false);
+  if(!gameState.battleStarted) return;
+
+  const pleasureRatio = Math.min(1.0, gameState.pleasure / CONFIG.ATTACK_PLEASURE_RATIO);
+  const baseDelaySec = CONFIG.ATTACK_BASE_DELAY - ((CONFIG.ATTACK_BASE_DELAY - CONFIG.ATTACK_MIN_DELAY) * pleasureRatio);
+  const variance = (Math.random() * CONFIG.ATTACK_VARIANCE) - (CONFIG.ATTACK_VARIANCE / 2);
+  const delaySec = Math.max(CONFIG.ATTACK_MIN_DELAY, baseDelaySec * (1 + variance));
+  const delay = delaySec * 1000;
+
+  gameState.nextAttackTime=Date.now()+delay;
+  gameState.attackTimerInterval=setInterval(updateAttackTimer,CONFIG.TIMER_TICK_MS);
+  updateAttackTimer();
+
+  gameState.enemyTimer=setTimeout(()=>{
+    clearInterval(gameState.attackTimerInterval);
+    gameState.attackTimerInterval=null;
+    attackTimerBox.style.display="none";
+    gameState.countdownValue=0;
+    setCrisisMode(false);
+    enemyAttack();
+  },delay);
+}
+
+function enemyAttack(){
+  if(!gameState.battleStarted) return;
+  showCommands(false);
+  const attackEvent = getEnemyAttackEvent();
+  if (!attackEvent) {
+    playEventVideo(getWaitEvent(), 'WAIT');
+    scheduleEnemyAttack();
+    return;
+  }
+  playEventVideo(attackEvent, 'ENEMY_ATTACK', () => {
+    if (gameState.pleasure >= CONFIG.MAX_PLEASURE && !gameState.battleEnded) { defeat(); return; }
+    playEventVideo(getWaitEvent(), 'WAIT');
+    scheduleEnemyAttack();
+  });
+}
+
+function handleButtonClick(btnId) {
+  const btnName = `BUTTON${btnId}`;
+  const stageData = gameState.parsedTimeline.stages[gameState.stage];
+  if (!stageData) return;
+  const btnData = stageData[btnName];
+  if (!btnData) return;
+
+  gameState.playSessionId++;
+  video.pause();
+  video.onended = null;
+  video.ontimeupdate = null;
+  gameState.currentClip = null;
+
+  showCommands(false);
+  clearTimeout(gameState.enemyTimer);
+  clearInterval(gameState.attackTimerInterval);
+  gameState.nextAttackTime = 0; gameState.countdownValue = 0;
+  attackTimerBox.style.display = "none"; setCrisisMode(false);
+
+  playEventVideo(btnData, btnName, () => {
+    if (gameState.pleasure >= CONFIG.MAX_PLEASURE && !gameState.battleEnded) { defeat(); return; }
+    playEventVideo(getWaitEvent(), 'WAIT');
+    scheduleEnemyAttack();
+  });
+}
+
+btn1.onclick = () => handleButtonClick(1);
+btn2.onclick = () => handleButtonClick(2);
+btn3.onclick = () => handleButtonClick(3);
+
+mainGaugeContainer.onclick = (e) => {
+  if (!gameState.battleStarted) return;
+  const rect = mainGaugeContainer.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const ratio = Math.max(0, Math.min(1, clickX / rect.width));
+  const delta = ratio >= 0.5 ? 10 : -10;
+  gameState.pleasure += delta;
+  updatePleasure();
+  spawnOno(delta > 0 ? CONFIG.SFX_TEXT_PLEASURE_UP : CONFIG.SFX_TEXT_PLEASURE_DOWN, 1);
+  doFlash(false);
+  if (gameState.pleasure >= CONFIG.MAX_PLEASURE && !gameState.battleEnded) defeat();
+};
+
+function defeat(){
+  if (gameState.battleEnded) return;
+  gameState.battleEnded = true;
+  
+  recordDefeat();   
+  
+  // ★追加：敗北を記録
+  
+  clearTimeout(gameState.enemyTimer);
+  showCommands(false);
+  screenElem.classList.remove("glitch-heavy");
+  doFlash(true); triggerShockwave();
+
+  resultOverlay.style.display = "flex";
+
+  const defeatEvent = gameState.parsedTimeline.DEFEAT;
+  const hasDefeatVideo = defeatEvent?.actions?.length > 0;
+
+  const continueLoop = () => {
+    const randomBtnId = Math.floor(Math.random() * 3) + 1;
+    const stageData = gameState.parsedTimeline.stages[gameState.stage] || {};
+    const btnData = stageData[`BUTTON${randomBtnId}`];
+
+    if (btnData) {
+      playEventVideo(btnData, `BUTTON${randomBtnId}`, () => {
+        playEventVideo(getWaitEvent(), 'WAIT');
+        scheduleEnemyAttack();
+      });
+    } else {
+      playEventVideo(getWaitEvent(), 'WAIT');
+      scheduleEnemyAttack();
+    }
+  };
+
+  if (hasDefeatVideo) {
+    playEventVideo(defeatEvent, 'DEFEAT', continueLoop);
+  } else {
+    continueLoop();
+  }
+
+  const pool = gameState.sfxTexts.defeat || CONFIG.SFX_TEXTS_DEFEAT;
+  let idx = 0;
+  const targetCount = defeatEvent && defeatEvent.sfxCount !== undefined ? defeatEvent.sfxCount : CONFIG.DEFEAT_SFX_DEFAULT;
+  gameState.defeatLoopTimer = setInterval(()=>{
+    if(!gameState.battleEnded) return;
+    const intensity = 1.2 + (idx % targetCount) * 0.25;
+    showMultipleOno([pool[Math.floor(Math.random()*pool.length)],pool[Math.floor(Math.random()*pool.length)]], intensity);
+    doFlash(false); triggerShockwave();
+    idx++;
+  },CONFIG.DEFEAT_LOOP_INTERVAL);
+  
+// ★ 敗北後: ループ継続 + 2秒後に戻るボタン表示
+  if (resultSub && window.lib && window.lib.showLibrary) {
+    resultSub.textContent = "▶ 図書館へ戻る";
+    resultSub.style.display = "block";
+    resultSub.style.cursor = "pointer";
+    resultSub.style.pointerEvents = "auto";
+    resultSub.style.marginTop = "30px";
+    resultSub.style.padding = "14px 32px";
+    resultSub.style.border = "1.5px solid #ff66aa";
+    resultSub.style.borderRadius = "4px";
+    resultSub.style.background = "linear-gradient(180deg, #c01860, #500825)";
+    resultSub.style.color = "#fff";
+    resultSub.style.fontWeight = "700";
+    resultSub.style.letterSpacing = "2px";
+    resultSub.style.boxShadow = "0 0 20px rgba(255,0,120,0.6)";
+    resultSub.style.opacity = "0";
+    resultSub.style.transition = "opacity 1s ease 2s";
+    requestAnimationFrame(() => { resultSub.style.opacity = "1"; });
+    
+    resultSub.onclick = () => {
+      resultSub.style.display = "none";
+      window.lib.showLibrary();
+    };
+  }
+}
+
+// ★追加：敗北記録の保存
+function saveDefeatedScenes(){
+  try {
+    localStorage.setItem('craer_defeated', JSON.stringify(gameState.defeatedScenes));
+  } catch (e) {
+    console.warn("敗北記録の保存失敗:", e);
+  }
+}
+
+// ★追加：敗北記録の読み込み
+function loadDefeatedScenes(){
+  try {
+    const saved = localStorage.getItem('craer_defeated');
+    if (saved) {
+      gameState.defeatedScenes = JSON.parse(saved);
+    }
+  } catch (e) {
+    console.warn("敗北記録の読み込み失敗:", e);
+  }
+}
+
+// ★追加：敗北を記録
+function recordDefeat(){
+  const enemyId = window.lib?.state?.currentEnemy?.name || "unknown";
+  
+  // ★変更：動画ファイル名ではなく「敵名」と「ステージ名」を記録する
+  gameState.defeatedScenes.push({
+    enemyId: enemyId,
+    stage: gameState.stage,
+    timestamp: Date.now()
+  });
+  
+  // 最新10件を超えたら古いものを削除
+  if (gameState.defeatedScenes.length > 10) {
+    gameState.defeatedScenes.shift();
+  }
+  
+  saveDefeatedScenes();
+}
+
+// ★追加：UI状態とバリアントをリセット
+function resetUIVariants() {
+  commandsEl.dataset.variant = "";
+  const uiElements = [
+    'bottomHUD', 'heroAvatarWrap', 'mainGaugeContainer',
+    'commands', 'nextAttackNotice', 'attackTimer',
+    'damageContainer', 'serifArea', 'heroSerifArea', 'temptationPopup'
+  ];
+  uiElements.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = '';
+  });
+  
+  // ★追加：画像も非表示
+  if (imageDisplay) imageDisplay.style.display = 'none';
+  
+  showCommands(false);
+} 
+
+function startBattle(){
+  if(gameState.battleStarted && !gameState.battleEnded) return;
+  if(!gameState.parsedTimeline || !gameState.parsedTimeline.stages || Object.keys(gameState.parsedTimeline.stages).length === 0) {
+    showErrorGame("timeline.txt が読み込まれていません");
+    return;
+  }
+  
+  resetUIVariants();                // ← ★ 呼び出し
+  
+  gameState.battleStarted = true; gameState.battleEnded = false;
+  gameState.pleasure = 0; 
+  const stageKeys = Object.keys(gameState.parsedTimeline.stages);
+  gameState.stage = stageKeys.length > 0 ? stageKeys[0] : "1";
+  gameState.guardUntil = 0;
+  resultOverlay.style.display = "none";
+  if (resultSub) {
+    resultSub.style.display = "none";
+    resultSub.onclick = null;
+  }
+  updatePleasure();
+  startPassive();
+
+  const appearEvent = gameState.parsedTimeline.APPEAR;
+  if (appearEvent && ((appearEvent.actions && appearEvent.actions.length > 0) || appearEvent.video)) {
+    playEventVideo(appearEvent, 'APPEAR', () => {
+      playEventVideo(getWaitEvent(), 'WAIT');
+      scheduleEnemyAttack();
+    });
+  } else {
+    playEventVideo(getWaitEvent(), 'WAIT');
+    scheduleEnemyAttack();
+  }
+}
+
+updateHeroAvatar();
+
+// ★④：敗北記録を読み込み
+loadDefeatedScenes();
+
+// ★⑤：単体の敗北を再生（そのステージへ飛んで敗北処理を走らせる）
+async function playSingleDefeat(index){
+  const record = gameState.defeatedScenes[index];
+  if (!record) {
+    console.warn("記録なし:", index);
+    return;
+  }
+  
+  const enemies = window.lib?.state?.enemies || [];
+  const enemy = enemies.find(e => e.name === record.enemyId);
+  if (!enemy) {
+    console.warn("敵が見つかりません:", record.enemyId);
+    return;
+  }
+  
+  
+  // ゲーム状態のロード（「入る」ボタンを押した時と同じ処理）
+  gameState.videoURLs = enemy.videoURLs;
+  gameState.parsedTimeline = window.idx.parseNewTimeline(enemy.timelineText);
+  gameState.serifPools = window.idx.parseSerifFile(enemy.serifText);
+  if (enemy.sfxText && window.idx.parseSfxFile) {
+    gameState.sfxTexts = window.idx.parseSfxFile(enemy.sfxText);
+  } else {
+    gameState.sfxTexts = { attack: null, defeat: null };
+  }
+  
+  if (enemy.charaURL) {
+    window.idx.heroAvatarSprite.style.backgroundImage = `url("${enemy.charaURL}")`;
+  }
+  
+  const dynamicStyleEl = document.getElementById("dynamicStyle");
+  if (dynamicStyleEl) dynamicStyleEl.textContent = enemy.cssText || "";
+
+  // 画面をゲーム画面に切り替え
+  const gameEl = document.getElementById("game");
+  if (gameEl) gameEl.style.display = "flex";
+  document.querySelectorAll(".lib_screen").forEach(el => el.classList.remove("active"));
+  window.dispatchEvent(new Event("resize"));
+  
+  // UIリセット
+  resetUIVariants();
+  showCommands(false);
+  imageDisplay.style.display = "none";
+  
+  const resultOverlayEl = document.getElementById("resultOverlay");
+  if (resultOverlayEl) resultOverlayEl.style.display = "none";
+  
+  // ★記録したステージへ飛ばして、強制的に敗北状態にする
+  gameState.battleStarted = true;
+  gameState.battleEnded = false;
+  gameState.stage = record.stage;
+  gameState.pleasure = CONFIG.MAX_PLEASURE; // 理性を0（MAX）にして敗北状態にする
+  
+  updatePleasure(); // UIを更新
+  
+  // ★ここで敗北処理を走らせる（侵食完了演出とループが始まる）
+  defeat();
+}
+
+window.idx = {
+  gameState: gameState,
+  startBattle: startBattle,
+  parseNewTimeline: parseNewTimeline,
+  parseSerifFile: parseSerifFile,
+  parseSfxFile: parseSfxFile,
+  heroAvatarSprite: heroAvatarSprite,
+  playSingleDefeat: playSingleDefeat,
+};
+
+})();
+</script>
+
+</body>
+</html>
