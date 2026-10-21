@@ -912,55 +912,60 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
 }
 
 /* ============================================
-   回想後コマンドバリアント：横並び
+   回想後コマンドバリアント：横並び（画面フィット・スマホ最適化）
    ============================================ */
 #commands[data-variant="kaiso_choice"] {
-  left: 5%;
-  right: 5%;
-  bottom: 12%;
-  height: 64px;
-  flex-direction: row;
-  gap: 8px;
-  justify-content: center;
-  align-items: stretch;
+  left: 4% !important;
+  right: 4% !important;
+  bottom: max(12%, env(safe-area-inset-bottom)) !important; /* 画面下部から適度に浮かせる */
+  height: 52px !important;            /* 押しやすい高さに調整 */
+  flex-direction: row !important;
+  gap: 8px !important;                /* ボタン同士の隙間をすっきりさせる */
+  justify-content: center !important;
+  align-items: stretch !important;
+  width: auto !important;
 }
 
 #commands[data-variant="kaiso_choice"] .command-btn {
-  flex: 1;
-  width: auto;
-  height: 100%;
-  justify-content: center;
-  padding: 0 8px;
-  background: linear-gradient(135deg, #1a0010, #0a0005) !important;
+  flex: 1 !important;
+  width: auto !important;
+  height: 100% !important;
+  justify-content: center !important;
+  padding: 0 4px !important;
+  background: linear-gradient(135deg, rgba(26, 0, 16, 0.95), rgba(10, 0, 5, 0.95)) !important;
   border: 1px solid #ff3366 !important;
-  border-radius: 2px;
+  border-radius: 6px !important;      /* それぞれのボタンを綺麗に角丸にする */
   box-shadow:
-    0 0 10px rgba(255, 0, 100, 0.5),
-    inset 0 0 8px rgba(255, 0, 100, 0.15);
+    0 0 10px rgba(255, 0, 100, 0.4),
+    inset 0 0 8px rgba(255, 0, 100, 0.15) !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 #commands[data-variant="kaiso_choice"] .command-btn::before {
-  display: none;
+  display: none !important;
 }
 
 #commands[data-variant="kaiso_choice"] .cmd-title {
   color: #ffccdd !important;
   font-family: 'Yuji Syuku', 'Shippori Mincho', serif !important;
-  font-size: 13px;
-  letter-spacing: 2px;
-  text-align: center;
+  font-size: 12px !important;         /* 3つ並んでも文字が収まりやすいサイズに微調整 */
+  letter-spacing: 1px !important;
+  text-align: center !important;
   text-shadow:
     0 0 6px rgba(255, 0, 100, 0.8),
-    1px 1px 2px #000;
-  white-space: nowrap;
+    1px 1px 2px #000 !important;
+  white-space: nowrap !important;
 }
 
+/* ホバー・タップ時の演出 */
 #commands[data-variant="kaiso_choice"] .command-btn:hover,
 #commands[data-variant="kaiso_choice"] .command-btn:active {
   border-color: #ff6699 !important;
+  background: rgba(50, 0, 25, 0.95) !important;
   box-shadow:
     0 0 16px rgba(255, 0, 150, 0.9),
-    inset 0 0 12px rgba(255, 0, 100, 0.4);
+    inset 0 0 12px rgba(255, 0, 100, 0.4) !important;
 }
 
 #commands[data-variant="kaiso_choice"] .command-btn:hover .cmd-title,
@@ -968,21 +973,140 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
   color: #ffffff !important;
   text-shadow:
     0 0 10px rgba(255, 0, 150, 1),
-    1px 1px 2px #000;
+    1px 1px 2px #000 !important;
 }
 
+
 /* ============================================
-   回想後コマンドバリアント：縦並び
+   回想後コマンドバリアント：縦並び（画面フィット・スマホ最適化）
    ============================================ */
 #commands[data-variant="kaiso_choice_v"] {
-  left: 12%;
-  right: 12%;
-  bottom: 15%;
+  left: 4% !important;
+  right: 4% !important;
+  bottom: max(10px, env(safe-area-inset-bottom)) !important; /* 画面下部に密着させつつセーフエリア対応 */
+  height: auto !important;
+  flex-direction: column !important;
+  gap: 0 !important;                  /* ボタン同士を完全に密着 */
+  justify-content: flex-end !important;
+  align-items: stretch !important;
+  width: auto !important;
+}
+
+#commands[data-variant="kaiso_choice_v"] .command-btn {
+  width: 100% !important;
+  height: 48px !important;            /* タップしやすい適切な高さ */
+  justify-content: center !important;
+  padding: 0 12px !important;
+  border-radius: 0 !important;        /* 基本は四角で隙間をなくす */
+  background: linear-gradient(135deg, rgba(26, 0, 16, 0.95), rgba(10, 0, 5, 0.95)) !important;
+  border: 1px solid #ff3366 !important;
+  border-bottom: none !important;     /* 繋ぎ目の線をなくす */
+  box-shadow: none !important;          
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* 一番上のボタン：上部の角だけ丸める */
+#commands[data-variant="kaiso_choice_v"] .command-btn:first-child {
+  border-radius: 8px 8px 0 0 !important;
+}
+
+/* 一番下のボタン：枠線を補完し、下部の角を丸める */
+#commands[data-variant="kaiso_choice_v"] .command-btn:last-child {
+  border-bottom: 1px solid #ff3366 !important;
+  border-radius: 0 0 8px 8px !important;
+}
+
+#commands[data-variant="kaiso_choice_v"] .command-btn::before {
+  display: none !important;
+}
+
+#commands[data-variant="kaiso_choice_v"] .cmd-title {
+  color: #ffccdd !important;
+  font-family: 'Yuji Syuku', 'Shippori Mincho', serif !important;
+  font-size: 14px !important;
+  letter-spacing: 2px !important;
+  text-align: center !important;
+  text-shadow:
+    0 0 6px rgba(255, 0, 100, 0.8),
+    1px 1px 2px #000 !important;
+  white-space: nowrap !important;
+}
+
+/* ホバー・タップ時の演出 */
+#commands[data-variant="kaiso_choice_v"] .command-btn:hover,
+#commands[data-variant="kaiso_choice_v"] .command-btn:active {
+  background: rgba(50, 0, 25, 0.95) !important;
+  border-color: #ff6699 !important;
+  box-shadow: inset 0 0 15px rgba(255, 0, 100, 0.8) !important;
+}
+
+#commands[data-variant="kaiso_choice_v"] .command-btn:hover .cmd-title,
+#commands[data-variant="kaiso_choice_v"] .command-btn:active .cmd-title {
+  color: #ffffff !important;
+  text-shadow:
+    0 0 10px rgba(255, 0, 150, 1),
+    1px 1px 2px #000 !important;
+}
+
+
+#commands[data-variant="kaiso_choice_v"] {
+  left: 15%;
+  right: 15%;
+  bottom: 0;                 /* ★画面の一番下に密着 */
   height: auto;
   flex-direction: column;
-  gap: 10px;
-  justify-content: center;
+  gap: 2px;                  /* ★ボタン同士の隙間をほぼゼロに */
+  justify-content: flex-end; /* ★下に向かって積み上がる */
   align-items: stretch;
+}
+
+#commands[data-variant="kaiso_choice_v"] .command-btn {
+  width: 100%;
+  height: 46px;              /* ★高さを56pxから46pxに小さく */
+  justify-content: center;
+  padding: 0 8px;
+  border-radius: 0;          /* ★角を丸めず四角くして隙間をなくす */
+  background: linear-gradient(135deg, #1a0010, #0a0005) !important;
+  border: 1px solid #ff3366 !important;
+  /* 下に積み上がるので、上のボタンだけ角を丸くする */
+  border-bottom: none;
+  box-shadow: none;          
+}
+
+/* 一番上のボタンだけ上部を丸くする */
+#commands[data-variant="kaiso_choice_v"] .command-btn:first-child {
+  border-radius: 6px 6px 0 0;
+}
+
+#commands[data-variant="kaiso_choice_v"] .command-btn::before {
+  display: none;
+}
+
+#commands[data-variant="kaiso_choice_v"] .cmd-title {
+  color: #ffccdd !important;
+  font-family: 'Yuji Syuku', 'Shippori Mincho', serif !important;
+  font-size: 13px;
+  letter-spacing: 3px;
+  text-align: center;
+  text-shadow:
+    0 0 6px rgba(255, 0, 100, 0.8),
+    1px 1px 2px #000;
+  white-space: nowrap;
+}
+
+/* タップ時の光り方 */
+#commands[data-variant="kaiso_choice_v"] .command-btn:active {
+  background: #2a0010 !important;
+  border-color: #ff6699 !important;
+  box-shadow: inset 0 0 15px rgba(255, 0, 100, 0.8);
+}
+
+#commands[data-variant="kaiso_choice_v"] .command-btn:active .cmd-title {
+  color: #ffffff !important;
+  text-shadow:
+    0 0 10px rgba(255, 0, 150, 1),
+    1px 1px 2px #000;
 }
 
 #commands[data-variant="kaiso_choice_v"] .command-btn {
@@ -1126,8 +1250,24 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
         cursor:pointer;
       ">閉じる</button>
       
-      <!-- ★追加：データリセットボタン -->
-      <button id="lib_recapClearButton" style="
+      <!-- ★追加：エンディングボタン（普段は非表示） -->
+<button id="lib_endingButton" style="
+        display:none;
+        margin:20px auto 0;
+        padding:12px 32px;
+        background:linear-gradient(180deg,#ff0055,#500825);
+        border:1.5px solid #ff3366;
+        border-radius:4px;
+        color:#fff;
+        font-size:13px;
+        font-weight:700;
+        letter-spacing:2px;
+        cursor:pointer;
+        box-shadow:0 0 20px rgba(255,0,80,0.8);
+      ">▶ 侵食の記憶</button>
+
+<!-- ★追加：データリセットボタン -->
+<button id="lib_recapClearButton" style="
         display:block;
         margin:15px auto 0;
         padding:8px 24px;
@@ -1689,15 +1829,30 @@ function showDefeatRecapMenu(){
     list.appendChild(btn);
   });
   
-  // 背景動画
-  const recapBg = document.getElementById("lib_recapBgVideo");
-  if (recapBg && !recapBg.src) {
-    recapBg.src = "library_loop.mp4";
-    recapBg.play().catch(()=>{});
-  }
-  
-  showScreen("recap");
+// 背景動画
+const recapBg = document.getElementById("lib_recapBgVideo");
+if (recapBg && !recapBg.src) {
+  recapBg.src = "library_loop.mp4";
+  recapBg.play().catch(() => {});
 }
+
+// ★追加：エンディングボタンの表示判定
+// ※ 未来の自分へ：エンディングを解禁したい時は、下の「20」を「10」などに変える
+const endingBtn = document.getElementById("lib_endingButton");
+if (endingBtn) {
+  if (defeatedScenes.length >= 20) {
+    endingBtn.style.display = "block";
+    endingBtn.onclick = () => {
+      window.idx.playEndingSequence();
+    };
+  } else {
+    endingBtn.style.display = "none";
+  }
+}
+
+showScreen("recap");
+}
+
 
 // ★追加：閉じるボタン
 document.getElementById("lib_recapCloseButton")?.addEventListener("click", () => {
@@ -1789,7 +1944,12 @@ const CONFIG = {
   START_BTN_TEXT: '▶ 侵蝕開始'
 };
 
+// ★追加：エンディング用のグローバル変数
+let isEndingSequence = false;
+let endingResolve = null;
+
 const canvas = document.getElementById("canvas");
+
 const ctx = canvas.getContext("2d");
 const video = document.getElementById("video");
 const imageDisplay = document.getElementById("imageDisplay");   // ★追加
@@ -2893,30 +3053,44 @@ function defeat(){
     idx++;
   },CONFIG.DEFEAT_LOOP_INTERVAL);
   
-// ★ 敗北後: ループ継続 + 2秒後に戻るボタン表示
-  if (resultSub && window.lib && window.lib.showLibrary) {
-    resultSub.textContent = "▶ 図書館へ戻る";
-    resultSub.style.display = "block";
-    resultSub.style.cursor = "pointer";
-    resultSub.style.pointerEvents = "auto";
-    resultSub.style.marginTop = "30px";
-    resultSub.style.padding = "14px 32px";
-    resultSub.style.border = "1.5px solid #ff66aa";
-    resultSub.style.borderRadius = "4px";
-    resultSub.style.background = "linear-gradient(180deg, #c01860, #500825)";
-    resultSub.style.color = "#fff";
-    resultSub.style.fontWeight = "700";
-    resultSub.style.letterSpacing = "2px";
-    resultSub.style.boxShadow = "0 0 20px rgba(255,0,120,0.6)";
-    resultSub.style.opacity = "0";
-    resultSub.style.transition = "opacity 1s ease 2s";
-    requestAnimationFrame(() => { resultSub.style.opacity = "1"; });
+// ★ 敗北後: ループ継続 + 2秒後にボタン表示
+if (resultSub) {
+  // ★変更：エンディング中なら「次の侵食へ」
+  resultSub.textContent = isEndingSequence ? "▶ 次の侵食へ" : "▶ 図書館へ戻る";
+  resultSub.style.display = "block";
+  resultSub.style.cursor = "pointer";
+  resultSub.style.pointerEvents = "auto";
+  resultSub.style.marginTop = "30px";
+  resultSub.style.padding = "14px 32px";
+  resultSub.style.border = "1.5px solid #ff66aa";
+  resultSub.style.borderRadius = "4px";
+  resultSub.style.background = "linear-gradient(180deg, #c01860, #500825)";
+  resultSub.style.color = "#fff";
+  resultSub.style.fontWeight = "700";
+  resultSub.style.letterSpacing = "2px";
+  resultSub.style.boxShadow = "0 0 20px rgba(255,0,120,0.6)";
+  resultSub.style.opacity = "0";
+  resultSub.style.transition = "opacity 1s ease 2s";
+  requestAnimationFrame(() => { resultSub.style.opacity = "1"; });
+  
+  resultSub.onclick = () => {
+    resultSub.style.display = "none";
     
-    resultSub.onclick = () => {
-      resultSub.style.display = "none";
+    // ★追加：エンディング中なら次のループへ
+    if (isEndingSequence && endingResolve) {
+      const resolveFn = endingResolve;
+      endingResolve = null;
+      resolveFn();
+      return;
+    }
+    
+    // 通常時は図書館へ
+    if (window.lib && window.lib.showLibrary) {
       window.lib.showLibrary();
-    };
-  }
+    }
+  };
+}
+
 }
 
 // ★追加：敗北記録の保存
@@ -3076,6 +3250,91 @@ async function playSingleDefeat(index){
   defeat();
 }
 
+// ★追加：エンディング連続再生
+async function playEndingSequence() {
+  isEndingSequence = true;
+  
+  // 最新5件を抽出
+  const targetScenes = gameState.defeatedScenes.slice(-5);
+  if (targetScenes.length === 0) {
+    isEndingSequence = false;
+    return;
+  }
+  
+  // ゲーム画面に切り替え
+  const gameEl = document.getElementById("game");
+  if (gameEl) gameEl.style.display = "flex";
+  document.querySelectorAll(".lib_screen").forEach(el => el.classList.remove("active"));
+  window.dispatchEvent(new Event("resize"));
+  
+  for (let i = 0; i < targetScenes.length; i++) {
+    const record = targetScenes[i];
+    const enemy = window.lib?.state?.enemies?.find(e => e.name === record.enemyId);
+    if (!enemy) continue;
+    
+    // データロード
+    gameState.videoURLs = enemy.videoURLs;
+    gameState.parsedTimeline = parseNewTimeline(enemy.timelineText);
+    gameState.serifPools = parseSerifFile(enemy.serifText);
+    if (enemy.sfxText && parseSfxFile) {
+      gameState.sfxTexts = parseSfxFile(enemy.sfxText);
+    } else {
+      gameState.sfxTexts = { attack: null, defeat: null };
+    }
+    if (enemy.charaURL) {
+      heroAvatarSprite.style.backgroundImage = `url("${enemy.charaURL}")`;
+    }
+    const dynamicStyleEl = document.getElementById("dynamicStyle");
+    if (dynamicStyleEl) dynamicStyleEl.textContent = enemy.cssText || "";
+    
+    // 状態セット
+    resetUIVariants();
+    gameState.battleStarted = true;
+    gameState.battleEnded = false;
+    gameState.stage = record.stage;
+    gameState.pleasure = CONFIG.MAX_PLEASURE;
+    updatePleasure();
+    
+    const resultOverlayEl = document.getElementById("resultOverlay");
+    if (resultOverlayEl) resultOverlayEl.style.display = "none";
+    
+    // 敗北処理を走らせ、ボタンが押される（＝resolve）まで待つ
+    await new Promise(resolve => {
+      endingResolve = resolve;
+      defeat();
+    });
+  }
+  
+  // ★最後に侵食エンディング動画
+  // ※ 未来の自分へ：エンディング動画ができたらファイル名を変更してください
+  try {
+    const endingURL = gameState.videoURLs['ending_erosion.mp4'];
+    if (endingURL) {
+      await new Promise(resolve => {
+        video.src = endingURL;
+        video.dataset.currentURL = endingURL;
+        video.load();
+        video.onloadeddata = () => {
+          video.play().catch(() => {});
+          video.onended = () => resolve();
+          // 念のため10秒で強制終了
+          setTimeout(resolve, 10000);
+        };
+        video.onerror = () => resolve();
+      });
+    }
+  } catch (e) {
+    console.warn("エンディング動画の再生に失敗:", e);
+  }
+  
+  isEndingSequence = false;
+  
+  // 図書館へ戻る
+  if (window.lib && window.lib.showLibrary) {
+    window.lib.showLibrary();
+  }
+}
+
 window.idx = {
   gameState: gameState,
   startBattle: startBattle,
@@ -3084,6 +3343,7 @@ window.idx = {
   parseSfxFile: parseSfxFile,
   heroAvatarSprite: heroAvatarSprite,
   playSingleDefeat: playSingleDefeat,
+  playEndingSequence: playEndingSequence, // ★追加
 };
 
 })();
