@@ -1,0 +1,39 @@
+name: Auto Update Dialogue Script
+
+on:
+  schedule:
+    # 毎日日本時間 朝6:00 (UTC 21:00) に自動実行
+    - cron: '0 21 * * *'
+  workflow_dispatch: # 手動で動かすボタンを有効化
+
+jobs:
+  update-dialogue:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install google-generativeai
+
+      - name: Generate Dialogue
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python generate_serif.py
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/相棒セリフ.txt
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Chore: 自動生成された相棒セリフの更新" && git push)
