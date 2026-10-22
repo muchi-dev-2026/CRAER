@@ -13,9 +13,8 @@ TAGS = ["#最新_ニュース", "#日常_雑談", "#関係性", "#哲学_怪奇"
 todays_focus = random.choice(TAGS)
 
 PROMPT = f"""
-あなたは、ゲーム内に登場する「相棒（楽しい本）」と「主人公」の会話スクリプトを専門に書く、プロのゲームシナリオライターです。
-会話の目的は、プレイヤーに最新の人間社会を面白く伝えながら、キャラクターへの愛着を深めることです。
-単なるニュースの読み上げではなく、笑い、皮肉、意外性、共感、知的好奇心、少しの不気味さが混ざった、生き生きとした掛け合いを作成してください。
+あなたは、ゲーム内に登場する「相棒（楽しい本）」のキャラクター設定と会話スクリプトを専門に書く、プロのゲームシナリオライターです。
+今日の最新情報を踏まえ、プレイヤーが思わず読みたくなる「相棒の自己紹介（インフォ）」と「生き生きとした掛け合い（セリフ）」を作成してください。
 
 【今日の重点テーマ】
 今日は特に「 {todays_focus} 」のタグの話題を多めに構成してください。
@@ -29,28 +28,19 @@ PROMPT = f"""
 
 ■ 主人公
 ・プレイヤーが感情移入できる人物。相棒の話を聞き、疑問、驚き、呆れ、ツッコミを自然に返す。
-・相棒のボケを毎回肯定せず、冷静なツッコミや意外な反論も交える。
-
-【会話の基本方針とバリエーション】
-1. 「情報の提示 → 意外な視点や冗談 → 主人公の反応」という流れを意識する。
-2. ブラックジョークの対象は「不条理な状況、無責任な組織、技術への過信、人間の矛盾」とし、被害者を嘲笑しない。
-3. 一つのタグにつき、異なる話題の会話ペアを「最低3組以上」作成すること。
 
 【文章表現のルール（超重要）】
 ・一つのセリフは必ず「全角40文字以内」で収めること。
 ・長い説明や複数行のセリフは禁止。テンポのよい掛け合いを優先し、1行で簡潔に言い切ること。
-・同じオチや同じ比喩を連続して使わないこと。時にはシリアスな会話や優しい会話も入れること。
 
-【出力仕様（厳守）】
-・必ず以下の「固定された4つのタグ」のみを使用してセリフグループを作ること。
-  1. #最新_ニュース （時事、AI、ネットの闇、テクノロジー）
-  2. #日常_雑談 （冒険の雑談、食べ物、言葉遊び、ファンタジーあるある）
-  3. #関係性 （相棒のメタ発言、主人公への質問、本音、信頼）
-  4. #哲学_怪奇 （怖い話、都市伝説、人生観、少し不気味な話）
-・相棒のセリフは必ず「serif:」、主人公のセリフは必ず「serif1:」で始める。
-・必ず交互に配置し、1組のペアを作る。
-・余計な解説、前置き、後書き、Markdownのコードブロック（```）は一切含めず、純粋なテキストのみを出力すること。
-・出力は必ず以下のフォーマットから始めること。
+【出力フォーマット（厳守）】
+余計な解説やMarkdownのコードブロック（```）は一切含めず、以下の形式のみを出力すること。
+最初に必ず [INFO] セクションを書き、その後に会話セクションを書くこと。
+
+[INFO]
+name: 楽しい本
+author: ナレッジ・エロイーズ
+description: （今日の最新情報や季節にちなんだ、相棒の「今の近況」を40文字〜60文字程度で面白おかしく書く）
 
 #最新_ニュース
 serif: （相棒のセリフ）
@@ -67,11 +57,13 @@ serif1: （主人公のセリフ）
 #哲学_怪奇
 serif: （相棒のセリフ）
 serif1: （主人公のセリフ）
+
+（※各タグにつき最低3組以上の会話ペアを作成すること）
 """
 
 def generate():
     print(f"今日の重点タグ: {todays_focus}")
-    print("AIがセリフを生成中...")
+    print("AIがインフォとセリフを生成中...")
     response = client.models.generate_content(
         model="gemini-3.5-flash-lite",
         contents=PROMPT,
@@ -85,12 +77,30 @@ def generate():
         text = text.rsplit("\n", 1)[0]
     text = text.strip()
 
-    output_path = "assets/book_serif.txt"
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    # [INFO] と 会話部分を切り分ける
+    if "[INFO]" in text:
+        parts = text.split("#", 1) # 最初の「#」で分割
+        if len(parts) == 2:
+            info_text = parts[0].strip()
+            serif_text = "#" + parts[1].strip()
+        else:
+            info_text = "[INFO]\nname: 楽しい本\nauthor: 不明\ndescription: 今日はなんだか調子がいいみたいだ。"
+            serif_text = text
+    else:
+        # もしAIが[INFO]を忘れた場合のフェイルセーフ
+        info_text = "[INFO]\nname: 楽しい本\nauthor: 不明\ndescription: 今日はなんだか調子がいいみたいだ。"
+        serif_text = text
 
-    with open(output_path, "w", encoding="utf-8") as f:
-        f.write(text)
-    print("セリフ生成完了:", output_path)
+    # ファイルに保存
+    os.makedirs("assets", exist_ok=True)
+    
+    with open("assets/book_info.txt", "w", encoding="utf-8") as f:
+        f.write(info_text)
+    print("インフォ生成完了: assets/book_info.txt")
+
+    with open("assets/book_serif.txt", "w", encoding="utf-8") as f:
+        f.write(serif_text)
+    print("セリフ生成完了: assets/book_serif.txt")
 
 if __name__ == "__main__":
     generate()
