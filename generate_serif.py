@@ -1,9 +1,8 @@
 import os
-import google.generativeai as genai
+from google import genai
 
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
+# クライアントの初期化（環境変数 GEMINI_API_KEY から自動で読み込まれます）
+client = genai.Client()
 
 PROMPT = """
 あなたはゲーム内に登場する「相棒（楽しい本）」と「主人公」の会話スクリプトを作成するライターです。
@@ -27,13 +26,11 @@ serif1: 本なのに季節を感じるんだな……。
 """
 
 def generate():
-    if not GEMINI_API_KEY:
-        raise ValueError("GEMINI_API_KEY が設定されていません")
-        
-    model = genai.GenerativeModel("gemini-2.0-flash")
-    
-    # AIにリクエストを送信
-    response = model.generate_content(PROMPT)
+    # 最新モデル（gemini-2.5-flash または gemini-2.0-flash）を指定
+    response = client.models.generate_content(
+        model='gemini-2.0-flash',
+        contents=PROMPT,
+    )
     text = response.text.strip()
 
     # 余計な ``` が混ざった場合の除去
