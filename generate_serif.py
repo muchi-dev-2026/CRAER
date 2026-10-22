@@ -85,7 +85,7 @@ def generate():
         text = text.rsplit("\n", 1)[0]
     text = text.strip()
 
-    output_path = "assets/相棒セリフ.txt"
+    output_path = "assets/book_serif.txt"
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
     with open(output_path, "w", encoding="utf-8") as f:
