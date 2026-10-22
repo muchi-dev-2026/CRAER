@@ -28,9 +28,10 @@ serif1: 本なのに季節を感じるんだな……。
 def generate():
     # 最新モデル（gemini-2.5-flash または gemini-2.0-flash）を指定
     response = client.models.generate_content(
-        model='gemini-2.0-flash',
+        model='gemini-3.8-flash',  # ここを更新！
         contents=PROMPT,
     )
+
     text = response.text.strip()
 
     # 余計な ``` が混ざった場合の除去
