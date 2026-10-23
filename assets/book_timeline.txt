@@ -1,111 +1,52 @@
-[INFO]
-name: 楽しい本
-author: 匿名
-description: 青白い虚空を漂う古びた黒革の魔導書。陽気な冗談と実況でプレイヤーを楽しませ、敗北しても責めずに励ます相棒。
-
-DEFAULT SERIFS:
-COMMAND_GUIDE:
-text: 相棒の本がこちらを向いています。気軽に話しかけてください。
-DEFAULT:
-serif: やっほー！ 今日も一緒に遊ぼう！
-serif1: よろしく、今日は何を話そうか？
-
-APPEAR:
-video: 0-4 スピード1
-tag: 登場_ひょっこり挨拶
 
 STAGE 1
 command
 hide
 
 WAIT:
-video: 4-8 スピード1
-tag: S1_ふわふわ待機
-#css: kaiso_choice_v
+ui: command_only
+tag: #最新_ニュース
 
 ENEMY_ATTACK:
-video: 14-18 スピード1
-tag: S1_楽しげなおしゃべり
-
-COMMAND_GUIDE:
-text: 本が楽しそうに浮遊しています。話題を選択してください。
+ui: command_only
+tag: #日常_雑談
 
 BUTTON1:
-text: 今日は何して遊ぼうかな？
-video: 8-12 スピード1
-tag: S1_今日の遊び相談
+text: 最新のニュースを聞く
+tag: #最新_ニュース
+goto: 1
 
 BUTTON2:
-text: その顔、なんか企んでる？
-video: 18-22 スピード1
-tag: S1_いたずら顔を観察
+text: ちょっと雑談しよう
+tag: #日常_雑談
+goto: 1
 
 BUTTON3:
-text: とりあえず一緒に笑おう！
-video: 32-36 スピード1
-tag: S1_ごきげん笑い
-nextStage: 2
+text: 別の話題を選ぶ
+goto: 2
 
 STAGE 2
 command
 hide
 
-
 WAIT:
-video: 22-26 スピード1
-tag: S2_首をかしげて待機
+ui: command_only
+tag: #関係性
 
 ENEMY_ATTACK:
-video: 28-32 スピード1
-tag: S2_得意げなひとこと
-
-COMMAND_GUIDE:
-text: 本がさらに上機嫌になりました。次の話題を選択してください。
+ui: command_only
+tag: #哲学_怪奇
 
 BUTTON1:
-text: 最近のおすすめを教えて！
-video: 14-18 スピード1
-tag: S2_おすすめを紹介
+text: 僕たちの関係性は？
+tag: #関係性
+goto: 2
 
 BUTTON2:
-text: その笑い方、つられるなあ
-video: 32-36 スピード1
-tag: S2_つられて笑顔
+text: 哲学的な話がしたい
+tag: #哲学_怪奇
+goto: 2
 
 BUTTON3:
-text: もっと面白い話を聞かせて！
-video: 18-22 スピード1
-tag: S2_話をせがむ
-nextStage: 3
-
-STAGE 3
-command
-hide
-
-
-WAIT:
-video: 24-28 スピード1
-tag: S3_わくわく待機
-
-ENEMY_ATTACK:
-video: 30-34 スピード1
-tag: S3_満面の笑みで応援
-
-COMMAND_GUIDE:
-text: 相棒がこちらを見つめています。好きな話題を選択してください。
-
-BUTTON1:
-text: 負けても次は笑っていこう！
-video: 8-12 スピード1
-tag: S3_前向きな約束
-
-BUTTON2:
-text: 君と話すと元気が出るよ
-video: 32-36 スピード1
-tag: S3_うれしそうに笑う
-
-BUTTON3:
-text: またあとでおしゃべりしよう
-video: 36-40 スピード1
-tag: S3_名残惜しいお別れ
+text: 図書館へ戻る
 goto: library
