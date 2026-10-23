@@ -32,18 +32,17 @@ BUTTON1:
 text: 最新のニュースを聞く
 video: 8-12 スピード1
 tag: #最新_ニュース
-nextStage: 2
 
 BUTTON2:
 text: ちょっと雑談しよう
 video: 18-22 スピード1
 tag: #日常_雑談
-nextStage: 2
+
 
 BUTTON3:
-text: 図書館へ戻る
+text: 次の話題へ
 video: 32-36 スピード1
-goto: library
+nextStage: 2
 
 # ==========================================
 # STAGE 2：関係性と哲学・怪奇
@@ -67,15 +66,47 @@ BUTTON1:
 text: 僕たちの関係性は？
 video: 14-18 スピード1
 tag: #関係性
-nextStage: 1
 
 BUTTON2:
 text: 哲学的な話がしたい
 video: 32-36 スピード1
 tag: #哲学_怪奇
-nextStage: 1
 
 BUTTON3:
-text: 図書館へ戻る
+text: 次の話題へ
 video: 18-22 スピード1
+nextStage: 3
+
+# ==========================================
+# STAGE 3：crare関連
+# ==========================================
+STAGE 3
+command
+hide
+
+WAIT:
+video: 4-8 スピード1
+tag: #最新_ニュース
+
+ENEMY_ATTACK:
+video: 14-18 スピード1
+tag: #関係性
+
+COMMAND_GUIDE:
+text: 本が楽しそうに浮遊しています。話題を選択してください。
+
+BUTTON1:
+text: crareについて
+video: file:se1.png ホールド5
+
+
+BUTTON2:
+text: 最初の話題へ
+video: 18-22 スピード1
+nextStage: 1
+
+
+BUTTON3:
+text: 図書館に戻る
+video: 32-36 スピード1
 goto: library
