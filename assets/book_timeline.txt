@@ -1,52 +1,81 @@
 
+DEFAULT SERIFS:
+COMMAND_GUIDE:
+text: 相棒の本がこちらを向いています。気軽に話しかけてください。
+DEFAULT:
+serif: やっほー！ 今日も一緒に遊ぼう！
+serif1: よろしく、今日は何を話そうか？
+
+APPEAR:
+video: 0-4 スピード1
+tag: 登場_ひょっこり挨拶
+
+# ==========================================
+# STAGE 1：ニュースと日常雑談
+# ==========================================
 STAGE 1
 command
 hide
 
 WAIT:
-ui: command_only
+video: 4-8 スピード1
 tag: #最新_ニュース
 
 ENEMY_ATTACK:
-ui: command_only
+video: 14-18 スピード1
 tag: #日常_雑談
+
+COMMAND_GUIDE:
+text: 本が楽しそうに浮遊しています。話題を選択してください。
 
 BUTTON1:
 text: 最新のニュースを聞く
+video: 8-12 スピード1
 tag: #最新_ニュース
-goto: 1
+nextStage: 2
 
 BUTTON2:
 text: ちょっと雑談しよう
+video: 18-22 スピード1
 tag: #日常_雑談
-goto: 1
+nextStage: 2
 
 BUTTON3:
-text: 別の話題を選ぶ
-goto: 2
+text: 図書館へ戻る
+video: 32-36 スピード1
+goto: library
 
+# ==========================================
+# STAGE 2：関係性と哲学・怪奇
+# ==========================================
 STAGE 2
 command
 hide
 
 WAIT:
-ui: command_only
+video: 22-26 スピード1
 tag: #関係性
 
 ENEMY_ATTACK:
-ui: command_only
+video: 28-32 スピード1
 tag: #哲学_怪奇
+
+COMMAND_GUIDE:
+text: 本がさらに上機嫌になりました。次の話題を選択してください。
 
 BUTTON1:
 text: 僕たちの関係性は？
+video: 14-18 スピード1
 tag: #関係性
-goto: 2
+nextStage: 1
 
 BUTTON2:
 text: 哲学的な話がしたい
+video: 32-36 スピード1
 tag: #哲学_怪奇
-goto: 2
+nextStage: 1
 
 BUTTON3:
 text: 図書館へ戻る
+video: 18-22 スピード1
 goto: library
