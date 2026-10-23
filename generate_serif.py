@@ -1,4 +1,5 @@
 import os
+import re
 import random
 from google import genai
 
@@ -41,7 +42,7 @@ PROMPT = f"""
 [INFO]
 name: 案内人
 author: muchi
-description: （今日の最新情報や季節にちなんだ、相棒の「今の近況」を40文字〜60文字程度で面白おかしく書く）
+description: （今日の最新情報や季節にちなんだ、相棒の「今の近況」を40文字〜60文字程度で面白おかしく書く。1行で収めること。改行・#記号は禁止）
 
 #最新_ニュース
 serif: （相棒のセリフ）
@@ -59,7 +60,7 @@ serif1: （主人公のセリフ）
 serif: （相棒のセリフ）
 serif1: （主人公のセリフ）
 
-（※各タグにつき最低5組以上の会話ペアを作成すること。話者名は必ず「serif:」と「serif1:」にすること。）
+（※各タグにつき最低12組以上の会話ペアを作成すること。話者名は必ず「serif:」と「serif1:」にすること。）
 """
 
 def generate():
@@ -79,22 +80,19 @@ def generate():
     text = text.strip()
 
     # [INFO] と 会話部分を切り分ける
-    if "[INFO]" in text:
-        parts = text.split("#", 1) # 最初の「#」で分割
-        if len(parts) == 2:
-            info_text = parts[0].strip()
-            serif_text = "#" + parts[1].strip()
-        else:
-            info_text = "[INFO]\nname: 楽しい本\nauthor: 不明\ndescription: 今日はなんだか調子がいいみたいだ。"
-            serif_text = text
+    # description 内の「#」で誤爆しないよう、#最新_ニュース の行を正規表現で探す
+    m = re.search(r"(?m)^\s*#最新_ニュース\s*$", text)
+    if m:
+        info_text = text[:m.start()].strip()
+        serif_text = text[m.start():].strip()
     else:
-        # もしAIが[INFO]を忘れた場合のフェイルセーフ
-        info_text = "[INFO]\nname: 楽しい本\nauthor: 不明\ndescription: 今日はなんだか調子がいいみたいだ。"
+        # AIが[INFO]やタグを忘れた場合のフェイルセーフ
+        info_text = "[INFO]\nname: 案内人\nauthor: muchi\ndescription: 今日はなんだか調子がいいみたいだ。"
         serif_text = text
 
     # ファイルに保存
     os.makedirs("assets", exist_ok=True)
-    
+
     with open("assets/book_info.txt", "w", encoding="utf-8") as f:
         f.write(info_text)
     print("インフォ生成完了: assets/book_info.txt")
