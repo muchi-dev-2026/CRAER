@@ -31,9 +31,10 @@ jobs:
         run: |
           python generate_serif.py
 
-      - name: Commit and Push
+- name: Commit and Push
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add assets/相棒セリフ.txt
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Chore: 自動生成された相棒セリフの更新" && git push)
+          git add assets/book_serif.txt
+          git add assets/book_info.txt
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Chore: 自動生成された相棒セリフとインフォの更新" && git push)
