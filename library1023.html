@@ -1268,16 +1268,6 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
   animation: gothicPulse 1.5s ease-in-out infinite alternate;
 }
 
-/* ★エンディングボタンを案内人ボタンの上に重ねる設定 */
-#lib_libraryEndingButton {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  /* 必要に応じて z-index を上げて手前に表示 */
-  z-index: 20;
-}
-
-
 
 </style>
 <style id="dynamicStyle"></style>
@@ -1319,22 +1309,22 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
     align-items: flex-end;
     pointer-events: none;
   ">
-  <!-- ★左端：エンディングボタン（普段は非表示） -->
-  <button id="lib_libraryEndingButton" class="lib_gothic_btn" style="display: none;">
-    <span class="lib_btn_text">† 侵食の記憶</span>
-  </button>
-  
-  <!-- ★左端：案内人（楽しい本）ボタン -->
-  <button id="lib_companionButton" class="lib_gothic_btn" style="display: none;">
-    <span class="lib_btn_text">📖 楽しい本</span>
-  </button>
-  
-  <!-- ★右端：敗北回想ボタン -->
-  <button id="lib_defeatRecapButton" class="lib_gothic_btn" style="display: none;">
-    <div class="recap-gauge-fill" style="width: 0%;"></div>
-    <span class="lib_btn_text recap-gauge-text">† 敗北回想</span>
-  </button>
-  
+<!-- ★左端：エンディングボタン（普段は非表示） -->
+<button id="lib_libraryEndingButton" class="lib_gothic_btn" style="display: none;">
+  <span class="lib_btn_text">† 侵食の記憶</span>
+</button>
+
+<!-- ★左端：案内人ボタン -->
+<button id="lib_companionButton" class="lib_gothic_btn" style="display: none;">
+  <span class="lib_btn_text">📖 案内人</span>
+</button>
+
+<!-- ★右端：敗北回想ボタン -->
+<button id="lib_defeatRecapButton" class="lib_gothic_btn" style="display: none;">
+  <div class="recap-gauge-fill" style="width: 0%;"></div>
+  <span class="lib_btn_text recap-gauge-text">† 敗北回想</span>
+</button>
+
 </div>
 </div>
 
@@ -1526,7 +1516,7 @@ async function loadCompanion() {
     const infoText = await infoRes.text();
     
     return {
-      name: "楽しい本",
+      name: "案内人",
       info: parseInfo(infoText),
       timelineText,
       serifText,
