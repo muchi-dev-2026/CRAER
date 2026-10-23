@@ -1267,6 +1267,18 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
   border-color: #ff0055 !important;
   animation: gothicPulse 1.5s ease-in-out infinite alternate;
 }
+
+/* ★エンディングボタンを案内人ボタンの上に重ねる設定 */
+#lib_libraryEndingButton {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  /* 必要に応じて z-index を上げて手前に表示 */
+  z-index: 20;
+}
+
+
+
 </style>
 <style id="dynamicStyle"></style>
 </head>
@@ -1296,7 +1308,7 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
   <div id="lib_commandLayer"></div>
   
   <!-- ★追加：左右に分けるためのコンテナ -->
-  <div id="lib_libraryButtons" style="
+<div id="lib_libraryButtons" style="
     position: absolute;
     bottom: 20px;
     left: 20px;
@@ -1307,18 +1319,23 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
     align-items: flex-end;
     pointer-events: none;
   ">
-<!-- ★左端：エンディングボタン -->
-<button id="lib_libraryEndingButton" class="lib_gothic_btn" style="display: none;">
-  <span class="lib_btn_text">† 侵食の記憶</span>
-</button>
-
-<!-- ★右端：敗北回想ボタン -->
-<button id="lib_defeatRecapButton" class="lib_gothic_btn" style="display: none;">
-  <div class="recap-gauge-fill" style="width: 0%;"></div>
-  <span class="lib_btn_text recap-gauge-text">† 敗北回想</span>
-</button>
-
-  </div>
+  <!-- ★左端：エンディングボタン（普段は非表示） -->
+  <button id="lib_libraryEndingButton" class="lib_gothic_btn" style="display: none;">
+    <span class="lib_btn_text">† 侵食の記憶</span>
+  </button>
+  
+  <!-- ★左端：案内人（楽しい本）ボタン -->
+  <button id="lib_companionButton" class="lib_gothic_btn" style="display: none;">
+    <span class="lib_btn_text">📖 楽しい本</span>
+  </button>
+  
+  <!-- ★右端：敗北回想ボタン -->
+  <button id="lib_defeatRecapButton" class="lib_gothic_btn" style="display: none;">
+    <div class="recap-gauge-fill" style="width: 0%;"></div>
+    <span class="lib_btn_text recap-gauge-text">† 敗北回想</span>
+  </button>
+  
+</div>
 </div>
 
 
@@ -1759,28 +1776,23 @@ if (libEndingBtn) {
   }
 }
 
-// ★追加：相棒を図書館に表示する
+// ★追加：相棒を「左下のボタン」として表示する
 const companionData = await loadCompanion();
-if (companionData) {
-  const btn = document.createElement("button");
-  btn.className = "lib_command";
-  const nameEl = document.createElement("span");
-  nameEl.className = "lib_command-name";
-  nameEl.textContent = "楽しい本";
-  // 相棒っぽく金色にする
-  nameEl.style.color = "#ffd700";
-  nameEl.style.textShadow = "0 0 10px #ffaa00";
-  btn.appendChild(nameEl);
-  
-  btn.onclick = () => {
+const companionBtn = document.getElementById("lib_companionButton");
+
+if (companionData && companionBtn) {
+  companionBtn.style.display = "flex";
+  companionBtn.onclick = () => {
     // 相棒を選択したら、インフォ画面へ直行
     state.currentEnemy = companionData;
     showEnemyPage(companionData);
   };
-  commandLayer.appendChild(btn);
+} else if (companionBtn) {
+  companionBtn.style.display = "none";
 }
 
 } // ← これが showLibrary 関数の閉じカッコです
+
 
 
 // ===== 敵を選択 =====
