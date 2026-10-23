@@ -97,6 +97,7 @@ text: 本が楽しそうに浮遊しています。話題を選択してくだ�
 BUTTON1:
 text: crareについて
 video: file:se1.png ホールド5
+ui: hide
 
 
 BUTTON2:
