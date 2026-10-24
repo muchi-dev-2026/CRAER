@@ -1267,6 +1267,8 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
   border-color: #ff0055 !important;
   animation: gothicPulse 1.5s ease-in-out infinite alternate;
 }
+
+
 </style>
 <style id="dynamicStyle"></style>
 </head>
@@ -1296,7 +1298,7 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
   <div id="lib_commandLayer"></div>
   
   <!-- ★追加：左右に分けるためのコンテナ -->
-  <div id="lib_libraryButtons" style="
+<div id="lib_libraryButtons" style="
     position: absolute;
     bottom: 20px;
     left: 20px;
@@ -1307,9 +1309,14 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
     align-items: flex-end;
     pointer-events: none;
   ">
-<!-- ★左端：エンディングボタン -->
+<!-- ★左端：エンディングボタン（普段は非表示） -->
 <button id="lib_libraryEndingButton" class="lib_gothic_btn" style="display: none;">
   <span class="lib_btn_text">† 侵食の記憶</span>
+</button>
+
+<!-- ★左端：案内人ボタン -->
+<button id="lib_companionButton" class="lib_gothic_btn" style="display: none;">
+  <span class="lib_btn_text">📖 案内人</span>
 </button>
 
 <!-- ★右端：敗北回想ボタン -->
@@ -1318,7 +1325,7 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
   <span class="lib_btn_text recap-gauge-text">† 敗北回想</span>
 </button>
 
-  </div>
+</div>
 </div>
 
 
@@ -1472,6 +1479,65 @@ const state = {
 
 // ★追加：エンディング解禁に必要な敗北回数（ここを変えるだけでゲージとボタンが連動します）
 const REQUIRED_DEFEATS = 10;
+
+// ===== [INFO] パース =====
+function parseInfo(text){
+  const info = { name: "", author: "", description: "" };
+  if (!text) return info;
+  const lines = text.split("\n");
+  let inInfo = false;
+  for (const rawLine of lines){
+    const line = rawLine.trim();
+    if (line.match(/^\[INFO\]$/i)){ inInfo = true; continue; }
+    if (line.match(/^\[/)){ inInfo = false; continue; }
+    if (inInfo){
+      const m = line.match(/^(\w+)\s*[:：]\s*(.+)$/);
+      if (m){
+        const key = m[1].toLowerCase();
+        if (key in info) info[key] = m[2].trim();
+      }
+    }
+  }
+  return info;
+}
+
+
+// ★追加：相棒データの読み込み
+async function loadCompanion() {
+  try {
+    const [timelineRes, serifRes, infoRes] = await Promise.all([
+      fetch("assets/book_timeline.txt"),
+      fetch("assets/book_serif.txt"),
+      fetch("assets/book_info.txt")
+    ]);
+    
+    const timelineText = await timelineRes.text();
+    const serifText = await serifRes.text();
+    const infoText = await infoRes.text();
+    
+    return {
+      name: "案内人",
+      info: parseInfo(infoText),
+      timelineText,
+      serifText,
+      videoURLs: {
+    "battle.mp4": "assets/book_battle.mp4"
+  },
+  imageURLs: {
+    "chara.png": "assets/book_chara.png",
+    "se1.png": "assets/se1.png"
+  },
+  
+      charaURL: "assets/book_chara.png",
+      sfxText: "",
+      cssText: ""
+    };
+  } catch (e) {
+    console.warn("相棒の読み込み失敗:", e);
+    return null;
+  }
+}
+
 
 // ===== 要素 =====
 const introScreen = document.getElementById("lib_introScreen");
@@ -1657,7 +1723,7 @@ async function showLibrary() {
   });
   
   
-// ★追加：敗北記録があればボタン表示（侵食ゲージ付き）
+// ★追加：があればボタン表示（侵食ゲージ付き）
 const recapBtn = document.getElementById("lib_defeatRecapButton");
 const defeatedCount = window.idx?.gameState?.defeatedScenes?.length || 0;
 
@@ -1703,7 +1769,24 @@ if (libEndingBtn) {
   }
 }
 
+// ★追加：相棒を「左下のボタン」として表示する
+const companionData = await loadCompanion();
+const companionBtn = document.getElementById("lib_companionButton");
+
+if (companionData && companionBtn) {
+  companionBtn.style.display = "flex";
+  companionBtn.onclick = () => {
+    // 相棒を選択したら、インフォ画面へ直行
+    state.currentEnemy = companionData;
+    showEnemyPage(companionData);
+  };
+} else if (companionBtn) {
+  companionBtn.style.display = "none";
+}
+
 } // ← これが showLibrary 関数の閉じカッコです
+
+
 
 // ===== 敵を選択 =====
 async function selectEnemy(enemy, btn) {
@@ -1762,24 +1845,36 @@ async function selectEnemy(enemy, btn) {
 }
 
 // ===== 敵画面 =====
-function showEnemyPage(enemy){
+function showEnemyPage(enemy) {
   libraryScreen.style.opacity = "1";
   libraryScreen.style.transition = "none";
   
   showScreen("enemy");
   
+  // 前回の動画を完全にリセット
+  battleLoop.pause();
+  battleLoop.removeAttribute("src");
+  battleLoop.load();
+  
+  // ★ enemy.videoURLs には動画しか入っていないので、安心して選べる
   if (enemy.videoURLs) {
-  const firstURL = Object.values(enemy.videoURLs)[0];
-  if (firstURL) {
-    battleLoop.src = firstURL;
-    battleLoop.play().catch(() => {});
+    const keys = Object.keys(enemy.videoURLs);
+    let targetKey = keys.find(k => k.toLowerCase() === "battle.mp4") || keys[0];
+    
+    if (targetKey) {
+      battleLoop.src = enemy.videoURLs[targetKey];
+      battleLoop.loop = true;
+      battleLoop.play().catch((err) => {
+        console.warn("敵紹介動画の再生失敗:", err);
+      });
+    }
   }
-}
   
   enemyName.textContent = enemy.info.name || enemy.name;
   enemyMeta.textContent = enemy.info.author ? `by ${enemy.info.author}` : "";
   enemyDescription.textContent = enemy.info.description || "";
 }
+
 
 // ===== 選び直す =====
 backButton.onclick = () => {
@@ -1787,6 +1882,7 @@ backButton.onclick = () => {
   battleLoop.src = "";
   showLibrary();
 };
+
 
 // ===== 入る =====
 enterButton.onclick = () => {
@@ -1805,9 +1901,9 @@ enterButton.onclick = () => {
     window.idx.gameState.battleStarted = false;
     window.idx.gameState.battleEnded = false;
     
-    // データの読み込み
-    window.idx.gameState.videoURLs = enemy.videoURLs;
-    window.idx.gameState.parsedTimeline = window.idx.parseNewTimeline(enemy.timelineText);
+// データの読み込み（★動画と画像を合体させて渡す）
+window.idx.gameState.videoURLs = { ...enemy.videoURLs, ...enemy.imageURLs };
+window.idx.gameState.parsedTimeline = window.idx.parseNewTimeline(enemy.timelineText);
     window.idx.gameState.serifPools = window.idx.parseSerifFile(enemy.serifText);
     if (enemy.sfxText && window.idx.parseSfxFile) {
       window.idx.gameState.sfxTexts = window.idx.parseSfxFile(enemy.sfxText);
@@ -1874,7 +1970,7 @@ folderButton.onclick = () => {
         
         const timelineFile = folder["timeline.txt"];
         const serifFile = folder["セリフ.txt"];
-        const charaFile = folder["chara.png"];
+        const charaFile = folder["chara.png"] || folder["chara.jpeg"] || folder["chara.jpg"];
         const sfxFile = folder["擬音.txt"];
         const styleFile = folder["style.css"];
         let videoFile = folder["battle.mp4"];
@@ -1888,23 +1984,28 @@ folderButton.onclick = () => {
         const sfxText = sfxFile ? await readFileText(sfxFile) : "";
         const cssText = styleFile ? await readFileText(styleFile) : "";
         
-        const allVideoURLs = {};
-        Object.entries(folder).forEach(([k, f]) => {
-          if (/\.(mp4|webm|jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(k)) {   // ★拡張子を拡張
-            allVideoURLs[k] = URL.createObjectURL(f);
-          }
-        });
-        
-        state.enemies.push({
-          name,
-          info: parseInfo(timelineText),
-          timelineText,
-          serifText,
-          videoURLs: allVideoURLs,
-          charaURL: charaFile ? URL.createObjectURL(charaFile) : null,
-          sfxText: sfxText,
-          cssText: cssText,
-        });
+const videos = {};
+const images = {};
+Object.entries(folder).forEach(([k, f]) => {
+  if (/\.(mp4|webm)$/i.test(k)) {
+    videos[k] = URL.createObjectURL(f);
+  } else if (/\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(k)) {
+    images[k] = URL.createObjectURL(f);
+  }
+});
+
+state.enemies.push({
+  name,
+  info: parseInfo(timelineText),
+  timelineText,
+  serifText,
+  videoURLs: videos, // ★ 動画だけ
+  imageURLs: images, // ★ 画像だけ（新設）
+  charaURL: charaFile ? URL.createObjectURL(charaFile) : null,
+  sfxText: sfxText,
+  cssText: cssText,
+});
+
       }
       
       await showLibrary();
@@ -1918,26 +2019,6 @@ folderButton.onclick = () => {
   input.click();
 };
 
-// ===== [INFO] パース =====
-function parseInfo(text){
-  const info = { name: "", author: "", description: "" };
-  if (!text) return info;
-  const lines = text.split("\n");
-  let inInfo = false;
-  for (const rawLine of lines){
-    const line = rawLine.trim();
-    if (line.match(/^\[INFO\]$/i)){ inInfo = true; continue; }
-    if (line.match(/^\[/)){ inInfo = false; continue; }
-    if (inInfo){
-      const m = line.match(/^(\w+)\s*[:：]\s*(.+)$/);
-      if (m){
-        const key = m[1].toLowerCase();
-        if (key in info) info[key] = m[2].trim();
-      }
-    }
-  }
-  return info;
-}
 
 // ===== 起動 =====
 playIntro();
@@ -2011,15 +2092,22 @@ document.getElementById("lib_recapClearButton")?.addEventListener("click", () =>
   const answer = confirm("敗北回想のデータをすべて削除します。よろしいですか？");
   if (!answer) return;
 
-  // localStorageから削除
-  localStorage.removeItem('craer_defeated');
-  
-  // メモリ上のデータも空にする
-  if (window.idx && window.idx.gameState) {
-    window.idx.gameState.defeatedScenes = [];
-  }
-  
-  alert("データを削除しました。");
+// localStorageから削除
+localStorage.removeItem('craer_defeated');
+
+// メモリ上のデータも空にする
+if (window.idx && window.idx.gameState) {
+  window.idx.gameState.defeatedScenes = [];
+}
+
+// ★追加：敵個別累計もリセット
+localStorage.removeItem('craer_defeats_by_enemy');
+if (window.idx && window.idx.gameState) {
+  window.idx.gameState.defeatsByEnemy = {};
+}
+
+alert("データを削除しました。");
+
   
   // 図書館に戻る（メニューを閉じる）
   const recapBg = document.getElementById("lib_recapBgVideo");
@@ -2157,7 +2245,9 @@ const gameState = {
   msgTimer: null, typewriterTimer: null,
   heroMsgTimer: null, heroTypewriterTimer: null,
   playSessionId: 0,
-  defeatedScenes: []   // ★追加：敗北記録
+playSessionId: 0,
+  defeatedScenes: [], // ★追加：敗北記録
+  defeatsByEnemy: {} // ★追加：敵個別累計
 };
 
 function showErrorGame(msg) {
@@ -2572,6 +2662,25 @@ function getCurrentStageLevel() {
   return 1;
 }
 
+// ★追加：nextStage の敗北回数条件を解決
+function resolveNextStage(val) {
+  const s = String(val).trim();
+  const m = s.match(/^(?:(all)?def\s*(\d+))\s+(.+)$/);
+  if (!m) return s;
+  
+  const [, all, n, target] = m;
+  const need = parseInt(n, 10);
+  const list = gameState.defeatedScenes || [];
+  let count;
+  if (all) {
+    count = list.length;
+  } else {
+    const id = window.lib?.state?.currentEnemy?.name;
+    count = (gameState.defeatsByEnemy?.[id]) || list.filter(r => r.enemyId === id).length;
+  }
+  return count >= need ? target.trim() : gameState.stage;
+}
+
 function updateHeroAvatar() {
   const level = getCurrentStageLevel();
   const currentStage = Math.min(level, 4);
@@ -2671,7 +2780,7 @@ function playEventVideo(eventData, eventName, onComplete=null) {
     }
 
 if (currentAction.nextStage !== undefined) {
-  gameState.stage = currentAction.nextStage;
+  gameState.stage = resolveNextStage(currentAction.nextStage);
 }
 
 // ★ goto 処理
@@ -3295,15 +3404,23 @@ function recordDefeat() {
     timestamp: Date.now()
   });
   
-  // 最新10件を超えたら古いものを削除
-  if (gameState.defeatedScenes.length > 10) {
-    gameState.defeatedScenes.shift();
-  }
-  
-  saveDefeatedScenes();
+// 最新10件を超えたら古いものを削除
+if (gameState.defeatedScenes.length > 10) {
+  gameState.defeatedScenes.shift();
+}
+
+saveDefeatedScenes();
+
+// ★追加：敵個別の累計を加算保存
+const key = 'craer_defeats_by_enemy';
+const map = JSON.parse(localStorage.getItem(key) || '{}');
+map[enemyId] = (map[enemyId] || 0) + 1;
+localStorage.setItem(key, JSON.stringify(map));
+gameState.defeatsByEnemy[enemyId] = map[enemyId];
 }
 
 // ★追加：UI状態とバリアントをリセット
+
 function resetUIVariants() {
   commandsEl.dataset.variant = "";
   const uiElements = [
@@ -3361,7 +3478,13 @@ updateHeroAvatar();
 // ★④：敗北記録を読み込み
 loadDefeatedScenes();
 
+// ★追加：敵個別の累計敗北回数を読み込み
+gameState.defeatsByEnemy = JSON.parse(
+  localStorage.getItem('craer_defeats_by_enemy') || '{}'
+);
+
 // ★⑤：単体の敗北を再生（そのステージへ飛んで敗北処理を走らせる）
+
 async function playSingleDefeat(index) {
     const record = gameState.defeatedScenes[index];
     if (!record) {
@@ -3379,8 +3502,9 @@ async function playSingleDefeat(index) {
     // ★追加：回想再生フラグをON（履歴の汚染防止）
     gameState.isRecapPlayback = true;
     
-    // ゲーム状態のロード（「入る」ボタンを押した時と同じ処理）
-    gameState.videoURLs = enemy.videoURLs;
+// ゲーム状態のロード（「入る」ボタンを押した時と同じ処理）
+gameState.videoURLs = { ...enemy.videoURLs, ...enemy.imageURLs };
+
     
   gameState.parsedTimeline = window.idx.parseNewTimeline(enemy.timelineText);
   gameState.serifPools = window.idx.parseSerifFile(enemy.serifText);
@@ -3445,8 +3569,8 @@ async function playEndingSequence() {
     const enemy = window.lib?.state?.enemies?.find(e => e.name === record.enemyId);
     if (!enemy) continue;
     
-    // データロード
-    gameState.videoURLs = enemy.videoURLs;
+  // データロード
+gameState.videoURLs = { ...enemy.videoURLs, ...enemy.imageURLs };
     gameState.parsedTimeline = parseNewTimeline(enemy.timelineText);
     gameState.serifPools = parseSerifFile(enemy.serifText);
     if (enemy.sfxText && parseSfxFile) {
