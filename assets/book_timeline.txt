@@ -98,6 +98,9 @@ BUTTON1:
 text: crareについて
 video: file:se1.png ホールド5
 ui: hide
+video: file:se1.png ホールド3
+ui: show
+nextStage: 3
 
 
 BUTTON2:
