@@ -2326,7 +2326,8 @@ defeatedScenes: [], // ★追加：敗北記録
 recapReturnTo: null, // ★追加：回想後の復帰先STAGE名
   recapReturnPleasure: null, // ★追加：回想後の復帰時pleasure値（null なら変更なし）
   recapHasNext: false, // ★追加：連続再生中に次の回想があるか
-  recapNextFn: null // ★追加：次の回想へ進む関数
+  recapNextFn: null, // ★追加：次の回想へ進む関数
+  recapSavedBattle: null // ★追加：回想中に退避する元バトルデータ
 };
 
 function showErrorGame(msg) {
@@ -3487,6 +3488,20 @@ if (gameState.recapReturnTo) {
   const returnPleasure = gameState.recapReturnPleasure;
   gameState.recapReturnTo = null;
   gameState.recapReturnPleasure = null;
+  
+  // ★追加：元バトルデータを復元
+  if (gameState.recapSavedBattle) {
+    const saved = gameState.recapSavedBattle;
+    gameState.videoURLs = saved.videoURLs;
+    gameState.parsedTimeline = saved.parsedTimeline;
+    gameState.serifPools = saved.serifPools;
+    gameState.sfxTexts = saved.sfxTexts;
+    if (saved.charaURL) {
+      heroAvatarSprite.style.backgroundImage = saved.charaURL;
+    }
+    gameState.recapSavedBattle = null;
+  }
+  
   gameState.battleStarted = true;
   gameState.battleEnded = false;
   gameState.stage = target;
@@ -3502,11 +3517,13 @@ if (gameState.recapReturnTo) {
   scheduleEnemyAttack();
   return;
 }
+
     
-    // 通常時は図書館へ
-    if (window.lib && window.lib.showLibrary) {
-      window.lib.showLibrary();
-    }
+// 通常時は図書館へ
+gameState.recapSavedBattle = null; // ★追加：退避データをクリア
+if (window.lib && window.lib.showLibrary) {
+  window.lib.showLibrary();
+}
   };
 }
 
@@ -3679,8 +3696,21 @@ async function playSingleDefeat(index, options = {}) {
       return;
     }
     
+    // ★追加：初回のみ元バトルデータを退避（連続再生の2件目以降は保存しない）
+    if (!gameState.recapSavedBattle) {
+      gameState.recapSavedBattle = {
+        videoURLs: { ...gameState.videoURLs },
+        parsedTimeline: gameState.parsedTimeline,
+        serifPools: gameState.serifPools,
+        sfxTexts: gameState.sfxTexts,
+        stage: gameState.stage,
+        charaURL: heroAvatarSprite.style.backgroundImage,
+      };
+    }
+    
     // ★追加：回想再生フラグをON（履歴の汚染防止）
     gameState.isRecapPlayback = true;
+    
     
 // ゲーム状態のロード（「入る」ボタンを押した時と同じ処理）
 gameState.videoURLs = { ...enemy.videoURLs, ...enemy.imageURLs };
@@ -3799,24 +3829,25 @@ function playRecapSequence(recapPlayStr, onComplete) {
     targets = scenes.map((_, i) => i);
   }
   
-  // 対象なし → そのまま戻る
-  if (targets.length === 0) {
-    console.warn("回想対象がありません:", recapPlayStr);
-    if (returnTo) {
-      gameState.recapReturnTo = returnTo;
-      gameState.battleStarted = true;
-      gameState.battleEnded = false;
-      gameState.stage = returnTo;
-      resultOverlay.style.display = "none";
-      playEventVideo(getWaitEvent(), 'WAIT');
-      scheduleEnemyAttack();
-    } else {
-      if (window.lib && window.lib.showLibrary) {
-        window.lib.showLibrary();
-      }
+// 対象なし → そのまま戻る
+if (targets.length === 0) {
+  console.warn("回想対象がありません:", recapPlayStr);
+  gameState.recapSavedBattle = null; // ★追加：念のためクリア
+  if (returnTo) {
+    gameState.recapReturnTo = returnTo;
+    gameState.battleStarted = true;
+    gameState.battleEnded = false;
+    gameState.stage = returnTo;
+    resultOverlay.style.display = "none";
+    playEventVideo(getWaitEvent(), 'WAIT');
+    scheduleEnemyAttack();
+  } else {
+    if (window.lib && window.lib.showLibrary) {
+      window.lib.showLibrary();
     }
-    return;
   }
+  return;
+}
   
   let pos = 0;
   
@@ -3843,10 +3874,11 @@ playSingleDefeat(idx, {
 
 // ★追加：エンディング連続再生
 async function playEndingSequence() {
-  isEndingSequence = true;
-  
-  // 最新5件を抽出
-  const targetScenes = gameState.defeatedScenes.slice(-5);
+    isEndingSequence = true;
+    gameState.recapSavedBattle = null; // ★追加：念のためクリア
+    
+    // 最新5件を抽出
+    const targetScenes = gameState.defeatedScenes.slice(-5);
   if (targetScenes.length === 0) {
     isEndingSequence = false;
     return;
