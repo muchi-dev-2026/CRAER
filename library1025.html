@@ -2323,7 +2323,8 @@ const gameState = {
   playSessionId: 0,
 defeatedScenes: [], // ★追加：敗北記録
   defeatsByEnemy: {}, // ★追加：敵個別累計
-  recapReturnTo: null, // ★追加：回想後の復帰先STAGE名
+recapReturnTo: null, // ★追加：回想後の復帰先STAGE名
+  recapReturnPleasure: null, // ★追加：回想後の復帰時pleasure値（null なら変更なし）
   recapHasNext: false, // ★追加：連続再生中に次の回想があるか
   recapNextFn: null // ★追加：次の回想へ進む関数
 };
@@ -3480,18 +3481,27 @@ if (resultSub) {
     
     gameState.isRecapPlayback = false;
     
-    // ★追加：復帰先が指定されていればそのSTAGEのWAITへ戻る
-    if (gameState.recapReturnTo) {
-      const target = gameState.recapReturnTo;
-      gameState.recapReturnTo = null;
-      gameState.battleStarted = true;
-      gameState.battleEnded = false;
-      gameState.stage = target;
-      resultOverlay.style.display = "none";
-      playEventVideo(getWaitEvent(), 'WAIT');
-      scheduleEnemyAttack();
-      return;
-    }
+// ★追加：復帰先が指定されていればそのSTAGEのWAITへ戻る
+if (gameState.recapReturnTo) {
+  const target = gameState.recapReturnTo;
+  const returnPleasure = gameState.recapReturnPleasure;
+  gameState.recapReturnTo = null;
+  gameState.recapReturnPleasure = null;
+  gameState.battleStarted = true;
+  gameState.battleEnded = false;
+  gameState.stage = target;
+  
+  // ★追加：pleasure を反映
+  if (returnPleasure !== null && returnPleasure !== undefined) {
+    gameState.pleasure = returnPleasure;
+    updatePleasure();
+  }
+  
+  resultOverlay.style.display = "none";
+  playEventVideo(getWaitEvent(), 'WAIT');
+  scheduleEnemyAttack();
+  return;
+}
     
     // 通常時は図書館へ
     if (window.lib && window.lib.showLibrary) {
@@ -3654,7 +3664,7 @@ gameState.defeatsByEnemy = JSON.parse(
 // ★⑤：単体の敗北を再生（そのステージへ飛んで敗北処理を走らせる）
 
 async function playSingleDefeat(index, options = {}) {
-    const { returnTo = null, hasNext = false, onNext = null } = options; // ★追加
+    const { returnTo = null, returnPleasure = null, hasNext = false, onNext = null } = options;
     const record = gameState.defeatedScenes[index];
     if (!record) {
       console.warn("記録なし:", index);
@@ -3713,10 +3723,12 @@ gameState.pleasure = CONFIG.MAX_PLEASURE;
 
 // ★追加：復帰先を記録
 gameState.recapReturnTo = returnTo;
+gameState.recapReturnPleasure = returnPleasure; // ★追加
 
 // ★追加：連続再生制御
 gameState.recapHasNext = hasNext;
 gameState.recapNextFn = onNext;
+
 
 updatePleasure();
 
@@ -3726,21 +3738,31 @@ defeat();
 // ★追加：recap文字列をパース
 // 戻り値: { mode: 'list' | 'number', indices: number[] | null, returnTo: string | null }
 function parseRecapTarget(recapStr) {
-  if (!recapStr) return { mode: 'list', indices: null, returnTo: null };
+  if (!recapStr) return { mode: 'list', indices: null, returnTo: null, returnPleasure: null };
   
   let str = String(recapStr).trim();
   let returnTo = null;
+  let returnPleasure = null; // ★追加
   
-  // " > kaiso_wait" 形式の戻り先抽出
+  // " > STAGE名 =数値" 形式の抽出
   const parts = str.split('>');
   if (parts.length >= 2) {
     str = parts[0].trim();
-    returnTo = parts.slice(1).join('>').trim() || null;
+    let returnStr = parts.slice(1).join('>').trim();
+    
+    // ★追加："=数値" を分離
+    const eqMatch = returnStr.match(/^(.+?)\s*=\s*(-?\d+)\s*$/);
+    if (eqMatch) {
+      returnTo = eqMatch[1].trim();
+      returnPleasure = parseInt(eqMatch[2], 10);
+    } else {
+      returnTo = returnStr || null;
+    }
   }
   
   // "list" ならリスト表示
   if (str.toLowerCase() === 'list' || str === '') {
-    return { mode: 'list', indices: null, returnTo };
+    return { mode: 'list', indices: null, returnTo, returnPleasure };
   }
   
   // "1,3,5" または "1-5" をパース
@@ -3752,19 +3774,20 @@ function parseRecapTarget(recapStr) {
     if (rangeMatch) {
       const start = parseInt(rangeMatch[1], 10);
       const end = parseInt(rangeMatch[2], 10);
-      for (let i = start; i <= end; i++) indices.push(i - 1); // 0始まり
+      for (let i = start; i <= end; i++) indices.push(i - 1);
     } else {
       const num = parseInt(p, 10);
       if (!isNaN(num)) indices.push(num - 1);
     }
   });
   
-  return { mode: 'number', indices, returnTo };
+  return { mode: 'number', indices, returnTo, returnPleasure };
 }
+
 
 // ★追加：回想を自動連続再生
 function playRecapSequence(recapPlayStr, onComplete) {
-  const { indices, returnTo } = parseRecapTarget(recapPlayStr);
+  const { indices, returnTo, returnPleasure } = parseRecapTarget(recapPlayStr); // ★追加
   const scenes = gameState.defeatedScenes || [];
   
   // 有効なインデックスだけ抽出
@@ -3805,11 +3828,12 @@ const playNext = () => {
   const isLast = (pos + 1 >= targets.length);
   pos++;
   
-  playSingleDefeat(idx, {
-    returnTo: isLast ? returnTo : null,
-    hasNext: !isLast,
-    onNext: playNext,
-  });
+playSingleDefeat(idx, {
+  returnTo: isLast ? returnTo : null,
+  returnPleasure: isLast ? returnPleasure : null, // ★追加（最後だけ）
+  hasNext: !isLast,
+  onNext: playNext,
+});
 };
   
   playNext();
