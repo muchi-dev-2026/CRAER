@@ -130,8 +130,7 @@ serif: ここまで来たか、、
 ENEMY_ATTACK:
 video: 4-8
 serif: test
-recapPlay: 1-5 > 1別1
-pleasure: =50
+recapPlay: 1-5 > 1別1 =50
 
 COMMAND_GUIDE:
 text:  テスト
