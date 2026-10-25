@@ -100,7 +100,48 @@ video: file:se1.png ホールド5
 ui: hide
 video: file:se1.png ホールド3
 ui: show
-nextStage: 3
+nextStage: def3 1別1
+
+
+BUTTON2:
+text: 最初の話題へ
+video: 18-22 スピード1
+nextStage: 1
+
+
+BUTTON3:
+text: 図書館に戻る
+video: 32-36 スピード1
+goto: library
+
+
+
+# ==========================================
+# STAGE テスト
+# ==========================================
+STAGE 1別1
+
+
+WAIT:
+video: 4-8 スピード1
+ui: show
+serif: ここまで来たか、、
+
+ENEMY_ATTACK:
+video: 4-8
+serif: test
+recapPlay: 1 > 1別1
+
+COMMAND_GUIDE:
+text:  テスト
+
+BUTTON1:
+text: crareについて
+video: file:se1.png ホールド5
+ui: hide
+video: file:se1.png ホールド3
+ui: show
+nextStage: def3 1別1
 
 
 BUTTON2:
