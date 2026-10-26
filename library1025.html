@@ -2727,7 +2727,13 @@ window.addEventListener("resize",resizeCanvas);
 window.addEventListener("resize",updateVideoOffsetY);
 resizeCanvas();
 
-function spawnOno(text, intensity=1){
+function spawnOno(text, intensity = 1) {
+  // ★追加：10個以上あったら新しく作らない
+  const currentOnos = damageContainer.querySelectorAll('.shriftOno');
+  if (currentOnos.length >= 10) {
+    return;
+  }
+  
   const el = document.createElement("div");
   el.className = "shriftOno"; el.textContent = text;
   el.style.top = (Math.random()*45+20)+"%";
@@ -3490,13 +3496,18 @@ function defeat(){
     continueLoop();
   }
 
-  const pool = gameState.sfxTexts.defeat || CONFIG.SFX_TEXTS_DEFEAT;
+const pool = gameState.sfxTexts.defeat || CONFIG.SFX_TEXTS_DEFEAT;
   let idx = 0;
   const targetCount = defeatEvent && defeatEvent.sfxCount !== undefined ? defeatEvent.sfxCount : CONFIG.DEFEAT_SFX_DEFAULT;
+  
+  // ★追加：前のタイマーが残っていたら強制停止（多重起動によるカクカクを防ぐ）
+  clearInterval(gameState.defeatLoopTimer);
+  
   gameState.defeatLoopTimer = setInterval(()=>{
     if(!gameState.battleEnded) return;
     const intensity = 1.2 + (idx % targetCount) * 0.25;
-    showMultipleOno([pool[Math.floor(Math.random()*pool.length)],pool[Math.floor(Math.random()*pool.length)]], intensity);
+    // 擬音は1回につき1個だけ出す（2個出していたのを減らすとさらに軽くなります）
+    showMultipleOno([pool[Math.floor(Math.random()*pool.length)]], intensity);
     doFlash(false); triggerShockwave();
     idx++;
   },CONFIG.DEFEAT_LOOP_INTERVAL);
@@ -3527,8 +3538,12 @@ if (resultSub) {
   resultSub.style.transition = "opacity 1s ease 2s";
   requestAnimationFrame(() => { resultSub.style.opacity = "1"; });
   
-  resultSub.onclick = () => {
+resultSub.onclick = () => {
     resultSub.style.display = "none";
+    
+    // ★追加：手動で戻る時もタイマーを停止する
+    clearInterval(gameState.defeatLoopTimer);
+    
     
     // エンディング連続再生
     if (isEndingSequence && endingResolve) {
