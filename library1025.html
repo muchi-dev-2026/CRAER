@@ -3369,16 +3369,21 @@ function startPassive(){
   },CONFIG.PASSIVE_INTERVAL);
 }
 
-function scheduleEnemyAttack(){
+function scheduleEnemyAttack() {
+  // ★追加：pleasureが100なら敗北を優先
+  if (gameState.pleasure >= CONFIG.MAX_PLEASURE && !gameState.battleEnded) {
+    defeat();
+    return;
+  }
+  
   clearTimeout(gameState.enemyTimer);
   clearInterval(gameState.attackTimerInterval);
-  gameState.countdownValue=0;
-  attackTimerBox.style.display="none";
+  gameState.countdownValue = 0;
+  attackTimerBox.style.display = "none";
   setCrisisMode(false);
-  if(!gameState.battleStarted) return;
-
+  if (!gameState.battleStarted) return;
+  
   const pleasureRatio = Math.min(1.0, gameState.pleasure / CONFIG.ATTACK_PLEASURE_RATIO);
-  const baseDelaySec = CONFIG.ATTACK_BASE_DELAY - ((CONFIG.ATTACK_BASE_DELAY - CONFIG.ATTACK_MIN_DELAY) * pleasureRatio);
   const variance = (Math.random() * CONFIG.ATTACK_VARIANCE) - (CONFIG.ATTACK_VARIANCE / 2);
   const delaySec = Math.max(CONFIG.ATTACK_MIN_DELAY, baseDelaySec * (1 + variance));
   const delay = delaySec * 1000;
