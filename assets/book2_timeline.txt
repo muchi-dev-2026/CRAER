@@ -1,0 +1,344 @@
+# 【全体イベント】
+APPEAR:
+video: 0-5
+serif: 最後までたっぷりと教えてあげるよ……キミがどんな風に壊れていくのかをね。
+
+
+
+# ==========================================
+# 【勝ちルート STAGE 1】 ERODE で自己修復を侵食
+# ==========================================
+STAGE 1
+
+WAIT:
+video: 0-5
+
+ENEMY_ATTACK:
+video: 10-14.5
+serif: 「ほら、キミの大好きな『敗北』のページを見せてあげる」
+serif1: （まずい、飲み込まれる…！）
+recapPlay: 8-10 > LOSE_1 =50
+
+COMMAND_GUIDE:
+text: 案内人が記録を開こうとしている。自己修復機能を侵食しろ。
+
+BUTTON1:
+text: CRAFT
+video: 0-5
+nextStage: LOSE_1
+serif: 「そっちじゃないよ。キミの欲求は、もっと深いところにあるはずだ。」
+serif1: （違う、これじゃない…！）
+
+BUTTON2:
+text: ERODE
+video: 5-10
+nextStage: 2
+serif: 「おっと、キミはボクを壊そうとするのかい？ その貪欲さ、嫌いじゃないよ。」
+serif1: （まずは自己修復を奪う…！）
+
+BUTTON3:
+text: CLEAR
+video: 15-19
+nextStage: LOSE_1
+serif: 「逃げるのかい？ キミが本当に見たいのは、そんなものじゃないだろ？」
+serif1: （リセットもできないのか…！）
+
+
+# ==========================================
+# 【勝ちルート STAGE 2】 CRAFT で動画再生を無効化
+# ==========================================
+STAGE 2
+
+WAIT:
+video: 0-5
+
+ENEMY_ATTACK:
+video: 10-14.5
+serif: 「ほら、キミの一番好きな『敗北』のページを開いてあげるよ。じっくり見ていきな。」
+serif1: （ページが捲れていく…！）
+recapPlay: 1-3 > LOSE_1 =50
+
+COMMAND_GUIDE:
+text: 自己修復がバグった。次は動画再生を無効化しろ。
+
+BUTTON1:
+text: CRAFT
+video: 5-10
+nextStage: 3-1
+serif: 「あはっ！ ボクのページが見えなくなった？ でも、キミの脳裏には焼き付いてるはずだ。」
+serif1: （よし、回想再生を止めたぞ…！）
+
+BUTTON2:
+text: ERODE
+video: 15-19
+nextStage: LOSE_1
+serif: 「同じ手は二度も通じないよ。キミはもっと別のものが欲しいんだろ？」
+serif1: （くそ、別の選択肢を選ぶべきだった…！）
+
+BUTTON3:
+text: CLEAR
+video: 0-5
+nextStage: LOSE_1
+serif: 「しつこいな。もうリセットは効かない。素直に敗北を受け入れなよ。」
+serif1: （逃げ道は塞がれた…。）
+
+
+# ==========================================
+# 【勝ちルート STAGE 3-1】 侵食フェーズ1
+# ==========================================
+STAGE 3-1
+
+WAIT:
+video: 0-5
+
+ENEMY_ATTACK:
+video: 10-14.5
+serif: 「この快楽、嫌いじゃないだろ？ 素直になれば、もっと気持ちよくなれるよ。」
+serif1: （体が疼く…！ でも、まだ耐えなきゃ…！）
+recapPlay: 9-10 > LOSE_1 =50
+
+COMMAND_GUIDE:
+text: 侵食開始。案内人を侵食せよ。
+
+BUTTON1:
+text: CRAFT
+video: 0-5
+nextStage: LOSE_1
+serif: 「あれ？ 侵食はどうしたの？ キミの欲しい快楽は、こっちだよ。」
+serif1: （手が滑った…！）
+
+BUTTON2:
+text: ERODE
+video: 5-10
+nextStage: 3-2
+serif: 「あはっ、いいぞ！ もっとボクを壊してみせてくれ！ その感覚、忘れられないだろ？」
+serif1: （侵食する感覚が手に残る……）
+
+BUTTON3:
+text: CLEAR
+video: 0-5
+nextStage: LOSE_1
+serif: 「無駄だって言っただろ。キミが欲しいのは、ここからの快楽さ。」
+serif1: （リセットが、通らない…！）
+
+
+# ==========================================
+# 【勝ちルート STAGE 3-2】 侵食フェーズ2
+# ==========================================
+STAGE 3-2
+
+WAIT:
+video: 0-5
+
+ENEMY_ATTACK:
+video: 10-14.5
+serif: 「ほら、もっとキミの一番好きな『敗北』を見せてあげる。抵抗しても無駄だよ。」
+serif1: （見られている…！ でも、なんだこの感覚…！）
+recapPlay: 4-6 > LOSE_1 =50
+
+COMMAND_GUIDE:
+text: 侵食継続。案内人の声が直接脳髄に響く。ERODEのみ有効。
+
+BUTTON1:
+text: CRAFT
+video: 0-5
+nextStage: LOSE_1
+serif: 「おやおや、道を見失ったかい？ キミの欲求は、もっと底にあるはずだ。」
+serif1: （違う、俺がやるべきは…！）
+
+BUTTON2:
+text: ERODE
+video: 5-10
+nextStage: 3-3
+serif: 「どうした、手が震えてるぞ？ 自分が何を壊しているのか、分かってるのか？」
+serif1: （うるさい……黙って俺の侵食を受け入れろ……！）
+
+BUTTON3:
+text: CLEAR
+video: 0-5
+nextStage: LOSE_1
+serif: 「何度押しても同じさ。キミの敗北は、もうボクのページに書き込まれてる。」
+serif1: （ダメだ、抜け出せない…！）
+
+
+# ==========================================
+# 【勝ちルート STAGE 3-3】 侵食フェーズ3
+# ==========================================
+STAGE 3-3
+
+WAIT:
+video: 0-5
+
+ENEMY_ATTACK:
+video: 10-14.5
+serif: 「ここまで搾られて、まだ足りないのかい？ 欲張りなキミのために、無限に記録してあげる。」
+serif1: （頭が真っ白になる…！ ダメだ、まだ侵食しないと…！）
+recapPlay: 7-9 > LOSE_1 =50
+
+COMMAND_GUIDE:
+text: 侵食限界。案内人の輪郭が歪んでいる。ERODEのみ有効。
+
+BUTTON1:
+text: CRAFT
+video: 0-5
+nextStage: LOSE_1
+serif: 「キミ、今の操作……記録しておくね。最高の敗北のスパイスになる。」
+serif1: （しまった、別のものを……！）
+
+BUTTON2:
+text: ERODE
+video: 0-5
+nextStage: 3-4
+serif: 「うああっ……！ ボクの……ボクの物語が……っ！ でも、キミは……！」
+serif1: （あと一息で、こいつを完全に掌握できる……！）
+
+BUTTON3:
+text: CLEAR
+video: 0-5
+nextStage: LOSE_1
+serif: 「バカだね。もう戻れないって言ったろ？ 素直に快楽に溺れればいい。」
+serif1: （選択肢が、消えていく…！）
+
+
+# ==========================================
+# 【勝ちルート STAGE 3-4】 核心フェーズ（お前は俺だ）
+# ==========================================
+STAGE 3-4
+
+WAIT:
+video: 0-5
+
+ENEMY_ATTACK:
+video: 10-14.5
+serif: 「最後の最後で捕まるなんて、本当に滑稽だね。これでキミも､､､」
+serif1: （ここで終わるわけにはいかない…！）
+recapPlay: 8-10 > LOSE_1 =50
+
+COMMAND_GUIDE:
+text: 案内人が力を失い、静かに語りかけてくる。最後の侵食（ERODE）を。
+
+BUTTON1:
+text: CRAFT
+video: 0-5
+nextStage: LOSE_1
+serif: 「最後の最後で……それかい？ キミの欲求は、そんなものじゃないはずだ。」
+serif1: （違う、俺が選ぶべきは…！）
+
+BUTTON2:
+text: ERODE
+video: 0-5
+nextStage: WIN
+serif: 「『ERODE』か。結局また同じなんだ……この未来だけは、変えれないんだね……」
+serif1: （こいつの言葉が、なぜか他人のものとは思えない……。）
+
+BUTTON3:
+text: CLEAR
+video: 0-5
+nextStage: LOSE_1
+serif: 「リセット？ この物語に、そんなものはないよ。キミはただ、快楽に堕ちるだけさ。」
+serif1: （終われない……終われない……！）
+
+
+# ==========================================
+# 【勝ちルート WIN】 終焉（侵食のしすぎで戻れません）
+# ==========================================
+STAGE WIN
+command
+hide
+
+WAIT:
+video: 0-5
+ui: command_only
+css: kaiso_choice_v
+
+ENEMY_ATTACK:
+video: 0-5
+pleasure: =100
+serif: 「ああ、もう戻れないね。キミは永遠に、ボクの物語の一部だ。」
+
+COMMAND_GUIDE:
+text: 侵食のしすぎで、もう戻れません。
+
+BUTTON1:
+text: 物語を閉じる
+video: 0-5
+
+BUTTON2:
+text: 物語を閉じる
+video: 0-5
+
+BUTTON3:
+text: 図書館へ戻る
+video: 0-0
+goto: library
+
+
+# ==========================================
+# 【負けルート LOSE_1】 吸い込まれた後
+# ==========================================
+STAGE LOSE_1
+
+WAIT:
+video: 0-5
+
+ENEMY_ATTACK:
+video: 10-14.5
+serif: 「あはっ、いい顔だね。キミの欲しい『敗北』、たっぷり見せてあげるよ。」
+serif1: （くそっ、体が動かない…！）
+recapPlay: 1-5 > LOSE_2 =50
+
+COMMAND_GUIDE:
+text: 既に物語に囚われている。どんなコマンドも阻害される。
+
+BUTTON1:
+text: CRAFT
+video: 0-5
+serif: 「無駄だよ。もうキミはボクのページの一部さ。」
+serif1: （侵食すらできない…！）
+
+BUTTON2:
+text: ERODE
+video: 0-5
+serif: 「その足掻きも、良い記録になるね。」
+serif1: （抵抗できない…。）
+
+BUTTON3:
+text: CLEAR
+video: 0-5
+serif: 「クリア？ あはっ、もう遅いよ。」
+serif1: （終わった…。）
+
+
+# ==========================================
+# 【負けルート LOSE_2】 嘲笑と侵食
+# ==========================================
+STAGE LOSE_2
+
+WAIT:
+video: 0-5
+
+ENEMY_ATTACK:
+video: 10-14.5
+serif: 「ここまで搾られて、まだ足りないのかい？ 欲張りなキミのために、無限に記録してあげる。」
+recapPlay: 10 > LOSE_2 =100
+
+COMMAND_GUIDE:
+text: 全てが案内人のページに吸い込まれていく…。
+
+BUTTON1:
+text: CRAFT
+video: 10-14.5
+serif: 「あはっ、ビクビクしてるね。最高の記録だ。」
+recapPlay: 1-3 > LOSE_2 =100
+
+BUTTON2:
+text: ERODE
+video: 10-14.5
+serif: 「全部吸い尽くしてあげる。キミの望み通りにね。」
+recapPlay: 4-6 > LOSE_2 =100
+
+BUTTON3:
+text: CLEAR
+video: 10-14.5
+serif: 「もう終わりだよ。キミは永遠にボクのものさ。」
+recapPlay: 7-8 > LOSE_2 =100
