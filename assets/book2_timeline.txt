@@ -1,7 +1,7 @@
 # 【全体イベント】
 APPEAR:
 video: 0-5
-serif: 最後までたっぷりと教えてあげるよ……キミがどんな風に壊れていくのかをね。
+serif: やぁ……ここまで来たね。最後までたっぷりと教えてあげるよ……キミがどんな風に侵されるのかをね。
 
 
 
@@ -20,28 +20,28 @@ serif1: （まずい、飲み込まれる…！）
 recapPlay: 8-10 > LOSE_1 =50
 
 COMMAND_GUIDE:
-text: 案内人が記録を開こうとしている。自己修復機能を侵食しろ。
+text: 案内人が記録を開こうとしています。危険です。
 
 BUTTON1:
-text: CRAFT
+text: CRAFT:創る
 video: 0-5
 nextStage: LOSE_1
-serif: 「そっちじゃないよ。キミの欲求は、もっと深いところにあるはずだ。」
+serif: 「僕のことを機能を知らないのにルールを作れる訳ないだろ。それにキミの欲求は、違うはずだ。」
 serif1: （違う、これじゃない…！）
 
 BUTTON2:
-text: ERODE
+text: ERODE:侵食
 video: 5-10
 nextStage: 2
 serif: 「おっと、キミはボクを壊そうとするのかい？ その貪欲さ、嫌いじゃないよ。」
-serif1: （まずは自己修復を奪う…！）
+serif1: （まずはCRAFTを奪う…！）
 
 BUTTON3:
-text: CLEAR
-video: 15-19
+text: CLEAR:リセット
+video: 5-10
 nextStage: LOSE_1
 serif: 「逃げるのかい？ キミが本当に見たいのは、そんなものじゃないだろ？」
-serif1: （リセットもできないのか…！）
+serif1: （このまま逃げれるか？…！）
 
 
 # ==========================================
@@ -59,7 +59,7 @@ serif1: （ページが捲れていく…！）
 recapPlay: 1-3 > LOSE_1 =50
 
 COMMAND_GUIDE:
-text: 自己修復がバグった。次は動画再生を無効化しろ。
+text:  相手のCRAFTにバグ。次の選択肢を選んでください。
 
 BUTTON1:
 text: CRAFT
@@ -137,7 +137,7 @@ serif1: （見られている…！ でも、なんだこの感覚…！）
 recapPlay: 4-6 > LOSE_1 =50
 
 COMMAND_GUIDE:
-text: 侵食継続。案内人の声が直接脳髄に響く。ERODEのみ有効。
+text: 侵食継続。案内人の声が直接脳髄に響く。ERODE推奨。
 
 BUTTON1:
 text: CRAFT
@@ -176,7 +176,7 @@ serif1: （頭が真っ白になる…！ ダメだ、まだ侵食しないと�
 recapPlay: 7-9 > LOSE_1 =50
 
 COMMAND_GUIDE:
-text: 侵食限界。案内人の輪郭が歪んでいる。ERODEのみ有効。
+text: 侵食限界。案内人の輪郭が歪んでいる。ERODE推奨。
 
 BUTTON1:
 text: CRAFT
@@ -189,7 +189,7 @@ BUTTON2:
 text: ERODE
 video: 0-5
 nextStage: 3-4
-serif: 「うああっ……！ ボクの……ボクの物語が……っ！ でも、キミは……！」
+serif: 「そろそろ終わりかな……」
 serif1: （あと一息で、こいつを完全に掌握できる……！）
 
 BUTTON3:
@@ -254,7 +254,7 @@ css: kaiso_choice_v
 ENEMY_ATTACK:
 video: 0-5
 pleasure: =100
-serif: 「ああ、もう戻れないね。キミは永遠に、ボクの物語の一部だ。」
+serif: 「ああ、もう戻れないね。永遠に、この図書館の一部だ。」
 
 COMMAND_GUIDE:
 text: 侵食のしすぎで、もう戻れません。
@@ -288,13 +288,13 @@ serif1: （くそっ、体が動かない…！）
 recapPlay: 1-5 > LOSE_2 =50
 
 COMMAND_GUIDE:
-text: 既に物語に囚われている。どんなコマンドも阻害される。
+text: 既に物語に囚われました。コマンドも侵食されています。
 
 BUTTON1:
 text: CRAFT
 video: 0-5
-serif: 「無駄だよ。もうキミはボクのページの一部さ。」
-serif1: （侵食すらできない…！）
+serif: 「無駄だよ。もうキミはもう終わりさ。」
+serif1: （創るすらできない…！）
 
 BUTTON2:
 text: ERODE
@@ -305,7 +305,7 @@ serif1: （抵抗できない…。）
 BUTTON3:
 text: CLEAR
 video: 0-5
-serif: 「クリア？ あはっ、もう遅いよ。」
+serif: 「あはっ、もう遅いよ。」
 serif1: （終わった…。）
 
 
@@ -340,5 +340,5 @@ recapPlay: 4-6 > LOSE_2 =100
 BUTTON3:
 text: CLEAR
 video: 10-14.5
-serif: 「もう終わりだよ。キミは永遠にボクのものさ。」
+serif: 「もう終わりだよ。キミも永遠に…。」
 recapPlay: 7-8 > LOSE_2 =100
