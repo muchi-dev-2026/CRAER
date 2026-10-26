@@ -12,11 +12,11 @@ STAGE 1
 
 WAIT:
 video: 0-5
+tag: wait_common
 
 ENEMY_ATTACK:
 video: 10-14.5
-serif: 「ほら、キミの大好きな『敗北』のページを見せてあげる」
-serif1: （まずい、飲み込まれる…！）
+tag: attack_common
 recapPlay: 8-10 > LOSE_1 =50
 
 COMMAND_GUIDE:
@@ -51,11 +51,11 @@ STAGE 2
 
 WAIT:
 video: 0-5
+tag: wait_common
 
 ENEMY_ATTACK:
 video: 10-14.5
-serif: 「ほら、キミの一番好きな『敗北』のページを開いてあげるよ。じっくり見ていきな。」
-serif1: （ページが捲れていく…！）
+tag: attack_common
 recapPlay: 1-3 > LOSE_1 =50
 
 COMMAND_GUIDE:
@@ -90,11 +90,11 @@ STAGE 3-1
 
 WAIT:
 video: 0-5
+tag: wait_common
 
 ENEMY_ATTACK:
 video: 10-14.5
-serif: 「この快楽、嫌いじゃないだろ？ 素直になれば、もっと気持ちよくなれるよ。」
-serif1: （体が疼く…！ でも、まだ耐えなきゃ…！）
+tag: attack_common
 recapPlay: 9-10 > LOSE_1 =50
 
 COMMAND_GUIDE:
@@ -129,11 +129,11 @@ STAGE 3-2
 
 WAIT:
 video: 0-5
+tag: wait_common
 
 ENEMY_ATTACK:
 video: 10-14.5
-serif: 「ほら、もっとキミの一番好きな『敗北』を見せてあげる。抵抗しても無駄だよ。」
-serif1: （見られている…！ でも、なんだこの感覚…！）
+tag: attack_common
 recapPlay: 4-6 > LOSE_1 =50
 
 COMMAND_GUIDE:
@@ -168,11 +168,11 @@ STAGE 3-3
 
 WAIT:
 video: 0-5
+tag: wait_common
 
 ENEMY_ATTACK:
 video: 10-14.5
-serif: 「ここまで搾られて、まだ足りないのかい？ 欲張りなキミのために、無限に記録してあげる。」
-serif1: （頭が真っ白になる…！ ダメだ、まだ侵食しないと…！）
+tag: attack_common
 recapPlay: 7-9 > LOSE_1 =50
 
 COMMAND_GUIDE:
@@ -207,11 +207,11 @@ STAGE 3-4
 
 WAIT:
 video: 0-5
+tag: wait_common
 
 ENEMY_ATTACK:
 video: 10-14.5
-serif: 「最後の最後で捕まるなんて、本当に滑稽だね。これでキミも､､､」
-serif1: （ここで終わるわけにはいかない…！）
+tag: attack_common
 recapPlay: 8-10 > LOSE_1 =50
 
 COMMAND_GUIDE:
@@ -248,13 +248,14 @@ hide
 
 WAIT:
 video: 0-5
+tag: wait_common
 ui: command_only
 css: kaiso_choice_v
 
 ENEMY_ATTACK:
 video: 0-5
 pleasure: =100
-serif: 「ああ、もう戻れないね。永遠に、この図書館の一部だ。」
+tag: attack_common
 
 COMMAND_GUIDE:
 text: 侵食のしすぎで、もう戻れません。
@@ -280,11 +281,11 @@ STAGE LOSE_1
 
 WAIT:
 video: 0-5
+tag: wait_common
 
 ENEMY_ATTACK:
 video: 10-14.5
-serif: 「あはっ、いい顔だね。キミの欲しい『敗北』、たっぷり見せてあげるよ。」
-serif1: （くそっ、体が動かない…！）
+tag: attack_common
 recapPlay: 1-5 > LOSE_2 =50
 
 COMMAND_GUIDE:
@@ -316,10 +317,11 @@ STAGE LOSE_2
 
 WAIT:
 video: 0-5
+tag: wait_common
 
 ENEMY_ATTACK:
 video: 10-14.5
-serif: 「ここまで搾られて、まだ足りないのかい？ 欲張りなキミのために、無限に記録してあげる。」
+tag: attack_common
 recapPlay: 10 > LOSE_2 =100
 
 COMMAND_GUIDE:
