@@ -322,7 +322,7 @@ tag: wait_common
 ENEMY_ATTACK:
 video: 10-14.5
 tag: attack_common
-recapPlay: 10 > LOSE_2 =110
+recapPlay: 2,6,10 > LOSE_2 =110
 
 COMMAND_GUIDE:
 text: 全てが案内人のページに吸い込まれていく…。
@@ -349,4 +349,4 @@ video: 0-3
 serif: 「もう終わりだよ。キミも永遠に…。」
 video: 10-14.5
 tag: attack_common
-recapPlay: 7-8 > LOSE_2 =110
+recapPlay: 7-9 > LOSE_2 =110
