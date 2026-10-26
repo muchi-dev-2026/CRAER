@@ -286,7 +286,7 @@ tag: wait_common
 ENEMY_ATTACK:
 video: 10-14.5
 tag: attack_common
-recapPlay: 1-5 > LOSE_2 =50
+recapPlay: 1-3 > LOSE_2 =50
 
 COMMAND_GUIDE:
 text: 既に物語に囚われました。コマンドも侵食されています。
