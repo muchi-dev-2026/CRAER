@@ -329,18 +329,24 @@ text: 全てが案内人のページに吸い込まれていく…。
 
 BUTTON1:
 text: CRAFT
-video: 10-14.5
+video: 0-3
 serif: 「あはっ、ビクビクしてるね。最高の記録だ。」
+video: 10-14.5
+tag: attack_common
 recapPlay: 1-3 > LOSE_2 =100
 
 BUTTON2:
 text: ERODE
-video: 10-14.5
+video: 0-3
 serif: 「全部吸い尽くしてあげる。キミの望み通りにね。」
+video: 10-14.5
+tag: attack_common
 recapPlay: 4-6 > LOSE_2 =100
 
 BUTTON3:
 text: CLEAR
-video: 10-14.5
+video: 0-3
 serif: 「もう終わりだよ。キミも永遠に…。」
+video: 10-14.5
+tag: attack_common
 recapPlay: 7-8 > LOSE_2 =100
