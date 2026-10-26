@@ -3541,8 +3541,24 @@ if (resultSub) {
 resultSub.onclick = () => {
     resultSub.style.display = "none";
     
-    // ★追加：手動で戻る時もタイマーを停止する
+    // ★ここから追加：goto: library と同じ停止処理
+    clearTimeout(gameState.enemyTimer);
+    clearInterval(gameState.passiveTimer);
+    clearInterval(gameState.attackTimerInterval);
     clearInterval(gameState.defeatLoopTimer);
+    gameState.enemyTimer = null;
+    gameState.passiveTimer = null;
+    gameState.attackTimerInterval = null;
+    gameState.defeatLoopTimer = null;
+    gameState.battleStarted = false;
+    gameState.nextAttackTime = 0;
+    gameState.countdownValue = 0;
+    gameState.currentClip = null;
+    attackTimerBox.style.display = "none";
+    setCrisisMode(false);
+    video.pause();
+    // ★ここまで追加
+    
     
     
     // エンディング連続再生
