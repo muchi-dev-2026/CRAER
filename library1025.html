@@ -2387,7 +2387,6 @@ const gameState = {
   msgTimer: null, typewriterTimer: null,
   heroMsgTimer: null, heroTypewriterTimer: null,
   playSessionId: 0,
-  playSessionId: 0,
 defeatedScenes: [], // ★追加：敗北記録
   defeatsByEnemy: {}, // ★追加：敵個別累計
 recapReturnTo: null, // ★追加：回想後の復帰先STAGE名
@@ -3384,6 +3383,7 @@ function scheduleEnemyAttack() {
   if (!gameState.battleStarted) return;
   
   const pleasureRatio = Math.min(1.0, gameState.pleasure / CONFIG.ATTACK_PLEASURE_RATIO);
+  const baseDelaySec = CONFIG.ATTACK_BASE_DELAY - ((CONFIG.ATTACK_BASE_DELAY - CONFIG.ATTACK_MIN_DELAY) * pleasureRatio);
   const variance = (Math.random() * CONFIG.ATTACK_VARIANCE) - (CONFIG.ATTACK_VARIANCE / 2);
   const delaySec = Math.max(CONFIG.ATTACK_MIN_DELAY, baseDelaySec * (1 + variance));
   const delay = delaySec * 1000;
