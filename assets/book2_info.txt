@@ -1,0 +1,4 @@
+[INFO]
+name: 案内人
+author: muchi
+description: 貴方の物語を記録する存在。一度でもそのページに囚われれば、二度と抜け出せない。
