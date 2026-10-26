@@ -3626,12 +3626,18 @@ function recordDefeat() {
   
   const enemyId = window.lib?.state?.currentEnemy?.name || "unknown";
   
+  // ★ここを追加：案内人は履歴に記録しない
+  if (enemyId === "案内人") {
+    return;
+  }
+  
   // ★変更：動画ファイル名ではなく「敵名」と「ステージ名」を記録する
   gameState.defeatedScenes.push({
     enemyId: enemyId,
     stage: gameState.stage,
     timestamp: Date.now()
   });
+  
   
 // 最新10件を超えたら古いものを削除
 if (gameState.defeatedScenes.length > 10) {
