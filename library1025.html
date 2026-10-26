@@ -3474,21 +3474,11 @@ function defeat(){
   const defeatEvent = gameState.parsedTimeline.DEFEAT;
   const hasDefeatVideo = defeatEvent?.actions?.length > 0;
 
-  const continueLoop = () => {
-    const randomBtnId = Math.floor(Math.random() * 3) + 1;
-    const stageData = gameState.parsedTimeline.stages[gameState.stage] || {};
-    const btnData = stageData[`BUTTON${randomBtnId}`];
+const continueLoop = () => {
+  playEventVideo(getWaitEvent(), 'WAIT');
+  scheduleEnemyAttack();
+};
 
-    if (btnData) {
-      playEventVideo(btnData, `BUTTON${randomBtnId}`, () => {
-        playEventVideo(getWaitEvent(), 'WAIT');
-        scheduleEnemyAttack();
-      });
-    } else {
-      playEventVideo(getWaitEvent(), 'WAIT');
-      scheduleEnemyAttack();
-    }
-  };
 
   if (hasDefeatVideo) {
     playEventVideo(defeatEvent, 'DEFEAT', continueLoop);
