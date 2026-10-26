@@ -12,7 +12,7 @@ STAGE 1
 
 WAIT:
 video: 0-5
-
+tag: wait_common
 
 ENEMY_ATTACK:
 video: 10-14.5
