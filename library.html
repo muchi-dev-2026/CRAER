@@ -1716,10 +1716,29 @@ function readFileText(file){
 const skipState = { on: false };
 const skipToggleBtn = document.getElementById("lib_skipToggle");
 skipToggleBtn.onclick = () => {
+  const gs = window.idx?.gameState;
+  
+  // ★敗北中・回想中 → resultSub.onclick()
+  if (gs?.battleEnded) {
+    const resultSub = document.getElementById("resultSub");
+    if (resultSub && resultSub.onclick) resultSub.onclick();
+    return;
+  }
+  
+  // ★バトル中 → goto: library と同じ処理
+  if (gs?.battleStarted && !gs?.battleEnded) {
+    if (window.idx && window.idx.exitViaGotoLibrary) {
+      window.idx.exitViaGotoLibrary();
+    }
+    return;
+  }
+  
+  // ★通常（図書館）→ スキップトグル
   skipState.on = !skipState.on;
   skipToggleBtn.textContent = skipState.on ? "SKIP ON" : "SKIP OFF";
   skipToggleBtn.classList.toggle("on", skipState.on);
 };
+
 
 // ===== イントロ再生 =====
 async function playIntro() {
@@ -1794,7 +1813,17 @@ async function showStartScreen() {
 
 // ===== 図書館画面 =====
 async function showLibrary() {
-    startBgVideo.pause();
+  startBgVideo.pause();
+  
+  // ★追加：スキップボタンを元に戻す
+  const skipBtn = document.getElementById("lib_skipToggle");
+  if (skipBtn) {
+    skipBtn.textContent = skipState.on ? "SKIP ON" : "SKIP OFF";
+    skipBtn.classList.toggle("on", skipState.on);
+  }
+  
+    
+    
     
     const gameEl = document.getElementById("game");
     if (gameEl) gameEl.style.display = "none";
@@ -2973,27 +3002,7 @@ if (currentAction.nextStage !== undefined) {
 
 // ★ goto 処理
 if (currentAction.goto === 'library') {
-  // 図書館へ戻る前にバトル状態を完全停止（裏でタイマーが走り続けるのを防ぐ）
-  clearTimeout(gameState.enemyTimer);
-  clearInterval(gameState.passiveTimer);
-  clearInterval(gameState.attackTimerInterval);
-  clearInterval(gameState.defeatLoopTimer);
-  gameState.enemyTimer = null;
-  gameState.passiveTimer = null;
-  gameState.attackTimerInterval = null;
-  gameState.defeatLoopTimer = null;
-  gameState.battleStarted = false;
-  gameState.battleEnded = true; // 誤発火防止
-  gameState.nextAttackTime = 0;
-  gameState.countdownValue = 0;
-  gameState.currentClip = null;
-  attackTimerBox.style.display = "none";
-  setCrisisMode(false);
-  showCommands(false);
-  video.pause();
-  if (window.lib && window.lib.showLibrary) {
-    window.lib.showLibrary();
-  }
+  exitViaGotoLibrary();
   return;
 }
 
@@ -3739,14 +3748,45 @@ function resetUIVariants() {
 }
 
 
-function startBattle(){
-  if(gameState.battleStarted && !gameState.battleEnded) return;
-  if(!gameState.parsedTimeline || !gameState.parsedTimeline.stages || Object.keys(gameState.parsedTimeline.stages).length === 0) {
+// ★追加：goto: library と同じ停止処理を関数化
+function exitViaGotoLibrary() {
+  clearTimeout(gameState.enemyTimer);
+  clearInterval(gameState.passiveTimer);
+  clearInterval(gameState.attackTimerInterval);
+  clearInterval(gameState.defeatLoopTimer);
+  gameState.enemyTimer = null;
+  gameState.passiveTimer = null;
+  gameState.attackTimerInterval = null;
+  gameState.defeatLoopTimer = null;
+  gameState.battleStarted = false;
+  gameState.battleEnded = false;
+  gameState.nextAttackTime = 0;
+  gameState.countdownValue = 0;
+  gameState.currentClip = null;
+  attackTimerBox.style.display = "none";
+  setCrisisMode(false);
+  showCommands(false);
+  video.pause();
+  if (window.lib && window.lib.showLibrary) {
+    window.lib.showLibrary();
+  }
+}
+
+
+  
+  function startBattle() {
+  if (gameState.battleStarted && !gameState.battleEnded) return;
+  if (!gameState.parsedTimeline || !gameState.parsedTimeline.stages || Object.keys(gameState.parsedTimeline.stages).length === 0) {
     showErrorGame("timeline.txt が読み込まれていません");
     return;
   }
   
-  resetUIVariants();                // ← ★ 呼び出し
+  resetUIVariants();
+  
+  // ★追加：スキップボタンを「← 戻る」に
+  const skipBtn = document.getElementById("lib_skipToggle");
+  if (skipBtn) skipBtn.textContent = "← 戻る";
+  
   
   gameState.battleStarted = true; gameState.battleEnded = false;
   gameState.pleasure = 0; 
@@ -4104,7 +4144,8 @@ window.idx = {
   parseSfxFile: parseSfxFile,
   heroAvatarSprite: heroAvatarSprite,
   playSingleDefeat: playSingleDefeat,
-  playEndingSequence: playEndingSequence, // ★追加
+  playEndingSequence: playEndingSequence,
+  exitViaGotoLibrary: exitViaGotoLibrary, // ★追加
 };
 
 })();
