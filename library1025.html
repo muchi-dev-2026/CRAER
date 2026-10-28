@@ -1561,8 +1561,8 @@ const state = {
   screen: "intro",
 };
 
-// ★追加：エンディング解禁に必要な敗北回数（ここを変えるだけでゲージとボタンが連動します 封印）
-const REQUIRED_DEFEATS = 9999;
+// ★追加：エンディング解禁に必要な敗北回数（ここを変えるだけでゲージとボタンが連動します）
+const REQUIRED_DEFEATS = 10;
 
 // ===== [INFO] パース =====
 function parseInfo(text){
@@ -1898,7 +1898,7 @@ if (libEndingBtn) {
 }
 
 // ★変更：敗北回数に応じて通常案内人 / エンディング案内人を切替
-const ENDING_THRESHOLD = 10; // ★エンディング案内人解禁に必要な敗北回数
+const ENDING_THRESHOLD = 999; // ★エンディング案内人解禁に必要な敗北回数　封印
 const companionData = await loadCompanion();
 const companion2Data = await loadCompanion2();
 const companionBtn = document.getElementById("lib_companionButton");
