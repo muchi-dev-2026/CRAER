@@ -1561,8 +1561,8 @@ const state = {
   screen: "intro",
 };
 
-// ★追加：エンディング解禁に必要な敗北回数（ここを変えるだけでゲージとボタンが連動します）
-const REQUIRED_DEFEATS = 10;
+// ★追加：エンディング解禁に必要な敗北回数（ここを変えるだけでゲージとボタンが連動します 封印）
+const REQUIRED_DEFEATS = 9999;
 
 // ===== [INFO] パース =====
 function parseInfo(text){
@@ -2289,9 +2289,9 @@ const CONFIG = {
   COUNTDOWN_THRESHOLD: 5.2,
   COUNTDOWN_START: 5,
   TIMER_TICK_MS: 60,
-  ENEMY_TYPE_SPEED: 30,
-  HERO_TYPE_SPEED: 30,
-  ENEMY_HOLD_MS: 4000,
+  ENEMY_TYPE_SPEED: 15,
+  HERO_TYPE_SPEED: 15,
+  ENEMY_HOLD_MS: 2000,
   ENEMY_FADE_MS: 2000,
   HERO_HOLD_MS: 4000,
   FLASH_STRONG_COLOR: 'rgba(255,0,100,0.6)',
@@ -2773,25 +2773,28 @@ function typeWriterMessage(text, speed = CONFIG.ENEMY_TYPE_SPEED) {
     } else {
       clearInterval(gameState.typewriterTimer);
       cursor.remove();
+      // ★修正：文字数連動の表示時間（下限 CONFIG.ENEMY_HOLD_MS、1文字100ms）
+      const holdTime = Math.max(CONFIG.ENEMY_HOLD_MS, text.length * 100);
       gameState.msgTimer = setTimeout(() => { 
         messageWrapEl.classList.add("zoom-out");
         setTimeout(() => { messageEl.innerHTML = ""; messageWrapEl.classList.remove("zoom-out"); }, CONFIG.ENEMY_FADE_MS);
-      }, CONFIG.ENEMY_HOLD_MS);
+      }, holdTime);
     }
   }, speed);
 }
+
 
 function typeWriterHeroMessage(text, speed = CONFIG.HERO_TYPE_SPEED) {
   clearTimeout(gameState.heroMsgTimer);
   clearInterval(gameState.heroTypewriterTimer);
   heroMessageEl.innerHTML = "";
-  if(!text) { heroMessageWrap.style.display = "none"; return; }
+  if (!text) { heroMessageWrap.style.display = "none"; return; }
   heroMessageWrap.style.display = "inline-block";
   let index = 0;
   const cursor = document.createElement("span");
   cursor.className = "hero-typing-cursor";
   heroMessageEl.appendChild(cursor);
-
+  
   gameState.heroTypewriterTimer = setInterval(() => {
     if (index < text.length) {
       cursor.before(text.charAt(index));
@@ -2799,13 +2802,16 @@ function typeWriterHeroMessage(text, speed = CONFIG.HERO_TYPE_SPEED) {
     } else {
       clearInterval(gameState.heroTypewriterTimer);
       cursor.remove();
+      // ★修正：文字数連動の表示時間（下限 CONFIG.HERO_HOLD_MS、1文字80ms）
+      const holdTime = Math.max(CONFIG.HERO_HOLD_MS, text.length * 80);
       gameState.heroMsgTimer = setTimeout(() => {
         heroMessageEl.innerHTML = "";
         heroMessageWrap.style.display = "none";
-      }, CONFIG.HERO_HOLD_MS);
+      }, holdTime);
     }
   }, speed);
 }
+
 
 function setMessage(text){ typeWriterMessage(text, CONFIG.ENEMY_TYPE_SPEED); }
 function setHeroMessage(text){ typeWriterHeroMessage(text, CONFIG.HERO_TYPE_SPEED); }
