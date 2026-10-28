@@ -18,10 +18,12 @@ hide
 
 WAIT:
 video: 4-8 スピード1
+pleasure: =0
 tag: 最新_ニュース
 
 ENEMY_ATTACK:
 video: 14-18 スピード1
+pleasure: =0
 tag: 日常_雑談
 
 COMMAND_GUIDE:
@@ -52,10 +54,12 @@ hide
 
 WAIT:
 video: 22-26 スピード1
+pleasure: =0
 tag: 関係性
 
 ENEMY_ATTACK:
 video: 28-32 スピード1
+pleasure: =0
 tag: 哲学_怪奇
 
 COMMAND_GUIDE:
@@ -85,10 +89,12 @@ hide
 
 WAIT:
 video: 4-8 スピード1
+pleasure: =0
 tag: 最新_ニュース
 
 ENEMY_ATTACK:
 video: 14-18 スピード1
+pleasure: =0
 tag: 関係性
 
 COMMAND_GUIDE:
