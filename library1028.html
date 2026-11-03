@@ -1740,33 +1740,23 @@ skipToggleBtn.onclick = () => {
 };
 
 
-// ===== イントロ再生 =====
-async function playIntro() {
-  if (skipState.on) { await showStartScreen(); return; }
-  
-  showScreen("intro");
-  
-  startBgVideo.src = "library_loop.mp4";
-  startBgVideo.muted = true;
-  startBgVideo.playsInline = true;
-  startBgVideo.loop = true;
-  startBgVideo.load();
-  
-  introVideo.src = "intro.mp4";
-  introVideo.muted = true;
-  introVideo.playsInline = true;
-  introVideo.currentTime = 0;
-  introVideo.load();
-  
-  try {
-    await introVideo.play();
-  } catch (err) {
-    console.warn("イントロ失敗:", err);
-    await showStartScreen();
-    return;
-  }
-  
-  await new Promise((resolve) => {
+// ★追加：動画を最後まで再生する共通ヘルパー
+function playIntroVideoFile(src) {
+  return new Promise(async (resolve) => {
+    introVideo.src = src;
+    introVideo.muted = true;
+    introVideo.playsInline = true;
+    introVideo.currentTime = 0;
+    introVideo.load();
+    
+    try {
+      await introVideo.play();
+    } catch (err) {
+      console.warn(`${src} 再生失敗:`, err);
+      resolve();
+      return;
+    }
+    
     let resolved = false;
     const finish = () => {
       if (resolved) return;
@@ -1783,9 +1773,39 @@ async function playIntro() {
     };
     setTimeout(finish, 30000);
   });
+}
+
+// ===== イントロ再生 =====
+async function playIntro() {
+  if (skipState.on) { await showStartScreen(); return; }
+  
+  showScreen("intro");
+  
+  startBgVideo.src = "library_loop.mp4";
+  startBgVideo.muted = true;
+  startBgVideo.playsInline = true;
+  startBgVideo.loop = true;
+  startBgVideo.load();
+  
+  // ★追加：初回起動イントロ（未視聴時のみ）
+  const INTRO_FIRST_SEEN_KEY = 'craer_intro_first_seen';
+  const firstIntroSeen = localStorage.getItem(INTRO_FIRST_SEEN_KEY) === '1';
+  
+  if (!firstIntroSeen) {
+    await playIntroVideoFile("intro_first.mp4");
+    try {
+      localStorage.setItem(INTRO_FIRST_SEEN_KEY, '1');
+    } catch (e) {
+      console.warn("初回イントロフラグの保存失敗:", e);
+    }
+  }
+  
+  // 通常イントロ（毎回再生）
+  await playIntroVideoFile("intro.mp4");
   
   await showStartScreen();
 }
+
 
 // ===== 起動画面 =====
 async function showStartScreen() {
@@ -2262,29 +2282,33 @@ document.getElementById("lib_recapClearButton")?.addEventListener("click", () =>
   // 本当に消していいか確認
   const answer = confirm("敗北回想のデータをすべて削除します。よろしいですか？");
   if (!answer) return;
-
-// localStorageから削除
-localStorage.removeItem('craer_defeated');
-
-// メモリ上のデータも空にする
-if (window.idx && window.idx.gameState) {
-  window.idx.gameState.defeatedScenes = [];
-}
-
-// ★追加：敵個別累計もリセット
-localStorage.removeItem('craer_defeats_by_enemy');
-if (window.idx && window.idx.gameState) {
-  window.idx.gameState.defeatsByEnemy = {};
-}
-
-alert("データを削除しました。");
-
+  
+  // localStorageから削除
+  localStorage.removeItem('craer_defeated');
+  
+  // メモリ上のデータも空にする
+  if (window.idx && window.idx.gameState) {
+    window.idx.gameState.defeatedScenes = [];
+  }
+  
+  // ★追加：敵個別累計もリセット
+  localStorage.removeItem('craer_defeats_by_enemy');
+  if (window.idx && window.idx.gameState) {
+    window.idx.gameState.defeatsByEnemy = {};
+  }
+  
+  // ★追加：初回イントロ視聴フラグもリセット（次回起動時に初回イントロから）
+  localStorage.removeItem('craer_intro_first_seen');
+  
+  alert("データを削除しました。");
+  
   
   // 図書館に戻る（メニューを閉じる）
   const recapBg = document.getElementById("lib_recapBgVideo");
   if (recapBg) recapBg.pause();
   showLibrary();
 });
+
 
 // ===== 外部公開 =====
 window.lib = {
