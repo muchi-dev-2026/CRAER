@@ -1252,9 +1252,9 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
 .lib_gothic_btn {
   position: relative;
   width: auto;
-  min-width: 100px;
+  min-width: 80px;
   height: 40px;
-  padding: 0 14px;
+  padding: 0 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1374,12 +1374,13 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
 <div id="lib_libraryButtons" style="
     position: absolute;
     bottom: 20px;
-    left: 20px;
-    right: 20px;
+    left: 12px;   /* 20pxから12pxに変更（広げる） */
+    right: 12px;  /* 20pxから12pxに変更（広げる） */
     z-index: 10;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
+    gap: 8px;     /* ★ボタン同士の最低限の隙間を保証 */
     pointer-events: none;
   ">
   <!-- ★左端：案内人ボタン（常時表示） -->
