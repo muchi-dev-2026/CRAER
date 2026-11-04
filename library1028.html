@@ -1251,9 +1251,10 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
    ============================================ */
 .lib_gothic_btn {
   position: relative;
-  width: 135px;
+  width: auto;
+  min-width: 100px;
   height: 40px;
-  padding: 0;
+  padding: 0 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1273,7 +1274,9 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
   box-sizing: border-box;
   overflow: hidden;
   transition: all 0.25s ease;
+  white-space: nowrap;
 }
+
 
 /* 四隅のL字装飾 */
 .lib_gothic_btn::before {
@@ -1338,11 +1341,6 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
 }
 
 
-/* エンディングボタン専用の赤い発光 */
-#lib_libraryEndingButton.gauge-full {
-  border-color: #ff0055 !important;
-  animation: gothicPulse 1.5s ease-in-out infinite alternate;
-}
 
 
 </style>
@@ -1373,7 +1371,6 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
   <video id="lib_bgVideo" muted loop playsinline preload="auto"></video>
   <div id="lib_commandLayer"></div>
   
-  <!-- ★追加：左右に分けるためのコンテナ -->
 <div id="lib_libraryButtons" style="
     position: absolute;
     bottom: 20px;
@@ -1385,27 +1382,22 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
     align-items: flex-end;
     pointer-events: none;
   ">
-<!-- ★左端：エンディングボタン（普段は非表示） -->
-<button id="lib_libraryEndingButton" class="lib_gothic_btn" style="display: none;">
-  <span class="lib_btn_text">† 侵食の記憶</span>
-</button>
-
-<!-- ★左端：案内人ボタン -->
-<button id="lib_companionButton" class="lib_gothic_btn" style="display: none;">
-  <span class="lib_btn_text">📖 案内人</span>
-</button>
-
-<!-- ★追加：エンディング用案内人ボタン -->
-<button id="lib_companion2Button" class="lib_gothic_btn" style="display: none;">
-  <span class="lib_btn_text">† 侵食の案内人</span>
-</button>
-
-<!-- ★右端：敗北回想ボタン -->
-<button id="lib_defeatRecapButton" class="lib_gothic_btn" style="display: none;">
-  <div class="recap-gauge-fill" style="width: 0%;"></div>
-  <span class="lib_btn_text recap-gauge-text">† 敗北回想</span>
-</button>
-
+  <!-- ★左端：案内人ボタン（常時表示） -->
+  <button id="lib_companionButton" class="lib_gothic_btn" style="display: none;">
+    <span class="lib_btn_text">案内人</span>
+  </button>
+  
+  <!-- ★中央：侵蝕書ボタン（敗北10回以上で表示） -->
+  <button id="lib_companion2Button" class="lib_gothic_btn" style="display: none;">
+    <span class="lib_btn_text">†侵蝕書</span>
+  </button>
+  
+  <!-- ★右端：敗北回想ボタン -->
+  <button id="lib_defeatRecapButton" class="lib_gothic_btn" style="display: none;">
+    <div class="recap-gauge-fill" style="width: 0%;"></div>
+    <span class="lib_btn_text recap-gauge-text">†敗北回想</span>
+  </button>
+  
 </div>
 </div>
 
@@ -1931,48 +1923,32 @@ if (recapBtn) {
   }
 }
 
-// ★追加：図書館画面でのエンディングボタン表示（両端レイアウト用）
-const libEndingBtn = document.getElementById("lib_libraryEndingButton");
-if (libEndingBtn) {
-  if (defeatedCount >= REQUIRED_DEFEATS + 9999) { // 実質封印
-    libEndingBtn.style.display = "flex";
-    libEndingBtn.onclick = () => {
-      if (window.idx && window.idx.playEndingSequence) {
-        window.idx.playEndingSequence();
-      }
-    };
-  } else {
-    libEndingBtn.style.display = "none";
-  }
-}
-
-// ★変更：敗北回数に応じて通常案内人 / エンディング案内人を切替
-const ENDING_THRESHOLD = 10; // ★エンディング案内人解禁に必要な敗北回数　封印
+// ★案内人（常時表示）
 const companionData = await loadCompanion();
 const companion2Data = await loadCompanion2();
 const companionBtn = document.getElementById("lib_companionButton");
 const companion2Btn = document.getElementById("lib_companion2Button");
 
-if (defeatedCount >= ENDING_THRESHOLD) {
-  // 敗北回数が閾値以上 → エンディング案内人を表示
-  if (companion2Data && companion2Btn) {
-    companion2Btn.style.display = "flex";
-    companion2Btn.onclick = () => {
-      state.currentEnemy = companion2Data;
-      showEnemyPage(companion2Data);
-    };
-  }
-  if (companionBtn) companionBtn.style.display = "none";
-} else {
-  // 敗北回数が閾値未満 → 通常案内人を表示
-  if (companionData && companionBtn) {
-    companionBtn.style.display = "flex";
-    companionBtn.onclick = () => {
-      state.currentEnemy = companionData;
-      showEnemyPage(companionData);
-    };
-  }
-  if (companion2Btn) companion2Btn.style.display = "none";
+if (companionData && companionBtn) {
+  companionBtn.style.display = "flex";
+  companionBtn.onclick = () => {
+    state.currentEnemy = companionData;
+    showEnemyPage(companionData);
+  };
+} else if (companionBtn) {
+  companionBtn.style.display = "none";
+}
+
+// ★侵蝕書（敗北10回以上で表示）
+const ENDING_THRESHOLD = 10; // ★侵蝕書解禁に必要な敗北回数
+if (defeatedCount >= ENDING_THRESHOLD && companion2Data && companion2Btn) {
+  companion2Btn.style.display = "flex";
+  companion2Btn.onclick = () => {
+    state.currentEnemy = companion2Data;
+    showEnemyPage(companion2Data);
+  };
+} else if (companion2Btn) {
+  companion2Btn.style.display = "none";
 }
 
 } // ← これが showLibrary 関数の閉じカッコです
@@ -3021,8 +2997,15 @@ if (actionIndex >= actions.length) {
     }
 
 if (currentAction.nextStage !== undefined) {
-  gameState.stage = resolveNextStage(currentAction.nextStage);
+  // ★変更：敗北中は defN 形式の敗北回数ジャンプを無視する
+  const nsRaw = String(currentAction.nextStage).trim();
+  const isDefJump = /^(?:(?:all)?def\s*\d+)\s+/i.test(nsRaw);
+  
+  if (!(gameState.battleEnded && isDefJump)) {
+    gameState.stage = resolveNextStage(currentAction.nextStage);
+  }
 }
+
 
 // ★ goto 処理
 if (currentAction.goto === 'library') {
