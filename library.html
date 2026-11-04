@@ -3021,8 +3021,15 @@ if (actionIndex >= actions.length) {
     }
 
 if (currentAction.nextStage !== undefined) {
-  gameState.stage = resolveNextStage(currentAction.nextStage);
+  // ★変更：敗北中は defN 形式の敗北回数ジャンプを無視する
+  const nsRaw = String(currentAction.nextStage).trim();
+  const isDefJump = /^(?:(?:all)?def\s*\d+)\s+/i.test(nsRaw);
+  
+  if (!(gameState.battleEnded && isDefJump)) {
+    gameState.stage = resolveNextStage(currentAction.nextStage);
+  }
 }
+
 
 // ★ goto 処理
 if (currentAction.goto === 'library') {
