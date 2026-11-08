@@ -1972,7 +1972,7 @@ if (companionData && companionBtn) {
 }
 
 // ★侵蝕書（敗北10回以上で表示）
-const ENDING_THRESHOLD = 10; // ★侵蝕書解禁に必要な敗北回数
+const ENDING_THRESHOLD = 900; // ★侵蝕書解禁に必要な敗北回数
 if (defeatedCount >= ENDING_THRESHOLD && companion2Data && companion2Btn) {
   companion2Btn.style.display = "flex";
   companion2Btn.onclick = () => {
