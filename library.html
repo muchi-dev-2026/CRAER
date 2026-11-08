@@ -974,6 +974,11 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
   box-shadow: 0 0 12px rgba(255, 20, 147, 0.8);
 }
 
+/* ★追加：CCボタン位置調整（スキップの下） */
+#lib_recapCC {
+  top: 50px;
+}
+
 /* ============================================
    回想後コマンドバリアント：横並び（画面フィット・スマホ最適化）
    ============================================ */
@@ -1251,9 +1256,10 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
    ============================================ */
 .lib_gothic_btn {
   position: relative;
-  width: 135px;
+  width: auto;
+  min-width: 80px;
   height: 40px;
-  padding: 0;
+  padding: 0 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1273,7 +1279,9 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
   box-sizing: border-box;
   overflow: hidden;
   transition: all 0.25s ease;
+  white-space: nowrap;
 }
+
 
 /* 四隅のL字装飾 */
 .lib_gothic_btn::before {
@@ -1338,11 +1346,6 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
 }
 
 
-/* エンディングボタン専用の赤い発光 */
-#lib_libraryEndingButton.gauge-full {
-  border-color: #ff0055 !important;
-  animation: gothicPulse 1.5s ease-in-out infinite alternate;
-}
 
 
 </style>
@@ -1351,7 +1354,8 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
 <body>
   <div id="lib_game">
     
-    <button id="lib_skipToggle" class="lib_skipToggle">SKIP OFF</button>
+<button id="lib_skipToggle" class="lib_skipToggle">SKIP OFF</button>
+<button id="lib_recapCC" class="lib_skipToggle" style="display: none; top: 50px;">CC OFF</button>
     
     <!-- ⓪ イントロ画面 -->
   <div id="lib_introScreen" class="lib_screen active">
@@ -1373,39 +1377,34 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
   <video id="lib_bgVideo" muted loop playsinline preload="auto"></video>
   <div id="lib_commandLayer"></div>
   
-  <!-- ★追加：左右に分けるためのコンテナ -->
 <div id="lib_libraryButtons" style="
     position: absolute;
     bottom: 20px;
-    left: 20px;
-    right: 20px;
+    left: 12px;   /* 20pxから12pxに変更（広げる） */
+    right: 12px;  /* 20pxから12pxに変更（広げる） */
     z-index: 10;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
+    gap: 8px;     /* ★ボタン同士の最低限の隙間を保証 */
     pointer-events: none;
   ">
-<!-- ★左端：エンディングボタン（普段は非表示） -->
-<button id="lib_libraryEndingButton" class="lib_gothic_btn" style="display: none;">
-  <span class="lib_btn_text">† 侵食の記憶</span>
-</button>
-
-<!-- ★左端：案内人ボタン -->
-<button id="lib_companionButton" class="lib_gothic_btn" style="display: none;">
-  <span class="lib_btn_text">📖 案内人</span>
-</button>
-
-<!-- ★追加：エンディング用案内人ボタン -->
-<button id="lib_companion2Button" class="lib_gothic_btn" style="display: none;">
-  <span class="lib_btn_text">† 侵食の案内人</span>
-</button>
-
-<!-- ★右端：敗北回想ボタン -->
-<button id="lib_defeatRecapButton" class="lib_gothic_btn" style="display: none;">
-  <div class="recap-gauge-fill" style="width: 0%;"></div>
-  <span class="lib_btn_text recap-gauge-text">† 敗北回想</span>
-</button>
-
+  <!-- ★左端：案内人ボタン（常時表示） -->
+  <button id="lib_companionButton" class="lib_gothic_btn" style="display: none;">
+    <span class="lib_btn_text">案内人</span>
+  </button>
+  
+  <!-- ★中央：侵蝕書ボタン（敗北10回以上で表示） -->
+  <button id="lib_companion2Button" class="lib_gothic_btn" style="display: none;">
+    <span class="lib_btn_text">†侵蝕書</span>
+  </button>
+  
+  <!-- ★右端：敗北回想ボタン -->
+  <button id="lib_defeatRecapButton" class="lib_gothic_btn" style="display: none;">
+    <div class="recap-gauge-fill" style="width: 0%;"></div>
+    <span class="lib_btn_text recap-gauge-text">†敗北回想</span>
+  </button>
+  
 </div>
 </div>
 
@@ -1504,7 +1503,32 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
         <div id="heroMessageWrap"><div id="heroMessage"></div></div>
       </div>
 
+      <!-- ★追加：回想専用のセリフ表示レイヤー（UI非表示中も表示される） -->
+      <div id="recapSerifLayer" style="
+        position: absolute;
+        left: 5%;
+        right: 5%;
+        bottom: 22%;
+        z-index: 100;
+        display: flex;
+        justify-content: center;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+      ">
+        <div id="recapSerifText" style="
+          font-family: 'Shippori Mincho', serif;
+          font-size: 15px;
+          line-height: 1.8;
+          color: #ffffff;
+          text-align: center;
+          text-shadow: 0 0 8px #ff0055, 1px 1px 3px #000, -1px -1px 0 #000;
+          letter-spacing: 1px;
+        "></div>
+      </div>
+
       <div id="temptationPopup">
+        
         <div id="temptationLabel">SYSTEM MESSAGE</div>
         <div id="temptationText"></div>
       </div>
@@ -1931,48 +1955,32 @@ if (recapBtn) {
   }
 }
 
-// ★追加：図書館画面でのエンディングボタン表示（両端レイアウト用）
-const libEndingBtn = document.getElementById("lib_libraryEndingButton");
-if (libEndingBtn) {
-  if (defeatedCount >= REQUIRED_DEFEATS + 9999) { // 実質封印
-    libEndingBtn.style.display = "flex";
-    libEndingBtn.onclick = () => {
-      if (window.idx && window.idx.playEndingSequence) {
-        window.idx.playEndingSequence();
-      }
-    };
-  } else {
-    libEndingBtn.style.display = "none";
-  }
-}
-
-// ★変更：敗北回数に応じて通常案内人 / エンディング案内人を切替
-const ENDING_THRESHOLD = 999; // ★エンディング案内人解禁に必要な敗北回数　封印
+// ★案内人（常時表示）
 const companionData = await loadCompanion();
 const companion2Data = await loadCompanion2();
 const companionBtn = document.getElementById("lib_companionButton");
 const companion2Btn = document.getElementById("lib_companion2Button");
 
-if (defeatedCount >= ENDING_THRESHOLD) {
-  // 敗北回数が閾値以上 → エンディング案内人を表示
-  if (companion2Data && companion2Btn) {
-    companion2Btn.style.display = "flex";
-    companion2Btn.onclick = () => {
-      state.currentEnemy = companion2Data;
-      showEnemyPage(companion2Data);
-    };
-  }
-  if (companionBtn) companionBtn.style.display = "none";
-} else {
-  // 敗北回数が閾値未満 → 通常案内人を表示
-  if (companionData && companionBtn) {
-    companionBtn.style.display = "flex";
-    companionBtn.onclick = () => {
-      state.currentEnemy = companionData;
-      showEnemyPage(companionData);
-    };
-  }
-  if (companion2Btn) companion2Btn.style.display = "none";
+if (companionData && companionBtn) {
+  companionBtn.style.display = "flex";
+  companionBtn.onclick = () => {
+    state.currentEnemy = companionData;
+    showEnemyPage(companionData);
+  };
+} else if (companionBtn) {
+  companionBtn.style.display = "none";
+}
+
+// ★侵蝕書（敗北10回以上で表示）
+const ENDING_THRESHOLD = 10; // ★侵蝕書解禁に必要な敗北回数
+if (defeatedCount >= ENDING_THRESHOLD && companion2Data && companion2Btn) {
+  companion2Btn.style.display = "flex";
+  companion2Btn.onclick = () => {
+    state.currentEnemy = companion2Data;
+    showEnemyPage(companion2Data);
+  };
+} else if (companion2Btn) {
+  companion2Btn.style.display = "none";
 }
 
 } // ← これが showLibrary 関数の閉じカッコです
@@ -2083,21 +2091,25 @@ enterButton.onclick = () => {
     return;
   }
   
-  if (window.idx && window.idx.startBattle) {
-    // ★追加：前回のバトルや回想のタイマー・状態を完全にリセットする
-    clearTimeout(window.idx.gameState.enemyTimer);
-    clearInterval(window.idx.gameState.passiveTimer);
-    clearInterval(window.idx.gameState.attackTimerInterval);
-    clearInterval(window.idx.gameState.defeatLoopTimer);
-    window.idx.gameState.battleStarted = false;
-    window.idx.gameState.battleEnded = false;
+ if (window.idx && window.idx.startBattle) {
+  // ★追加：前回のバトルや回想のタイマー・状態を完全にリセットする
+  clearTimeout(window.idx.gameState.enemyTimer);
+  clearInterval(window.idx.gameState.passiveTimer);
+  clearInterval(window.idx.gameState.attackTimerInterval);
+  clearInterval(window.idx.gameState.defeatLoopTimer);
+  window.idx.gameState.battleStarted = false;
+  window.idx.gameState.battleEnded = false;
     
 // データの読み込み（★動画と画像を合体させて渡す）
 window.idx.gameState.videoURLs = { ...enemy.videoURLs, ...enemy.imageURLs };
 window.idx.gameState.parsedTimeline = window.idx.parseNewTimeline(enemy.timelineText);
-    window.idx.gameState.serifPools = window.idx.parseSerifFile(enemy.serifText);
-    if (enemy.sfxText && window.idx.parseSfxFile) {
-      window.idx.gameState.sfxTexts = window.idx.parseSfxFile(enemy.sfxText);
+// ★変更：parseSerifFile の戻り値が { pools, uiTexts } になったため
+const parsedSerif1 = window.idx.parseSerifFile(enemy.serifText);
+window.idx.gameState.serifPools = parsedSerif1.pools;
+window.idx.gameState.uiTexts = parsedSerif1.uiTexts;
+
+if (enemy.sfxText && window.idx.parseSfxFile) {
+  window.idx.gameState.sfxTexts = window.idx.parseSfxFile(enemy.sfxText);
     } else {
       window.idx.gameState.sfxTexts = { attack: null, defeat: null };
     }
@@ -2187,7 +2199,7 @@ Object.entries(folder).forEach(([k, f]) => {
 
 state.enemies.push({
   name,
-  info: parseInfo(timelineText),
+  info: parseInfo(serifText), // ★変更：セリフ.txt から [INFO] を読む
   timelineText,
   serifText,
   videoURLs: videos, // ★ 動画だけ
@@ -2375,6 +2387,33 @@ const CONFIG = {
 let isEndingSequence = false;
 let endingResolve = null;
 
+// ★追加：CC（字幕）トグル
+const recapSerifState = { on: true };
+const recapCCBtn = document.getElementById("lib_recapCC");
+
+function updateCCButton() {
+  const ls = localStorage.getItem("craer_recap_cc") || "on";
+  const isOn = ls !== "off";
+  recapSerifState.on = isOn;
+  recapCCBtn.textContent = isOn ? "CC ON" : "CC OFF";
+  recapCCBtn.classList.toggle("on", isOn);
+}
+
+if (recapCCBtn) {
+  updateCCButton();
+  
+  recapCCBtn.onclick = () => {
+    const current = localStorage.getItem("craer_recap_cc") || "on";
+    localStorage.setItem("craer_recap_cc", current === "on" ? "off" : "on");
+    updateCCButton();
+    
+    if (!recapSerifState.on) {
+      const layer = document.getElementById("recapSerifLayer");
+      if (layer) layer.style.opacity = "0";
+    }
+  };
+}
+
 const canvas = document.getElementById("canvas");
 
 const ctx = canvas.getContext("2d");
@@ -2426,11 +2465,12 @@ if (resultSub) {
 }
 
 const gameState = {
-  videoURLs: {},
-  charaURL: null,
-  sfxTexts: { attack: null, defeat: null },
-  parsedTimeline: { stages: {}, defaultSerifs: {}, APPEAR: {}, DEFEAT: {} },
-  serifPools: {},
+    videoURLs: {},
+    charaURL: null,
+    sfxTexts: { attack: null, defeat: null },
+    parsedTimeline: { stages: {}, defaultSerifs: {}, APPEAR: {}, DEFEAT: {} },
+    serifPools: {},
+    uiTexts: {}, // ★追加：UIテキスト翻訳用
   pleasure: 0, stage: null,
   battleStarted: false, battleEnded: false,
   currentClip: null, isGazing: false, gazeStart: 0, guardUntil: 0,
@@ -2469,22 +2509,38 @@ function stopContinuousShake() {
 
 function parseSerifFile(text) {
   const pools = {};
-  if (!text) return pools;
+  const uiTexts = {};
+  if (!text) return { pools, uiTexts };
   const lines = text.split('\n');
   let currentTag = null;
   let currentEntry = null;
-
+  
   function pushEntry() {
     if (currentTag && currentEntry && (currentEntry.serif !== null || currentEntry.serif1 !== null)) {
       if (!pools[currentTag]) pools[currentTag] = [];
       pools[currentTag].push(currentEntry);
-      currentEntry = null;
     }
+    currentEntry = null;
   }
-
+  
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
     if (!line) { pushEntry(); continue; }
+    
+    const uiMatch = line.match(/^(SYSTEM_MESSAGE|COMMAND_GUIDE|BUTTON1|BUTTON2|BUTTON3|DEFAULT):\s*(.+)$/i);
+if (uiMatch) {
+  const upperKey = uiMatch[1].toUpperCase();
+  const val = uiMatch[2].trim();
+  if (currentTag) {
+    const uiKey = currentTag + "__UI";
+    if (!pools[uiKey]) pools[uiKey] = {};
+    pools[uiKey][upperKey] = val;
+  } else {
+    uiTexts[upperKey] = val;
+  }
+  continue;
+}
+    
     if (line.startsWith('#')) {
       pushEntry();
       currentTag = line.slice(1).trim();
@@ -2492,19 +2548,35 @@ function parseSerifFile(text) {
       continue;
     }
     if (!currentTag) continue;
-    if (line.toLowerCase().startsWith('serif:')) {
-      const val = line.slice(6).trim();
-      if (currentEntry && currentEntry.serif !== null) pushEntry();
-      if (!currentEntry) currentEntry = { serif: null, serif1: null };
-      currentEntry.serif = val;
-    } else if (line.toLowerCase().startsWith('serif1:')) {
-      const val = line.slice(7).trim();
-      if (!currentEntry) currentEntry = { serif: null, serif1: null };
-      currentEntry.serif1 = val;
-    }
+    
+const timeMatch = line.match(/^(serif|serif1):\s*([\d\.]+)@(.+)$/i);
+if (timeMatch) {
+  const which = timeMatch[1].toLowerCase();
+  const time = parseFloat(timeMatch[2]);
+  const val = timeMatch[3].trim();
+  
+  // ★1行 = 1エントリとして即座に登録
+  const entry = { serif: null, serif1: null, time, text: val };
+  entry[which] = val;
+  if (!pools[currentTag]) pools[currentTag] = [];
+  pools[currentTag].push(entry);
+  continue;
+}
+
+    
+if (line.toLowerCase().startsWith('serif:')) {
+  const val = line.slice(6).trim();
+  if (currentEntry && currentEntry.serif !== null) pushEntry();
+  if (!currentEntry) currentEntry = { serif: null, serif1: null, time: null };
+  currentEntry.serif = val;
+} else if (line.toLowerCase().startsWith('serif1:')) {
+  const val = line.slice(7).trim();
+  if (!currentEntry) currentEntry = { serif: null, serif1: null, time: null };
+  currentEntry.serif1 = val;
+}
   }
   pushEntry();
-  return pools;
+  return { pools, uiTexts };
 }
 
 function parseSfxFile(text) {
@@ -2547,18 +2619,18 @@ function parseNewTimeline(text) {
     if (!line || line.startsWith('#')) continue;
     const upperLine = line.toUpperCase();
 
-    if (upperLine.startsWith('STAGE ')) {
-      const match = line.match(/^STAGE\s+(.+)$/i);
-      if (match) {
-        currentStage = match[1].trim();
-        if (!data.stages[currentStage]) data.stages[currentStage] = {};
-        currentContext = 'STAGE';
-currentEventObj = null;
-}
-continue;
+if (upperLine.startsWith('STAGE ')) {
+  const match = line.match(/^STAGE\s+(.+)$/i);
+  if (match) {
+    currentStage = match[1].trim();
+    if (!data.stages[currentStage]) data.stages[currentStage] = {};
+    currentContext = 'STAGE';
+    currentEventObj = null;
+  }
+  continue;
 }
 
-// ★ここから追加
+// ★修正：現在のステージにだけ command / hide を適用する
 if (currentContext === 'STAGE' && currentStage) {
   if (upperLine === 'COMMAND') {
     data.stages[currentStage]['FORCE_COMMAND'] = true;
@@ -2569,7 +2641,6 @@ if (currentContext === 'STAGE' && currentStage) {
     continue;
   }
 }
-// ★ここまで追加
 
     if (upperLine === 'DEFAULT SERIFS' || upperLine === 'DEFAULT_SERIFS') {
       currentContext = 'DEFAULT_SERIFS';
@@ -2747,15 +2818,21 @@ function resolveSerifs(actionData) {
       if (bestKey) matchedPool = gameState.serifPools[bestKey];
     }
     if (matchedPool && matchedPool.length > 0) {
-      const picked = matchedPool[Math.floor(Math.random() * matchedPool.length)];
-      if (picked.serif != null) enemySerif = picked.serif;
-      if (picked.serif1 != null) heroSerif = picked.serif1;
+      // ★追加：時間指定セリフ（time !== null）を除外
+      //   時間指定セリフは #recapSerifLayer 側で表示されるため
+      const nonTimedPool = matchedPool.filter(p => p.time === null || p.time === undefined);
+      if (nonTimedPool.length > 0) {
+        const picked = nonTimedPool[Math.floor(Math.random() * nonTimedPool.length)];
+        if (picked.serif != null) enemySerif = picked.serif;
+        if (picked.serif1 != null) heroSerif = picked.serif1;
+      }
     }
   }
   if (actionData.serif) enemySerif = actionData.serif;
   if (actionData.serif1) heroSerif = actionData.serif1;
   return { enemySerif, heroSerif };
 }
+
 
 function handleEventSerifs(actionData) {
   const { enemySerif, heroSerif } = resolveSerifs(actionData);
@@ -2869,6 +2946,21 @@ function typeWriterHeroMessage(text, speed = CONFIG.HERO_TYPE_SPEED) {
 function setMessage(text){ typeWriterMessage(text, CONFIG.ENEMY_TYPE_SPEED); }
 function setHeroMessage(text){ typeWriterHeroMessage(text, CONFIG.HERO_TYPE_SPEED); }
 
+// ★追加：回想セリフ表示用
+let recapSerifTimeout = null;
+function setRecapMessage(text) {
+  if (!recapSerifState.on) return; // ★追加：CC OFF時は表示しない
+  const layer = document.getElementById("recapSerifLayer");
+  const textEl = document.getElementById("recapSerifText");
+  if (!layer || !textEl) return;
+  clearTimeout(recapSerifTimeout);
+  if (!text) { layer.style.opacity = "0"; return; }
+  textEl.textContent = text;
+  layer.style.opacity = "1";
+  recapSerifTimeout = setTimeout(() => { layer.style.opacity = "0"; }, 5000);
+}
+
+
 function getCurrentStageLevel() {
   const pct = gameState.pleasure / CONFIG.MAX_PLEASURE;
   if (pct >= CONFIG.STAGE_THRESHOLDS.stage4) return 4;
@@ -2914,8 +3006,19 @@ function updateCommandUI(){
 
   const stageData = gameState.parsedTimeline.stages[gameState.stage] || {};
   const b1 = stageData['BUTTON1'], b2 = stageData['BUTTON2'], b3 = stageData['BUTTON3'];
+  
+  // ★変更：WAITのタグを基準に、そのタグ専用のUIテキストを探す
+const waitTag = stageData['WAIT']?.tag;
+let ui = {};
+if (waitTag && gameState.serifPools[waitTag + "__UI"]) {
+  ui = { ...gameState.serifPools[waitTag + "__UI"] };
+} else {
+  ui = { ...(gameState.uiTexts || {}) };
+}
+  
 
   const getBtnText = (b, key) => {
+    if (ui[key]) return ui[key]; // ★追加：セリフファイルの翻訳を最優先
     if (b && b.text) return b.text;
     if (gameState.parsedTimeline.defaultSerifs[key]) {
       const def = gameState.parsedTimeline.defaultSerifs[key];
@@ -2923,6 +3026,7 @@ function updateCommandUI(){
     }
     return "---";
   };
+  
 
   title1.textContent = `・${getBtnText(b1, 'BUTTON1')}`;
   title2.textContent = `・${getBtnText(b2, 'BUTTON2')}`;
@@ -2931,12 +3035,29 @@ function updateCommandUI(){
   elements.forEach(el => el.className = `cmd-title ${styleClass}`);
 }
 
-function showCommands(flag){
-  if(flag){
+function showCommands(flag) {
+  if (flag) {
     updateCommandUI();
     commandsEl.classList.add("visible");
     [btn1, btn2, btn3].forEach(b => b.disabled = false);
-    const guideText = getCommandGuideText();
+    
+// ★変更：UIテキスト翻訳があれば優先（WAITタグ専用のテキストも考慮）
+const stageData = gameState.parsedTimeline.stages[gameState.stage] || {};
+const waitTag = stageData['WAIT']?.tag;
+
+let ui = {};
+if (waitTag && gameState.serifPools[waitTag + "__UI"]) {
+  ui = { ...gameState.serifPools[waitTag + "__UI"] };
+} else {
+  ui = { ...(gameState.uiTexts || {}) };
+}
+
+const guideText = ui['COMMAND_GUIDE'] || getCommandGuideText();
+    
+    const sysLabel = document.getElementById("temptationLabel");
+    if (sysLabel) sysLabel.textContent = ui['SYSTEM_MESSAGE'] || "SYSTEM MESSAGE";
+    
+    
     temptationTextEl.textContent = guideText;
     if (guideText) temptationPopup.classList.add("visible");
     else temptationPopup.classList.remove("visible");
@@ -3217,13 +3338,49 @@ const sfx = currentAction.sfxCount !== undefined ? currentAction.sfxCount : (act
     await seekTo(hasTimeRange ? clip.start : 0);
     if (sessionId !== gameState.playSessionId) return;
 
-    applySpeed();
-    video.play().then(() => { applySpeed(); }).catch(() => {
-      setTimeout(() => {
-        if (sessionId !== gameState.playSessionId) return;
-        playNextAction();
-      }, holdDuration);
-    });
+applySpeed();
+video.play().then(() => { applySpeed(); }).catch(() => {
+  setTimeout(() => {
+    if (sessionId !== gameState.playSessionId) return;
+    playNextAction();
+  }, holdDuration);
+});
+
+// ★追加：時間指定セリフの監視（@ 記号でパースされたもの）
+let timedSerifs = [];
+const currentTag = currentAction.tag || eventData.tag;
+if (currentTag && gameState.serifPools[currentTag]) {
+  const pool = gameState.serifPools[currentTag];
+  timedSerifs = pool.filter(p => p.time !== null && p.text !== null)
+    .sort((a, b) => a.time - b.time);
+}
+
+// ★追加：時間指定セリフがある → CCボタン表示
+if (recapCCBtn) {
+  recapCCBtn.style.display = timedSerifs.length > 0 ? "block" : "none";
+}
+
+if (timedSerifs.length > 0) {
+  let serifIndex = 0;
+  const startVidTime = video.currentTime;
+  
+  const serifInterval = setInterval(() => {
+    if (sessionId !== gameState.playSessionId) {
+      clearInterval(serifInterval);
+      return;
+    }
+    if (video.paused || video.ended) return;
+    
+    const elapsed = video.currentTime - startVidTime;
+    if (serifIndex < timedSerifs.length && elapsed >= timedSerifs[serifIndex].time) {
+      setRecapMessage(timedSerifs[serifIndex].text);
+      serifIndex++;
+    }
+    if (serifIndex >= timedSerifs.length && video.ended) {
+      clearInterval(serifInterval);
+    }
+  }, 100);
+}
 
     if (hasTimeRange) {
       const checkRange = () => {
@@ -3891,12 +4048,16 @@ async function playSingleDefeat(index, options = {}) {
 // ゲーム状態のロード（「入る」ボタンを押した時と同じ処理）
 gameState.videoURLs = { ...enemy.videoURLs, ...enemy.imageURLs };
 
-    
-  gameState.parsedTimeline = window.idx.parseNewTimeline(enemy.timelineText);
-  gameState.serifPools = window.idx.parseSerifFile(enemy.serifText);
-  if (enemy.sfxText && window.idx.parseSfxFile) {
-    gameState.sfxTexts = window.idx.parseSfxFile(enemy.sfxText);
-  } else {
+
+gameState.parsedTimeline = window.idx.parseNewTimeline(enemy.timelineText);
+// ★変更：parseSerifFile の戻り値が { pools, uiTexts } になったため
+const parsedSerif2 = window.idx.parseSerifFile(enemy.serifText);
+gameState.serifPools = parsedSerif2.pools;
+gameState.uiTexts = parsedSerif2.uiTexts;
+
+if (enemy.sfxText && window.idx.parseSfxFile) {
+  gameState.sfxTexts = window.idx.parseSfxFile(enemy.sfxText);
+} else {
     gameState.sfxTexts = { attack: null, defeat: null };
   }
   
@@ -4076,13 +4237,17 @@ async function playEndingSequence() {
     const enemy = window.lib?.state?.enemies?.find(e => e.name === record.enemyId);
     if (!enemy) continue;
     
-    // データロード
-    gameState.videoURLs = { ...enemy.videoURLs, ...enemy.imageURLs };
-    gameState.parsedTimeline = parseNewTimeline(enemy.timelineText);
-    gameState.serifPools = parseSerifFile(enemy.serifText);
-    if (enemy.sfxText && parseSfxFile) {
-      gameState.sfxTexts = parseSfxFile(enemy.sfxText);
-    } else {
+// データロード
+gameState.videoURLs = { ...enemy.videoURLs, ...enemy.imageURLs };
+gameState.parsedTimeline = parseNewTimeline(enemy.timelineText);
+// ★変更：parseSerifFile の戻り値が { pools, uiTexts } になったため
+const parsedSerif3 = parseSerifFile(enemy.serifText);
+gameState.serifPools = parsedSerif3.pools;
+gameState.uiTexts = parsedSerif3.uiTexts;
+
+if (enemy.sfxText && parseSfxFile) {
+  gameState.sfxTexts = parseSfxFile(enemy.sfxText);
+} else {
       gameState.sfxTexts = { attack: null, defeat: null };
     }
     if (enemy.charaURL) {
