@@ -974,6 +974,11 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
   box-shadow: 0 0 12px rgba(255, 20, 147, 0.8);
 }
 
+/* ★追加：CCボタン位置調整（スキップの下） */
+#lib_recapCC {
+  top: 50px;
+}
+
 /* ============================================
    回想後コマンドバリアント：横並び（画面フィット・スマホ最適化）
    ============================================ */
@@ -1349,7 +1354,8 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
 <body>
   <div id="lib_game">
     
-    <button id="lib_skipToggle" class="lib_skipToggle">SKIP OFF</button>
+<button id="lib_skipToggle" class="lib_skipToggle">SKIP OFF</button>
+<button id="lib_recapCC" class="lib_skipToggle" style="display: none; top: 50px;">CC OFF</button>
     
     <!-- ⓪ イントロ画面 -->
   <div id="lib_introScreen" class="lib_screen active">
@@ -2381,6 +2387,33 @@ const CONFIG = {
 let isEndingSequence = false;
 let endingResolve = null;
 
+// ★追加：CC（字幕）トグル
+const recapSerifState = { on: true };
+const recapCCBtn = document.getElementById("lib_recapCC");
+
+function updateCCButton() {
+  const ls = localStorage.getItem("craer_recap_cc") || "on";
+  const isOn = ls !== "off";
+  recapSerifState.on = isOn;
+  recapCCBtn.textContent = isOn ? "CC ON" : "CC OFF";
+  recapCCBtn.classList.toggle("on", isOn);
+}
+
+if (recapCCBtn) {
+  updateCCButton();
+  
+  recapCCBtn.onclick = () => {
+    const current = localStorage.getItem("craer_recap_cc") || "on";
+    localStorage.setItem("craer_recap_cc", current === "on" ? "off" : "on");
+    updateCCButton();
+    
+    if (!recapSerifState.on) {
+      const layer = document.getElementById("recapSerifLayer");
+      if (layer) layer.style.opacity = "0";
+    }
+  };
+}
+
 const canvas = document.getElementById("canvas");
 
 const ctx = canvas.getContext("2d");
@@ -2531,16 +2564,16 @@ if (timeMatch) {
 }
 
     
-    if (line.toLowerCase().startsWith('serif:')) {
-      const val = line.slice(6).trim();
-      if (currentEntry && currentEntry.serif !== null) pushEntry();
-      if (!currentEntry) currentEntry = { serif: null, serif1: null };
-      currentEntry.serif = val;
-    } else if (line.toLowerCase().startsWith('serif1:')) {
-      const val = line.slice(7).trim();
-      if (!currentEntry) currentEntry = { serif: null, serif1: null };
-      currentEntry.serif1 = val;
-    }
+if (line.toLowerCase().startsWith('serif:')) {
+  const val = line.slice(6).trim();
+  if (currentEntry && currentEntry.serif !== null) pushEntry();
+  if (!currentEntry) currentEntry = { serif: null, serif1: null, time: null };
+  currentEntry.serif = val;
+} else if (line.toLowerCase().startsWith('serif1:')) {
+  const val = line.slice(7).trim();
+  if (!currentEntry) currentEntry = { serif: null, serif1: null, time: null };
+  currentEntry.serif1 = val;
+}
   }
   pushEntry();
   return { pools, uiTexts };
@@ -2916,6 +2949,7 @@ function setHeroMessage(text){ typeWriterHeroMessage(text, CONFIG.HERO_TYPE_SPEE
 // ★追加：回想セリフ表示用
 let recapSerifTimeout = null;
 function setRecapMessage(text) {
+  if (!recapSerifState.on) return; // ★追加：CC OFF時は表示しない
   const layer = document.getElementById("recapSerifLayer");
   const textEl = document.getElementById("recapSerifText");
   if (!layer || !textEl) return;
@@ -3319,6 +3353,11 @@ if (currentTag && gameState.serifPools[currentTag]) {
   const pool = gameState.serifPools[currentTag];
   timedSerifs = pool.filter(p => p.time !== null && p.text !== null)
     .sort((a, b) => a.time - b.time);
+}
+
+// ★追加：時間指定セリフがある → CCボタン表示
+if (recapCCBtn) {
+  recapCCBtn.style.display = timedSerifs.length > 0 ? "block" : "none";
 }
 
 if (timedSerifs.length > 0) {
