@@ -1394,9 +1394,9 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
     <span class="lib_btn_text">案内人</span>
   </button>
   
-  <!-- ★中央：侵蝕書ボタン（敗北10回以上で表示） -->
+  <!-- ★中央：侵黒書ボタン（敗北10回以上で表示） -->
   <button id="lib_companion2Button" class="lib_gothic_btn" style="display: none;">
-    <span class="lib_btn_text">†侵蝕書</span>
+    <span class="lib_btn_text">†侵黒書</span>
   </button>
   
   <!-- ★右端：敗北回想ボタン -->
@@ -1751,6 +1751,11 @@ skipToggleBtn.onclick = () => {
   
   // ★バトル中 → goto: library と同じ処理
   if (gs?.battleStarted && !gs?.battleEnded) {
+    // ★close: on のステージでは CLOSE ブロックを実行
+    if (gs.closeActive && window.idx && window.idx.triggerClose) {
+      window.idx.triggerClose();
+      return;
+    }
     if (window.idx && window.idx.exitViaGotoLibrary) {
       window.idx.exitViaGotoLibrary();
     }
@@ -1801,6 +1806,8 @@ function playIntroVideoFile(src) {
 
 // ===== イントロ再生 =====
 async function playIntro() {
+  if (await handleBroken()) return;   // ★壊れ中は先へ進ませない
+
   if (skipState.on) { await showStartScreen(); return; }
   
   showScreen("intro");
@@ -1972,7 +1979,7 @@ if (companionData && companionBtn) {
 }
 
 // ★侵蝕書（敗北10回以上で表示）
-const ENDING_THRESHOLD = 10; // ★侵蝕書解禁に必要な敗北回数
+const ENDING_THRESHOLD = 900; // ★侵蝕書解禁に必要な敗北回数
 if (defeatedCount >= ENDING_THRESHOLD && companion2Data && companion2Btn) {
   companion2Btn.style.display = "flex";
   companion2Btn.onclick = () => {
@@ -2323,10 +2330,127 @@ document.getElementById("lib_recapClearButton")?.addEventListener("click", () =>
 
 
 // ===== 外部公開 =====
+// 背景色から、読みやすい文字色を選ぶ（#rgb / #rrggbb のみ対応）
+function freezeTextColor(bg) {
+  let h = String(bg).replace('#', '');
+  if (h.length === 3) h = h.split('').map(c => c + c).join('');
+  const n = parseInt(h, 16);
+  if (isNaN(n)) return '#888';
+  const lum = (((n >> 16) & 255) * 299 + ((n >> 8) & 255) * 587 + (n & 255) * 114) / 1000;
+  return lum > 128 ? '#222' : '#eee';
+}
+
+// ★白/黒の画面で固まって終了する（spec："色|メッセージ"）
+function freezeScreen(spec) {
+  const parts = String(spec).split('|');
+  const color = parts[0] || '#000';
+  const message = parts[1] || '';
+  document.querySelectorAll('video, audio').forEach(m => {
+    try { m.pause(); } catch (e) {}
+  });
+  const el = document.createElement('div');
+  el.id = 'lib_freeze';
+  el.style.cssText =
+    'position:fixed;inset:0;z-index:2147483647;opacity:0;' +
+    'transition:opacity 2.5s ease;display:flex;align-items:center;' +
+    'justify-content:center;background:' + color + ';';
+  if (message) {
+    const msg = document.createElement('div');
+    msg.textContent = message;
+    msg.style.cssText =
+      'opacity:0;transition:opacity 2s ease 3.5s;white-space:pre-line;' +
+      'text-align:center;letter-spacing:0.2em;line-height:2;padding:0 24px;' +
+      "font-family:'Shippori Mincho',serif;color:" + freezeTextColor(color) + ';';
+    el.appendChild(msg);
+    requestAnimationFrame(() => requestAnimationFrame(() => { msg.style.opacity = '1'; }));
+  }
+  document.body.appendChild(el);
+  requestAnimationFrame(() => requestAnimationFrame(() => { el.style.opacity = '1'; }));
+  ['click', 'pointerdown', 'touchstart', 'keydown'].forEach(t => {
+    window.addEventListener(t, e => e.stopImmediatePropagation(), true);
+  });
+}
+
+function afterEnding(next) {
+  const gameEl = document.getElementById("game");
+  if (gameEl) gameEl.style.display = "none";
+  const fb = document.getElementById('fadeToBlack');
+  if (fb) fb.classList.remove('active');
+  skipToggleBtn.textContent = skipState.on ? "SKIP ON" : "SKIP OFF";
+  if (typeof next === 'string' && next.indexOf('freeze:') === 0) {
+    freezeScreen(next.slice(7));
+    return;
+  }
+  if (next === 'broken') {
+    let n = 5;
+    try { n = parseInt(localStorage.getItem('craer_broken'), 10) || 5; } catch (e) {}
+    showBrokenScreen(n, false);
+    return;
+  }
+  if (next === 'intro') playIntro();
+  else showLibrary();
+}
+
+// ★壊れ演出：5（ERODE直後）→ 4 → 3 → 次回起動で「修復します。」
+function brokenLayer(text, instant) {
+  const el = document.createElement('div');
+  el.style.cssText =
+    'position:fixed;inset:0;z-index:2147483647;background:#000;' +
+    'transition:opacity 1.5s ease;display:flex;align-items:center;justify-content:center;' +
+    'opacity:' + (instant ? '1' : '0') + ';';
+  const msg = document.createElement('div');
+  msg.style.cssText =
+    "color:#eee;text-align:center;letter-spacing:0.2em;line-height:2.2;" +
+    "white-space:pre-line;padding:0 24px;font-family:'Shippori Mincho',serif;";
+  msg.textContent = text;
+  el.appendChild(msg);
+  document.body.appendChild(el);
+  if (!instant) {
+    requestAnimationFrame(() => requestAnimationFrame(() => { el.style.opacity = '1'; }));
+  }
+  return el;
+}
+
+function showBrokenScreen(n, instant) {
+  document.querySelectorAll('video, audio').forEach(m => {
+    try { m.pause(); } catch (e) {}
+  });
+  skipToggleBtn.style.visibility = 'hidden';
+  brokenLayer("壊れています。\nブラウザを閉じてください（" + n + "）", instant);
+  ['click', 'pointerdown', 'touchstart', 'keydown'].forEach(t => {
+    window.addEventListener(t, e => e.stopImmediatePropagation(), true);
+  });
+}
+
+// 起動時：true を返したら先へ進ませない
+async function handleBroken() {
+  const BROKEN_LAST = 3;   // この数字を表示した次の起動で修復する
+  let raw = null;
+  try { raw = localStorage.getItem('craer_broken'); } catch (e) { return false; }
+  if (raw === null) return false;
+  const n = parseInt(raw, 10) || BROKEN_LAST;
+  const next = n - 1;
+  if (next >= BROKEN_LAST) {
+    try { localStorage.setItem('craer_broken', String(next)); } catch (e) {}
+    showBrokenScreen(next, true);
+    return true;
+  }
+  const el = brokenLayer("修復します。", true);
+  await new Promise(r => setTimeout(r, 2000));
+  try { localStorage.removeItem('craer_broken'); } catch (e) {}
+  el.style.opacity = '0';
+  setTimeout(() => el.remove(), 1600);
+  return false;
+}
+
+
+
+
 window.lib = {
   state: state,
   showScreen: showScreen,
   showLibrary: showLibrary,
+  afterEnding: afterEnding,
 };
 
 })();
@@ -2447,6 +2571,7 @@ const heroAvatarSprite = document.getElementById("heroAvatarSprite");
 const heroSerifArea = document.getElementById("heroSerifArea");
 const errorDisplay = document.getElementById("errorDisplay");
 const mainGaugeContainer = document.getElementById("mainGaugeContainer");
+const closeBtn = document.getElementById("lib_skipToggle"); // ★追加：右上ボタン（close 兼用）
 
 const btn1 = document.getElementById("btn1");
 const btn2 = document.getElementById("btn2");
@@ -2486,7 +2611,8 @@ recapReturnTo: null, // ★追加：回想後の復帰先STAGE名
   recapReturnPleasure: null, // ★追加：回想後の復帰時pleasure値（null なら変更なし）
   recapHasNext: false, // ★追加：連続再生中に次の回想があるか
   recapNextFn: null, // ★追加：次の回想へ進む関数
-  recapSavedBattle: null // ★追加：回想中に退避する元バトルデータ
+  recapSavedBattle: null, // ★追加：回想中に退避する元バトルデータ
+  closeActive: false // ★追加：右上ボタンが close 状態か
 };
 
 function showErrorGame(msg) {
@@ -2679,7 +2805,7 @@ if (currentContext === 'STAGE' && currentStage) {
     }
 
     const upperKey = upperLine.replace(/\s+/g, '_').replace(/:$/, '');
-    if (['WAIT', 'ENEMY_ATTACK', 'BUTTON1', 'BUTTON2', 'BUTTON3', 'COMMAND_GUIDE', 'DEFAULT'].includes(upperKey)) {
+        if (['WAIT', 'ENEMY_ATTACK', 'BUTTON1', 'BUTTON2', 'BUTTON3', 'COMMAND_GUIDE', 'DEFAULT', 'CLOSE'].includes(upperKey)) {
       if (currentContext === 'STAGE') {
         if (!data.stages[currentStage][upperKey]) data.stages[currentStage][upperKey] = { actions: [] };
         currentEventObj = data.stages[currentStage][upperKey];
@@ -3157,7 +3283,16 @@ if (currentAction.goto === 'library') {
   exitViaGotoLibrary();
   return;
 }
+if (currentAction.goto && ENDINGS[String(currentAction.goto).trim()]) {
+  runEnding(String(currentAction.goto).trim());
+  return;
+}
 
+
+// ★ 右上ボタンの close 切替（close: on / off）
+if (currentAction.close !== undefined) {
+  setCloseMode(String(currentAction.close).trim().toLowerCase() === 'on');
+}
 
 // ★ UI表示切替
 if (currentAction.ui !== undefined) {
@@ -3621,13 +3756,8 @@ function enemyAttack(){
   });
 }
 
-function handleButtonClick(btnId) {
-  const btnName = `BUTTON${btnId}`;
-  const stageData = gameState.parsedTimeline.stages[gameState.stage];
-  if (!stageData) return;
-  const btnData = stageData[btnName];
-  if (!btnData) return;
-
+// ★変更：コマンド実行の共通処理（BUTTON1〜3 と CLOSE で共用）
+function runCommand(evData, name) {
   gameState.playSessionId++;
   video.pause();
   video.onended = null;
@@ -3640,11 +3770,37 @@ function handleButtonClick(btnId) {
   gameState.nextAttackTime = 0; gameState.countdownValue = 0;
   attackTimerBox.style.display = "none"; setCrisisMode(false);
 
-  playEventVideo(btnData, btnName, () => {
+  playEventVideo(evData, name, () => {
     if (gameState.pleasure >= CONFIG.MAX_PLEASURE && !gameState.battleEnded) { defeat(); return; }
     playEventVideo(getWaitEvent(), 'WAIT');
     scheduleEnemyAttack();
   });
+}
+
+function handleButtonClick(btnId) {
+  const btnName = `BUTTON${btnId}`;
+  const stageData = gameState.parsedTimeline.stages[gameState.stage];
+  if (!stageData) return;
+  const btnData = stageData[btnName];
+  if (!btnData) return;
+  runCommand(btnData, btnName);
+}
+
+// ★追加：右上ボタンの表示切替（close 状態 ⇔ 通常の「← 戻る」）
+function setCloseMode(on) {
+  const was = gameState.closeActive;
+  gameState.closeActive = on;
+  if (on) closeBtn.textContent = 'close';
+  else if (was) closeBtn.textContent = '← 戻る';
+}
+
+// ★追加：close ボタン押下 → 現在ステージの CLOSE ブロックを実行
+function triggerClose() {
+  if (!gameState.battleStarted || gameState.battleEnded) return;
+  const stageData = gameState.parsedTimeline.stages[gameState.stage];
+  const closeData = stageData && stageData['CLOSE'];
+  if (!closeData) return;
+  runCommand(closeData, 'CLOSE');
 }
 
 btn1.onclick = () => handleButtonClick(1);
@@ -3667,8 +3823,9 @@ mainGaugeContainer.onclick = (e) => {
 function defeat(){
   if (gameState.battleEnded) return;
   gameState.battleEnded = true;
+  setCloseMode(false); // ★追加
   
-  recordDefeat();   
+  recordDefeat();  
   
   // ★追加：敗北を記録
   
@@ -3856,7 +4013,7 @@ function recordDefeat() {
   const enemyId = window.lib?.state?.currentEnemy?.name || "unknown";
   
   // ★ここを追加：案内人は履歴に記録しない
-  if (enemyId === "案内人") {
+  if (enemyId === "案内人（真）") {
     return;
   }
   
@@ -3915,6 +4072,7 @@ function clearBlackInstant() {
 // ★追加：UI状態とバリアントをリセット
 
 function resetUIVariants() {
+  setCloseMode(false); // ★追加
   commandsEl.dataset.variant = "";
   const uiElements = [
     'bottomHUD', 'heroAvatarWrap', 'mainGaugeContainer',
@@ -3937,7 +4095,8 @@ function resetUIVariants() {
 
 
 // ★追加：goto: library と同じ停止処理を関数化
-function exitViaGotoLibrary() {
+function exitViaGotoLibrary(skipShowLibrary) {
+  setCloseMode(false); // ★追加
   clearTimeout(gameState.enemyTimer);
   clearInterval(gameState.passiveTimer);
   clearInterval(gameState.attackTimerInterval);
@@ -3955,7 +4114,7 @@ function exitViaGotoLibrary() {
   setCrisisMode(false);
   showCommands(false);
   video.pause();
-  if (window.lib && window.lib.showLibrary) {
+  if (!skipShowLibrary && window.lib && window.lib.showLibrary) {
     window.lib.showLibrary();
   }
 }
@@ -4331,6 +4490,33 @@ if (enemy.sfxText && parseSfxFile) {
   }
 }
 
+// ★ エンディング定義（増やすときはここに1行足す）
+const ENDINGS = {
+  END1: { remove: ['craer_intro_first_seen'], set: {},                  next: 'freeze:#fff|ブラウザを閉じてください' },
+END2: { remove: [], set: { craer_broken: '5' }, next: 'broken' },
+
+  END3: { remove: [],                         set: {},                    next: 'library' }
+};
+
+
+
+function runEnding(name) {
+  const def = ENDINGS[name];
+  if (!def) return;
+  try {
+    def.remove.forEach(k => localStorage.removeItem(k));
+    Object.keys(def.set).forEach(k => localStorage.setItem(k, def.set[k]));
+    const seen = JSON.parse(localStorage.getItem('craer_endings_seen') || '[]');
+    if (!seen.includes(name)) {
+      seen.push(name);
+      localStorage.setItem('craer_endings_seen', JSON.stringify(seen));
+    }
+  } catch (e) {
+    console.warn('エンディング記録の保存失敗:', e);
+  }
+  exitViaGotoLibrary(true);   // 戦闘を止めるだけ（図書館には戻らない）
+  if (window.lib && window.lib.afterEnding) window.lib.afterEnding(def.next);
+}
 
 window.idx = {
   gameState: gameState,
@@ -4342,6 +4528,7 @@ window.idx = {
   playSingleDefeat: playSingleDefeat,
   playEndingSequence: playEndingSequence,
   exitViaGotoLibrary: exitViaGotoLibrary, // ★追加
+  triggerClose: triggerClose, // ★追加
 };
 
 })();
