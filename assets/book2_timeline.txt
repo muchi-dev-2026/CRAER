@@ -189,13 +189,13 @@ video: 0-5
 tag: win_store
 
 CLOSE:
-video: 5-10 ホールド2
+video: file:kaiso.mp4 65-72 ホールド3
 close: off
 tag: win_close
 pleasure: =0
 ui: hide
 
-#video: file:kaiso.mp4 0-53.5
+video: file:kaiso.mp4 0-53.5
 nextStage: WIN2
 
 
@@ -225,7 +225,7 @@ video: 0-0
 goto: END1
 
 BUTTON2:
-video: file:kaiso.mp4 75-85
+video: file:kaiso.mp4 75-85 ホールド5
 video: 0-0
 goto: END2
 
