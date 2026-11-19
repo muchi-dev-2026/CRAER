@@ -4013,7 +4013,7 @@ function recordDefeat() {
   const enemyId = window.lib?.state?.currentEnemy?.name || "unknown";
   
   // ★ここを追加：案内人は履歴に記録しない
-  if (enemyId === "案内人（真）") {
+  if (enemyId === "案内人") {
     return;
   }
   
