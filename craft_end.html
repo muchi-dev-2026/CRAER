@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CRAER - CRAFT END</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      background-color: #ffffff;
+      color: #222222;
+      font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 16px 32px;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex: 1;
+    }
+    
+    /* 上部ビジュアル枠 */
+    .media-frame {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: radial-gradient(circle at center, #ffffff 40%, #f2f2f2 100%);
+      border: 1px solid #e6e6e6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .media-frame img,
+    .media-frame video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    
+    .media-placeholder {
+      color: #999999;
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-align: center;
+      line-height: 1.8;
+    }
+    
+    /* 横罫線インフォパネル（白画面版） */
+    .info-panel {
+      width: 100%;
+      padding: 22px 20px 24px;
+      background-color: #fafafa;
+      border-top: 1px solid #e2e2e2;
+      border-bottom: 1px solid #e2e2e2;
+      background-image: repeating-linear-gradient(to bottom,
+          transparent 0px,
+          transparent 31px,
+          rgba(0, 0, 0, 0.05) 32px);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .story-title {
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: #1a1a1a;
+    }
+    
+    .author-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: 13px;
+      color: #777777;
+      letter-spacing: 0.05em;
+    }
+    
+    .pixiv-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      background-color: #eeeeee;
+      color: #555555;
+      text-decoration: none;
+      font-style: normal;
+      font-family: sans-serif;
+      font-weight: bold;
+      font-size: 12px;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    
+    .pixiv-link:active {
+      background-color: #0096fa;
+      color: #ffffff;
+    }
+    
+    .description {
+      font-size: 14px;
+      line-height: 2.0;
+      color: #2b2b2b;
+      letter-spacing: 0.04em;
+      margin-top: 4px;
+    }
+    
+    .erode-log {
+      margin-top: 8px;
+      padding-top: 12px;
+      border-top: 1px dashed #d8d8d8;
+      font-family: "Courier New", monospace;
+      font-size: 11.5px;
+      line-height: 1.75;
+      color: #666666;
+    }
+    
+    .erode-log-title {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      color: #999999;
+      margin-bottom: 4px;
+    }
+    
+    /* 下部案内テキストのみ */
+    .footer-area {
+      width: 100%;
+      max-width: 420px;
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      text-align: center;
+    }
+    
+    .close-notice {
+      font-size: 13px;
+      color: #333333;
+      letter-spacing: 0.12em;
+    }
+    
+    .sub-hint {
+      font-size: 11px;
+      color: #999999;
+      letter-spacing: 0.1em;
+    }
+  </style>
+</head>
+
+<body>
+  
+  <div class="container">
+    <!-- 上部ビジュアル（画像や動画をここに入れる） -->
+    <div class="media-frame">
+      <!-- 画像を使う場合：下の1行のコメントを外してパスを指定 -->
+      <!-- <img src="./your-image.png" alt="CRAFT END"> -->
+      
+      <div class="media-placeholder">
+        [ STORY 01 : CLOSED ]<br>
+        この先は白紙です
+      </div>
+    </div>
+    
+    <!-- 白画面版インフォパネル -->
+    <div class="info-panel">
+      <div class="story-title">story01</div>
+      
+      <div class="author-row">
+        <span>by muchi</span>
+        <a href="https://www.pixiv.net/" target="_blank" rel="noopener noreferrer" class="pixiv-link" title="pixiv">p</a>
+      </div>
+      
+      <div class="description">
+        この話は終わりです。初めてゲーム作ったけど、中々面白かったです。処女作にしては頑張った。敵作ってくれた人いるのかな？、わからないけど、まぁいいか、、、
+      </div>
+      
+      <div class="erode-log">
+        <div class="erode-log-title">[ERODE LOG]</div>
+        完成コード: 4387行<br>
+        GitHubコード変更数: 292<br>
+        作成した動画: 397<br>
+        1番長かったAIとのやり取り: 20万文字以上<br>
+        使ったAI（ゲームコード作成: 3つ / ストーリー・敵セリフ: 6つ / 動画・画像生成: 10くらい？）
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer-area">
+    <div class="close-notice">ブラウザ閉じてください。</div>
+    <div class="sub-hint">次は、あなたの番。</div>
+  </div>
+  
+</body>
+
+</html>
