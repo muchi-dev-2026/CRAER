@@ -21,7 +21,7 @@
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
-      padding: 20px 16px 32px;
+      padding: 20px 16px 88px;
       -webkit-font-smoothing: antialiased;
     }
     
@@ -53,14 +53,7 @@
       height: 100%;
       object-fit: cover;
       display: block;
-    }
-    
-    .media-placeholder {
-      color: #999999;
-      font-size: 13px;
-      letter-spacing: 0.12em;
-      text-align: center;
-      line-height: 1.8;
+      transform: scale(1.42);
     }
     
     /* 横罫線インフォパネル（白画面版） */
@@ -89,6 +82,7 @@
     .author-row {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 8px;
       font-family: Georgia, serif;
       font-style: italic;
@@ -96,13 +90,20 @@
       color: #777777;
       letter-spacing: 0.05em;
     }
+
+    .link-badges {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
     
-    .pixiv-link {
+    .social-badge {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 20px;
+      min-width: 22px;
       height: 20px;
+      padding: 0 6px;
       border-radius: 4px;
       background-color: #eeeeee;
       color: #555555;
@@ -110,12 +111,13 @@
       font-style: normal;
       font-family: sans-serif;
       font-weight: bold;
-      font-size: 12px;
+      font-size: 11px;
+      letter-spacing: 0.02em;
       transition: background-color 0.2s, color 0.2s;
     }
     
-    .pixiv-link:active {
-      background-color: #0096fa;
+    .social-badge:active {
+      background-color: #333333;
       color: #ffffff;
     }
     
@@ -173,24 +175,22 @@
 <body>
   
   <div class="container">
-    <!-- 上部ビジュアル（画像や動画をここに入れる） -->
+    <!-- 上部ビジュアル -->
     <div class="media-frame">
-      <!-- 画像を使う場合：下の1行のコメントを外してパスを指定 -->
-      <!-- <img src="./your-image.png" alt="CRAFT END"> -->
-      
-      <div class="media-placeholder">
-        [ STORY 01 : CLOSED ]<br>
-        この先は白紙です
-      </div>
+      <video src="./assets/kaiso.mp4" autoplay muted playsinline loop></video>
     </div>
     
     <!-- 白画面版インフォパネル -->
     <div class="info-panel">
-      <div class="story-title">story01</div>
+      <div class="story-title">あとがき</div>
       
       <div class="author-row">
         <span>by muchi</span>
-        <a href="https://www.pixiv.net/" target="_blank" rel="noopener noreferrer" class="pixiv-link" title="pixiv">p</a>
+        <div class="link-badges">
+          <a href="https://www.pixiv.net/users/130183269/" target="_blank" rel="noopener noreferrer" class="social-badge" title="pixiv">P</a>
+          <a href="https://x.com/muchidev2026" target="_blank" rel="noopener noreferrer" class="social-badge" title="X">𝕏</a>
+          <a href="https://ci-en.dlsite.com/creator/41847" target="_blank" rel="noopener noreferrer" class="social-badge" title="Ci-en">Ci-en</a>
+        </div>
       </div>
       
       <div class="description">
