@@ -1980,7 +1980,7 @@ if (companionData && companionBtn) {
 }
 
 // ★侵蝕書（敗北10回以上で表示）
-const ENDING_THRESHOLD = 10; // ★侵蝕書解禁に必要な敗北回数
+const ENDING_THRESHOLD = 900; // ★侵蝕書解禁に必要な敗北回数
 if (defeatedCount >= ENDING_THRESHOLD && companion2Data && companion2Btn) {
   companion2Btn.style.display = "flex";
   companion2Btn.onclick = () => {
@@ -2388,9 +2388,28 @@ function afterEnding(next) {
     showBrokenScreen(n, false);
     return;
   }
+    if (typeof next === 'string' && next.indexOf('page:') === 0) {
+    goEndPage(next.slice(5));
+    return;
+  }
   if (next === 'intro') playIntro();
   else showLibrary();
 }
+
+// ★白く染めてから、別ページ（エンディング用HTML）へ移る。戻るボタンでは戻れない
+function goEndPage(url) {
+  document.querySelectorAll('video, audio').forEach(m => {
+    try { m.pause(); } catch (e) {}
+  });
+  const el = document.createElement('div');
+  el.style.cssText =
+    'position:fixed;inset:0;z-index:2147483647;background:#fff;opacity:0;' +
+    'transition:opacity 1.5s ease;';
+  document.body.appendChild(el);
+  requestAnimationFrame(() => requestAnimationFrame(() => { el.style.opacity = '1'; }));
+  setTimeout(() => { location.replace(url); }, 1700);
+}
+
 
 // ★壊れ演出：5（ERODE直後）→ 4 → 3 → 次回起動で「修復します。」
 function brokenLayer(text, instant) {
@@ -4493,7 +4512,8 @@ if (enemy.sfxText && parseSfxFile) {
 
 // ★ エンディング定義（増やすときはここに1行足す）
 const ENDINGS = {
-  END1: { remove: ['craer_intro_first_seen'], set: {},                  next: 'freeze:#fff|ブラウザを閉じてください' },
+  END1: { remove: ['craer_intro_first_seen'], set: {}, next: 'page:craft_end.html' },
+
 END2: { remove: [], set: { craer_broken: '5' }, next: 'broken' },
 
   END3: { remove: [],                         set: {},                    next: 'library' }
