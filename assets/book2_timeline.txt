@@ -1,14 +1,16 @@
+# ==========================================
 # 【全体イベント】
+# ==========================================
 APPEAR:
 video: 0-5
-serif: 「図書館の最深部へようこそ。ここには、救えなかった人たちの物語が眠っている。……キミが次に開くページも、きっとね。」
-serif1: （誰かを救うための場所のはずなのに、なぜ俺の敗北を待っているように感じる？）
+tag: app_b2
 
 
 # ==========================================
-# 【勝ちルート STAGE 1】 ERODE で自己修復を侵食
+# 【B1】自己修復 稼働中 / チャージ0
+#   正解：ERODE → B2
 # ==========================================
-STAGE 1
+STAGE B1
 
 WAIT:
 video: 0-5
@@ -16,116 +18,38 @@ tag: wait_common
 
 ENEMY_ATTACK:
 video: 10-14.5
-tag: attack_common
+pleasure: +20
+sfxCount: 1
 recapPlay: 8-10 > LOSE_1 =50
-
-COMMAND_GUIDE:
-text: 案内人が記録を開こうとしています。危険です。
-
-BUTTON1:
-text: CRAFT:創る
-video: 0-5
-nextStage: LOSE_1
-serif: 「僕のことを機能を知らないのにルールを作れる訳ないだろ。それにキミの欲求は、違うはずだ。」
-serif1: （違う、これじゃない…！）
-
-BUTTON2:
-text: ERODE:侵食
-video: 5-10
-nextStage: 2
-serif: 「おっと、キミはボクを壊そうとするのかい？ その貪欲さ、嫌いじゃないよ。」
-serif1: （まずはCRAFTを奪う…！）
-
-BUTTON3:
-text: CLEAR:リセット
-video: 5-10
-nextStage: LOSE_1
-serif: 「逃げるのかい？ キミが本当に見たいのは、そんなものじゃないだろ？」
-serif1: （このまま逃げれるか？…！）
-
-
-# ==========================================
-# 【勝ちルート STAGE 2】 CRAFT で動画再生を無効化
-# ==========================================
-STAGE 2
-
-WAIT:
-video: 0-5
-tag: wait_common
-
-ENEMY_ATTACK:
-video: 10-14.5
 tag: attack_common
-recapPlay: 1-3 > LOSE_1 =50
 
 COMMAND_GUIDE:
-text:  相手のCRAFTにバグ。次の選択肢を選んでください。
 
 BUTTON1:
-text: CRAFT
-video: 5-10
-nextStage: 3-1
-serif: 「あはっ！ ボクのページが見えなくなった？ でも、キミの脳裏には焼き付いてるはずだ。」
-serif1: （よし、回想再生を止めたぞ…！）
-
-BUTTON2:
-text: ERODE
 video: 15-19
+pleasure: +25
 nextStage: LOSE_1
-serif: 「同じ手は二度も通じないよ。キミはもっと別のものが欲しいんだろ？」
-serif1: （くそ、別の選択肢を選ぶべきだった…！）
-
-BUTTON3:
-text: CLEAR
-video: 0-5
-nextStage: LOSE_1
-serif: 「しつこいな。もうリセットは効かない。素直に敗北を受け入れなよ。」
-serif1: （逃げ道は塞がれた…。）
-
-
-# ==========================================
-# 【勝ちルート STAGE 3-1】 侵食フェーズ1
-# ==========================================
-STAGE 3-1
-
-WAIT:
-video: 0-5
-tag: wait_common
-
-ENEMY_ATTACK:
-video: 10-14.5
-tag: attack_common
-recapPlay: 9-10 > LOSE_1 =50
-
-COMMAND_GUIDE:
-text: 侵食開始。案内人を侵食せよ。
-
-BUTTON1:
-text: CRAFT
-video: 0-5
-nextStage: LOSE_1
-serif: 「あれ？ 侵食はどうしたの？ キミの欲しい快楽は、こっちだよ。」
-serif1: （手が滑った…！）
+tag: b1_craft
 
 BUTTON2:
-text: ERODE
 video: 5-10
-nextStage: 3-2
-serif: 「あはっ、いいぞ！ もっとボクを壊してみせてくれ！ その感覚、忘れられないだろ？」
-serif1: （侵食する感覚が手に残る……）
+pleasure: +15
+nextStage: B2
+tag: b1_erode
 
 BUTTON3:
-text: CLEAR
 video: 0-5
+pleasure: +25
 nextStage: LOSE_1
-serif: 「無駄だって言っただろ。キミが欲しいのは、ここからの快楽さ。」
-serif1: （リセットが、通らない…！）
+tag: b1_store
 
 
 # ==========================================
-# 【勝ちルート STAGE 3-2】 侵食フェーズ2
+# 【B2】自己修復を侵食した / 敵が回復を始める / チャージ0
+#   正解：STORE → B3
+#   失敗：B1 へ巻き戻し
 # ==========================================
-STAGE 3-2
+STAGE B2
 
 WAIT:
 video: 0-5
@@ -133,145 +57,184 @@ tag: wait_common
 
 ENEMY_ATTACK:
 video: 10-14.5
-tag: attack_common
+pleasure: +20
+sfxCount: 1
+recapPlay: 1-3 > LOSE_1 =50
+tag: b2_attack
+
+COMMAND_GUIDE:
+
+BUTTON1:
+video: 15-19
+pleasure: +25
+nextStage: LOSE_1
+tag: b2_craft
+
+BUTTON2:
+video: 5-10
+pleasure: +10
+nextStage: LOSE_1
+tag: b2_erode
+
+BUTTON3:
+video: 0-5
+nextStage: B3
+tag: b2_store
+
+
+# ==========================================
+# 【B3】一回分を貯めた / 敵がクラフトを創り始める / チャージ1
+#   正解：CRAFT → WIN
+#   時間切れ：敵のクラフトが発動 → B4
+# ==========================================
+STAGE B3
+
+WAIT:
+video: 0-5
+tag: wait_common
+
+ENEMY_ATTACK:
+video: 10-14.5
+pleasure: +20
+sfxCount: 1
 recapPlay: 4-6 > LOSE_1 =50
+tag: b3_attack
 
 COMMAND_GUIDE:
-text: 侵食継続。案内人の声が直接脳髄に響く。ERODE推奨。
 
 BUTTON1:
-text: CRAFT
-video: 0-5
-nextStage: LOSE_1
-serif: 「おやおや、道を見失ったかい？ キミの欲求は、もっと底にあるはずだ。」
-serif1: （違う、俺がやるべきは…！）
-
-BUTTON2:
-text: ERODE
 video: 5-10
-nextStage: 3-3
-serif: 「どうした、手が震えてるぞ？ 自分が何を壊しているのか、分かってるのか？」
-serif1: （うるさい……黙って俺の侵食を受け入れろ……！）
-
-BUTTON3:
-text: CLEAR
-video: 0-5
-nextStage: LOSE_1
-serif: 「何度押しても同じさ。キミの敗北は、もうボクのページに書き込まれてる。」
-serif1: （ダメだ、抜け出せない…！）
-
-
-# ==========================================
-# 【勝ちルート STAGE 3-3】 侵食フェーズ3
-# ==========================================
-STAGE 3-3
-
-WAIT:
-video: 0-5
-tag: wait_common
-
-ENEMY_ATTACK:
-video: 10-14.5
-tag: attack_common
-recapPlay: 7-9 > LOSE_1 =50
-
-COMMAND_GUIDE:
-text: 侵食限界。案内人の輪郭が歪んでいる。ERODE推奨。
-
-BUTTON1:
-text: CRAFT
-video: 0-5
-nextStage: LOSE_1
-serif: 「キミ、今の操作……記録しておくね。最高の敗北のスパイスになる。」
-serif1: （しまった、別のものを……！）
-
-BUTTON2:
-text: ERODE
-video: 0-5
-nextStage: 3-4
-serif: 「そろそろ終わりかな……」
-serif1: （あと一息で、こいつを完全に掌握できる……！）
-
-BUTTON3:
-text: CLEAR
-video: 0-5
-nextStage: LOSE_1
-serif: 「バカだね。もう戻れないって言ったろ？ 素直に快楽に溺れればいい。」
-serif1: （選択肢が、消えていく…！）
-
-
-# ==========================================
-# 【勝ちルート STAGE 3-4】 核心フェーズ（お前は俺だ）
-# ==========================================
-STAGE 3-4
-
-WAIT:
-video: 0-5
-tag: wait_common
-
-ENEMY_ATTACK:
-video: 10-14.5
-tag: attack_common
-recapPlay: 8-10 > LOSE_1 =50
-
-COMMAND_GUIDE:
-text: 案内人が力を失い、静かに語りかけてくる。最後の侵食（ERODE）を。
-
-BUTTON1:
-text: CRAFT
-video: 0-5
-nextStage: LOSE_1
-serif: 「最後の最後で……それかい？ キミの欲求は、そんなものじゃないはずだ。」
-serif1: （違う、俺が選ぶべきは…！）
-
-BUTTON2:
-text: ERODE
-video: 0-5
+pleasure: +15
 nextStage: WIN
-serif: 「『ERODE』か。結局また同じなんだ……この未来だけは、変えれないんだね……」
-serif1: （こいつの言葉が、なぜか他人のものとは思えない……。）
+tag: b3_craft
+
+BUTTON2:
+video: 15-19
+pleasure: +20
+nextStage: LOSE_1
+tag: b3_erode
 
 BUTTON3:
-text: CLEAR
 video: 0-5
+pleasure: +20
 nextStage: LOSE_1
-serif: 「リセット？ この物語に、そんなものはないよ。キミはただ、快楽に堕ちるだけさ。」
-serif1: （終われない……終われない……！）
+tag: b3_store
 
 
 # ==========================================
-# 【勝ちルート WIN】 終焉（侵食のしすぎで戻れません）
+# 【B4】敵のクラフトが発動 / チャージ1
+#   正解：CRAFT → WIN（逆転）
+# ==========================================
+STAGE B4
+
+WAIT:
+video: 0-5
+tag: wait_common
+
+ENEMY_ATTACK:
+video: 10-14.5
+pleasure: +40
+sfxCount: 2
+tag: attack_common
+
+COMMAND_GUIDE:
+
+BUTTON1:
+video: 5-10
+pleasure: +15
+nextStage: WIN
+tag: b4_craft
+
+BUTTON2:
+video: 15-19
+pleasure: +30
+tag: b4_erode
+
+BUTTON3:
+video: 0-5
+pleasure: +30
+tag: b4_store
+
+
+# ==========================================
+# 【WIN】終焉：右上の close で物語を閉じる
 # ==========================================
 STAGE WIN
-command
-hide
 
 WAIT:
 video: 0-5
-tag: wait_common
-ui: command_only
-css: kaiso_choice_v
+tag: win_wait
+close: on
 
 ENEMY_ATTACK:
 video: 0-5
 pleasure: =100
-tag: attack_common
+tag: win_timeout
 
 COMMAND_GUIDE:
-text: 侵食のしすぎで、もう戻れません。
 
 BUTTON1:
-text: 物語を閉じる
 video: 0-5
+#pleasure: =0
+tag: win_craft
 
 BUTTON2:
-text: 物語を閉じる
 video: 0-5
+#pleasure: =0
+tag: win_erode
 
 BUTTON3:
-text: 図書館へ戻る
+video: 0-5
+#pleasure: =100
+tag: win_store
+
+CLOSE:
+video: 5-10 ホールド2
+close: off
+tag: win_close
+pleasure: =0
+ui: hide
+
+#video: file:kaiso.mp4 0-53.5
+nextStage: WIN2
+
+
+# ==============================================================================
+# 【STAGE WIN2】 回想後：選択
+# ==============================================================================
+STAGE WIN2
+command
+hide
+
+WAIT:
+video: file:kaiso.mp4 54-58
+ui: command_only
+css: kaiso_choice_v
+pleasure: =0
+tag: s1b5_w1
+
+ENEMY_ATTACK:
+video: file:kaiso.mp4 54-58
+pleasure: =0
+
+COMMAND_GUIDE:
+
+BUTTON1:
+video: file:kaiso.mp4 61-74
 video: 0-0
-goto: library
+goto: END1
+
+BUTTON2:
+video: file:kaiso.mp4 75-85
+video: 0-0
+goto: END2
+
+BUTTON3:
+video: file:kaiso.mp4 61-70
+video: 0-0
+goto: END3
+
+
 
 
 # ==========================================
@@ -281,7 +244,7 @@ STAGE LOSE_1
 
 WAIT:
 video: 0-5
-tag: wait_common
+tag: lose1_wait
 
 ENEMY_ATTACK:
 video: 10-14.5
@@ -289,25 +252,27 @@ tag: attack_common
 recapPlay: 1-3 > LOSE_2 =50
 
 COMMAND_GUIDE:
-text: 既に物語に囚われました。コマンドも侵食されています。
 
 BUTTON1:
-text: CRAFT
 video: 0-5
-serif: 「無駄だよ。もうキミはもう終わりさ。」
-serif1: （創るすらできない…！）
+tag: lose1_craft
+video: 10-14.5
+tag: attack_common
+recapPlay: 1-3 > LOSE_2 =50
 
 BUTTON2:
-text: ERODE
 video: 0-5
-serif: 「その足掻きも、良い記録になるね。」
-serif1: （抵抗できない…。）
+tag: lose1_erode
+video: 10-14.5
+tag: attack_common
+recapPlay: 4-6 > LOSE_2 =50
 
 BUTTON3:
-text: CLEAR
 video: 0-5
-serif: 「あはっ、もう遅いよ。」
-serif1: （終わった…。）
+tag: lose1_clear
+video: 10-14.5
+tag: attack_common
+recapPlay: 7-9 > LOSE_2 =50
 
 
 # ==========================================
@@ -317,7 +282,7 @@ STAGE LOSE_2
 
 WAIT:
 video: 0-5
-tag: wait_common
+tag: lose2_wait
 
 ENEMY_ATTACK:
 video: 10-14.5
@@ -325,28 +290,24 @@ tag: attack_common
 recapPlay: 2,6,10 > LOSE_2 =110
 
 COMMAND_GUIDE:
-text: 全てが案内人のページに吸い込まれていく…。
 
 BUTTON1:
-text: CRAFT
 video: 0-3
-serif: 「あはっ、ビクビクしてるね。最高の記録だ。」
+tag: lose2_craft
 video: 10-14.5
 tag: attack_common
 recapPlay: 1-3 > LOSE_2 =110
 
 BUTTON2:
-text: ERODE
 video: 0-3
-serif: 「全部吸い尽くしてあげる。キミの望み通りにね。」
+tag: lose2_erode
 video: 10-14.5
 tag: attack_common
 recapPlay: 4-6 > LOSE_2 =110
 
 BUTTON3:
-text: CLEAR
 video: 0-3
-serif: 「もう終わりだよ。キミも永遠に…。」
+tag: lose2_clear
 video: 10-14.5
 tag: attack_common
 recapPlay: 7-9 > LOSE_2 =110
