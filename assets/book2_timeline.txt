@@ -225,7 +225,7 @@ video: 0-0
 goto: END1
 
 BUTTON2:
-video: file:kaiso.mp4 75-85 ホールド5
+video: file:kaiso.mp4 75-89 ホールド5
 video: 0-0
 goto: END2
 
