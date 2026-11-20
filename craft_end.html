@@ -1,218 +1,682 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>CRAER - CRAFT END</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
-    body {
-      background-color: #ffffff;
-      color: #222222;
-      font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
-      min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 16px 88px;
-      -webkit-font-smoothing: antialiased;
-    }
-    
-    .container {
-      width: 100%;
-      max-width: 420px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      flex: 1;
-    }
-    
-    /* 上部ビジュアル枠 */
-    .media-frame {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      background: radial-gradient(circle at center, #ffffff 40%, #f2f2f2 100%);
-      border: 1px solid #e6e6e6;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .media-frame img,
-    .media-frame video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transform: scale(1.0);
-    }
-    
-    /* 横罫線インフォパネル（白画面版） */
-    .info-panel {
-      width: 100%;
-      padding: 22px 20px 24px;
-      background-color: #fafafa;
-      border-top: 1px solid #e2e2e2;
-      border-bottom: 1px solid #e2e2e2;
-      background-image: repeating-linear-gradient(to bottom,
-          transparent 0px,
-          transparent 31px,
-          rgba(0, 0, 0, 0.05) 32px);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    
-    .story-title {
-      font-size: 22px;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      color: #1a1a1a;
-    }
-    
-    .author-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      font-family: Georgia, serif;
-      font-style: italic;
-      font-size: 13px;
-      color: #777777;
-      letter-spacing: 0.05em;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#ffffff">
+<title>CRAER - CRAFT END</title>
 
-    .link-badges {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    
-    .social-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 22px;
-      height: 20px;
-      padding: 0 6px;
-      border-radius: 4px;
-      background-color: #eeeeee;
-      color: #555555;
-      text-decoration: none;
-      font-style: normal;
-      font-family: sans-serif;
-      font-weight: bold;
-      font-size: 11px;
-      letter-spacing: 0.02em;
-      transition: background-color 0.2s, color 0.2s;
-    }
-    
-    .social-badge:active {
-      background-color: #333333;
-      color: #ffffff;
-    }
-    
-    .description {
-      font-size: 14px;
-      line-height: 2.0;
-      color: #2b2b2b;
-      letter-spacing: 0.04em;
-      margin-top: 4px;
-    }
-    
-    .erode-log {
-      margin-top: 8px;
-      padding-top: 12px;
-      border-top: 1px dashed #d8d8d8;
-      font-family: "Courier New", monospace;
-      font-size: 11.5px;
-      line-height: 1.75;
-      color: #666666;
-    }
-    
-    .erode-log-title {
-      font-size: 10px;
-      letter-spacing: 0.15em;
-      color: #999999;
-      margin-bottom: 4px;
-    }
-    
-    /* 下部案内テキストのみ */
-    .footer-area {
-      width: 100%;
-      max-width: 420px;
-      margin-top: 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      text-align: center;
-    }
-    
-    .close-notice {
-      font-size: 13px;
-      color: #333333;
-      letter-spacing: 0.12em;
-    }
-    
-    .sub-hint {
-      font-size: 11px;
-      color: #999999;
-      letter-spacing: 0.1em;
-    }
-  </style>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #ffffff;
+  --panel: #ffffff;
+  --text: #202020;
+  --muted: #888888;
+  --line: #e9e9e9;
+  --soft: #f8f8f8;
+}
+
+html {
+  background: var(--bg);
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family:
+    "Hiragino Mincho ProN",
+    "Yu Mincho",
+    "Noto Serif JP",
+    serif;
+  min-height: 100dvh;
+  padding: 34px 16px 50px;
+  display: flex;
+  justify-content: center;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.container {
+  width: 100%;
+  max-width: 440px;
+}
+
+/* 共通リビール演出 */
+.reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.delay-1 { animation-delay: 0.05s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.4s; }
+.delay-4 { animation-delay: 0.65s; }
+.delay-5 { animation-delay: 0.9s; }
+
+/* BRAND */
+
+.brand {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.brand-title {
+  font-family: Georgia, serif;
+  font-size: 11px;
+  letter-spacing: 0.42em;
+  color: #555555;
+}
+
+.brand-line {
+  width: 38px;
+  height: 1px;
+  background: #dcdcdc;
+  margin: 16px auto 0;
+  transform: scaleX(0);
+  animation: expandLine 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.25s forwards;
+}
+
+/* VIDEO */
+
+.media-frame {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  position: relative;
+  overflow: hidden;
+  background: #fafafa;
+  border: 1px solid var(--line);
+}
+
+.media-frame video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.03);
+  animation: settleVideo 2.2s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+}
+
+.media-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.04),
+    transparent 20%,
+    transparent 80%,
+    rgba(255,255,255,0.08)
+  );
+}
+
+/* INFORMATION */
+
+.info-panel {
+  margin-top: 14px;
+  padding: 26px 22px 24px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+
+.story-title {
+  font-size: 21px;
+  font-weight: normal;
+  letter-spacing: 0.2em;
+  margin-bottom: 22px;
+  color: #171717;
+}
+
+.author-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.link-badges {
+  display: flex;
+  gap: 6px;
+}
+
+.social-badge {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 29px;
+  height: 27px;
+  padding: 0 8px;
+  color: #444444;
+  border: 1px solid #e2e2e2;
+  background: #ffffff;
+  border-radius: 2px;
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.social-badge:hover {
+  background: #f5f5f5;
+  border-color: #cccccc;
+  color: #171717;
+  transform: translateY(-1px);
+}
+
+.social-badge:active {
+  background: #222222;
+  color: #ffffff;
+  transform: translateY(0);
+}
+
+.description {
+  margin-top: 24px;
+  font-size: 13px;
+  line-height: 2.15;
+  letter-spacing: 0.035em;
+  color: #353535;
+}
+
+/* ERODE LOG */
+
+.erode-log {
+  margin-top: 29px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  line-height: 2.05;
+  color: #777777;
+}
+
+.erode-log-title {
+  margin-bottom: 2px;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  font-weight: bold;
+  color: #333333;
+}
+
+.erode-log-subtitle {
+  margin-bottom: 13px;
+  font-family:
+    "Hiragino Mincho ProN",
+    "Yu Mincho",
+    serif;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: #999999;
+}
+
+.log-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  min-height: 23px;
+}
+
+.log-row > span:first-child {
+  flex-shrink: 0;
+}
+
+.log-value {
+  color: #222222;
+  font-weight: bold;
+  text-align: right;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+/* AI DETAILS */
+
+.ai-group {
+  margin-top: 9px;
+  margin-bottom: 12px;
+  padding: 9px 0 7px;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.ai-sub-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  padding-left: 12px;
+  min-height: 23px;
+  color: #777777;
+}
+
+.ai-sub-row > span:first-child {
+  flex-shrink: 0;
+}
+
+.ai-sub-value {
+  color: #444444;
+  font-size: 10.5px;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* AUTHOR NOTE */
+
+.author-note {
+  margin-top: 13px;
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.author-note .log-value {
+  letter-spacing: 0.06em;
+}
+
+/* FOOTER */
+
+.footer-area {
+  text-align: center;
+  margin-top: 42px;
+  padding-bottom: 12px;
+}
+
+.footer-divider {
+  width: 38px;
+  height: 1px;
+  background: #dddddd;
+  margin: 0 auto 26px;
+  transform: scaleX(0);
+  animation: expandLine 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1.05s forwards;
+}
+
+.close-notice {
+  font-size: 13px;
+  font-weight: normal;
+  letter-spacing: 0.15em;
+  color: #333333;
+  opacity: 0;
+  animation: fadeInSimple 1.1s ease 1.25s forwards;
+}
+
+.close-notice::before,
+.close-notice::after {
+  content: "—";
+  color: #bbbbbb;
+  margin: 0 9px;
+}
+
+.sub-hint {
+  margin-top: 15px;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: #888888;
+  opacity: 0;
+  animation: fadeInSimple 1.2s ease 1.75s forwards;
+}
+
+/* 控えめな点滅カーソル */
+.sub-hint::after {
+  content: "";
+  display: inline-block;
+  width: 1px;
+  height: 11px;
+  background: #999999;
+  margin-left: 4px;
+  vertical-align: -1px;
+  animation: blinkCursor 1.2s steps(1) infinite;
+}
+
+/* 画面タップで演出を即時完了 */
+body.skip-anim .reveal,
+body.skip-anim .close-notice,
+body.skip-anim .sub-hint {
+  opacity: 1 !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+body.skip-anim .brand-line,
+body.skip-anim .footer-divider {
+  transform: scaleX(1) !important;
+  animation: none !important;
+}
+
+body.skip-anim .media-frame video {
+  transform: scale(1) !important;
+  animation: none !important;
+}
+
+/* ANIMATION */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInSimple {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes expandLine {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes settleVideo {
+  from { transform: scale(1.03); }
+  to { transform: scale(1); }
+}
+
+@keyframes blinkCursor {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* SMALL SCREEN */
+
+@media (max-width: 360px) {
+  body {
+    padding: 24px 12px 36px;
+  }
+
+  .info-panel {
+    padding: 22px 16px;
+  }
+
+  .story-title {
+    font-size: 19px;
+  }
+
+  .erode-log {
+    font-size: 10px;
+  }
+
+  .ai-sub-value {
+    font-size: 9.5px;
+  }
+
+  .description {
+    font-size: 12px;
+  }
+
+  .close-notice {
+    font-size: 12px;
+  }
+}
+
+/* ACCESSIBILITY */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal,
+  .close-notice,
+  .sub-hint {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .brand-line,
+  .footer-divider {
+    transform: scaleX(1) !important;
+  }
+
+  .media-frame video {
+    transform: scale(1) !important;
+  }
+}
+</style>
 </head>
 
 <body>
-  
-  <div class="container">
-    <!-- 上部ビジュアル -->
-    <div class="media-frame">
-      <video src="./assets/kaiso.mp4" autoplay muted playsinline loop></video>
+
+<main class="container">
+
+  <!-- BRAND -->
+  <header class="brand reveal delay-1">
+    <div class="brand-title">CRAER — CRAFT END</div>
+    <div class="brand-line"></div>
+  </header>
+
+  <!-- MAIN VISUAL -->
+  <section class="media-frame reveal delay-2">
+    <video
+      src="./assets/kaiso.mp4"
+      autoplay
+      muted
+      playsinline
+      loop
+      preload="auto">
+    </video>
+  </section>
+
+  <!-- AFTERWORD -->
+  <section class="info-panel reveal delay-3">
+
+    <h1 class="story-title">あとがき</h1>
+
+    <div class="author-row">
+      <span>— muchi dev 2026</span>
+
+      <nav class="link-badges" aria-label="作者リンク">
+
+        <a
+          href="https://www.pixiv.net/users/130183269/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="social-badge"
+          aria-label="pixiv">P</a>
+
+        <a
+          href="https://x.com/muchidev2026"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="social-badge"
+          aria-label="X">𝕏</a>
+
+        <a
+          href="https://ci-en.dlsite.com/creator/41847"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="social-badge"
+          aria-label="Ci-en">Ci-en</a>
+
+      </nav>
     </div>
-    
-    <!-- 白画面版インフォパネル -->
-    <div class="info-panel">
-      <div class="story-title">あとがき</div>
-      
-      <div class="author-row">
-        <span>by muchi</span>
-        <div class="link-badges">
-          <a href="https://www.pixiv.net/users/130183269/" target="_blank" rel="noopener noreferrer" class="social-badge" title="pixiv">P</a>
-          <a href="https://x.com/muchidev2026" target="_blank" rel="noopener noreferrer" class="social-badge" title="X">𝕏</a>
-          <a href="https://ci-en.dlsite.com/creator/41847" target="_blank" rel="noopener noreferrer" class="social-badge" title="Ci-en">Ci-en</a>
+
+    <p class="description reveal delay-4">
+      この話は終わりです。初めてゲームを作ったけど、なかなか面白かったです。初めてにしては頑張った。敵を作ってくれた人、いるのかな？ わからないけど、まぁいいか……。
+    </p>
+
+    <!-- ERODE LOG -->
+    <section class="erode-log reveal delay-5" id="erodeLog">
+
+      <div class="erode-log-title">
+        [ ERODE LOG ]
+      </div>
+
+      <div class="erode-log-subtitle">
+        制作の記録
+      </div>
+
+      <div class="log-row">
+        <span>完成コード</span>
+        <span class="log-value" data-count="132400" data-prefix="約" data-suffix="字">約132,400字</span>
+      </div>
+
+      <div class="log-row">
+        <span>コード変更数</span>
+        <span class="log-value" data-count="892" data-prefix="" data-suffix="以上">892以上</span>
+      </div>
+
+      <div class="log-row">
+        <span>画像・動画生成</span>
+        <span class="log-value" data-count="1130" data-prefix="約" data-suffix="">約1,130</span>
+      </div>
+
+      <div class="log-row">
+        <span>最長AI対話</span>
+        <span class="log-value" data-count="200000" data-prefix="" data-suffix="以上">200,000以上</span>
+      </div>
+
+      <div class="log-row">
+        <span>制作期間</span>
+        <span class="log-value" data-count="94" data-prefix="" data-suffix="日">94日</span>
+      </div>
+
+      <!-- AI TOOLS -->
+      <div class="ai-group">
+
+        <div class="log-row">
+          <span>使用AI</span>
+          <span class="log-value"></span>
+        </div>
+
+        <div class="ai-sub-row">
+          <span>コード用</span>
+          <span class="ai-sub-value">DeepSeek / Gemini / Claude</span>
+        </div>
+
+        <div class="ai-sub-row">
+          <span>シナリオ・セリフ用</span>
+          <span class="ai-sub-value">ChatGPT / Grok / Notion / 上記</span>
+        </div>
+
+        <div class="ai-sub-row">
+          <span>画像・動画用</span>
+          <span class="ai-sub-value">DesignAI / Grok / 他10以上</span>
+        </div>
+
+      </div>
+
+      <!-- AUTHOR -->
+      <div class="author-note">
+        <div class="log-row">
+          <span>作者 / 職業</span>
+          <span class="log-value">無知 / 営業</span>
         </div>
       </div>
-      
-      <div class="description">
-        この話は終わりです。初めてゲーム作ったけど、中々面白かったです。処女作にしては頑張った。敵作ってくれた人いるのかな？、わからないけど、まぁいいか、、、
-      </div>
-      
-      <div class="erode-log">
-        <div class="erode-log-title">[ERODE LOG]</div>
-        完成コード: 4387行<br>
-        GitHubコード変更数: 292<br>
-        生成画像・動画: 1130<br>
-        最長AI対話: 20万文字超<br>
-        使ったAI（ゲームコード用: 3つ / ストーリー・セリフ用: 6つ / 動画・画像生成: 10くらい？）
-      </div>
-    </div>
-  </div>
-  
-  <div class="footer-area">
-    <div class="close-notice">ブラウザ閉じてください。</div>
-    <div class="sub-hint">次は、あなたの番。</div>
-  </div>
-  
-</body>
 
+    </section>
+
+  </section>
+
+  <!-- END MESSAGE -->
+  <footer class="footer-area">
+
+    <div class="footer-divider"></div>
+
+    <div class="close-notice">
+      ブラウザを閉じてください。
+    </div>
+
+    <div class="sub-hint">
+      次は、あなたの番。
+    </div>
+
+  </footer>
+
+</main>
+
+<script>
+(() => {
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const targets = document.querySelectorAll('[data-count]');
+  let animated = false;
+
+  const formatNumber = (num) => Math.round(num).toLocaleString('ja-JP');
+
+  const finishAllCounts = () => {
+    targets.forEach((el) => {
+      const end = Number(el.dataset.count);
+      const prefix = el.dataset.prefix || '';
+      const suffix = el.dataset.suffix || '';
+      el.textContent = `${prefix}${formatNumber(end)}${suffix}`;
+    });
+  };
+
+  const runCounts = () => {
+    if (animated || prefersReduced) return;
+    animated = true;
+
+    const duration = 1100;
+    const startTime = performance.now();
+
+    const tick = (now) => {
+      if (document.body.classList.contains('skip-anim')) {
+        finishAllCounts();
+        return;
+      }
+
+      const progress = Math.min(1, (now - startTime) / duration);
+      // easeOutQuart
+      const eased = 1 - Math.pow(1 - progress, 4);
+
+      targets.forEach((el) => {
+        const end = Number(el.dataset.count);
+        const prefix = el.dataset.prefix || '';
+        const suffix = el.dataset.suffix || '';
+        el.textContent = `${prefix}${formatNumber(end * eased)}${suffix}`;
+      });
+
+      if (progress < 1) {
+        requestAnimationFrame(tick);
+      } else {
+        finishAllCounts();
+      }
+    };
+
+    requestAnimationFrame(tick);
+  };
+
+  // ログが画面内に入ったらカウント開始
+  const logSection = document.getElementById('erodeLog');
+  if (!prefersReduced && 'IntersectionObserver' in window && logSection) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setTimeout(runCounts, 350);
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0.25 });
+
+    observer.observe(logSection);
+  }
+
+  // 画面タップ（リンク以外）で演出をスキップ
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('a')) return;
+    document.body.classList.add('skip-anim');
+    finishAllCounts();
+  }, { once: true });
+})();
+</script>
+
+</body>
 </html>
