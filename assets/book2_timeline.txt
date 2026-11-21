@@ -189,13 +189,14 @@ video: 0-5
 tag: win_store
 
 CLOSE:
-video: file:kaiso.mp4 61-68 ホールド3
+video: file:kaiso.mp4 63-65 ホールド3
 close: off
 tag: win_close
 pleasure: =0
 ui: hide
 
-video: file:kaiso.mp4 0-76
+video: file:kaiso.mp4 0-79 ホールド2
+video: file:kaiso.mp4 79-81
 nextStage: WIN2
 
 
@@ -207,30 +208,30 @@ command
 hide
 
 WAIT:
-video: file:kaiso.mp4 76-80
+video: file:kaiso.mp4 81-85
 ui: command_only
 css: kaiso_choice_v
 pleasure: =0
 tag: s1b5_w1
 
 ENEMY_ATTACK:
-video: file:kaiso.mp4 76-80
+video: file:kaiso.mp4 81-85
 pleasure: =0
 
 COMMAND_GUIDE:
 
 BUTTON1:
-video: file:kaiso.mp4 82-86
+video: file:kaiso.mp4 85-89
 video: 0-0
 goto: END1
 
 BUTTON2:
-video: file:kaiso.mp4 87.3-93 ホールド5
+video: file:kaiso.mp4 90-95 ホールド5
 video: 0-0
 goto: END2
 
 BUTTON3:
-video: file:kaiso.mp4 87.3-89
+video: file:kaiso.mp4 62-68
 video: 0-0
 goto: END3
 
