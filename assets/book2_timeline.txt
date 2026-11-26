@@ -183,39 +183,6 @@ nextStage: LOSE_1
 tag: b3_store
 
 
-# ==========================================
-# 【B4】敵のクラフトが発動 / チャージ1
-#   正解：CRAFT → WIN（逆転）
-# ==========================================
-STAGE B4
-
-WAIT:
-video: 0-5
-tag: wait_common
-
-ENEMY_ATTACK:
-video: 10-14.5
-pleasure: +40
-sfxCount: 2
-tag: attack_common
-
-COMMAND_GUIDE:
-
-BUTTON1:
-video: 5-10
-pleasure: +15
-nextStage: WIN
-tag: b4_craft
-
-BUTTON2:
-video: 15-19
-pleasure: +30
-tag: b4_erode
-
-BUTTON3:
-video: 0-5
-pleasure: +30
-tag: b4_store
 
 
 # ==========================================
@@ -247,13 +214,15 @@ tag: win_erode
 
 BUTTON3:
 video: 0-5
-#pleasure: =100
+#pleasure: =0
 tag: win_store
 
 CLOSE:
+video: 0-5
+tag: win_close
+
 video: file:kaiso.mp4 63-65 ホールド3
 close: off
-tag: win_close
 pleasure: =0
 ui: hide
 
