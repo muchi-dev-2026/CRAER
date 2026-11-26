@@ -26,7 +26,7 @@ COMMAND_GUIDE:
 
 BUTTON1:
 video: file:at.mp4 0-8
-#pleasure: +25
+#pleasure: +15
 tag: b0_sw1
 
 video: file:at.mp4 8-12
@@ -63,7 +63,7 @@ tag: b0_rev
 
 BUTTON3:
 video: 10-14.5 ホールド2
-pleasure: +20
+pleasure: +15
 tag: b0_hs
 nextStage: B1
 
