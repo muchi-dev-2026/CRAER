@@ -7,6 +7,68 @@ tag: app_b2
 
 
 # ==========================================
+# 【B0】通常戦闘 / チャージ0
+# ==========================================
+STAGE B0
+
+WAIT:
+video: 0-5
+tag: b0_wait
+
+ENEMY_ATTACK:
+video: 10-14.5
+pleasure: +20
+sfxCount: 1
+recapPlay: 8-10 > LOSE_1 =50
+tag: b0_atk
+
+COMMAND_GUIDE:
+
+BUTTON1:
+video: file:at.mp4 0-8
+#pleasure: +25
+tag: b0_sw1
+
+video: file:at.mp4 8-12
+tag: b0_sw2
+
+video: file:at.mp4 12-14
+tag: b0_sw3
+
+video: file:at.mp4 14-24 ホールド1
+tag: b0_sw4
+
+video: file:up.mp4
+
+video: 15-20
+tag: b0_rev
+
+
+BUTTON2:
+video: file:mg.mp4 0-9.5
+# pleasure: +15
+tag: b0_mg1
+
+video: file:mg.mp4 9.5-17
+tag: b0_mg2
+
+video: file:mg.mp4 17-22 ホールド1
+tag: b0_mg3
+
+video: file:up.mp4
+
+video: 20-25
+tag: b0_rev
+
+
+BUTTON3:
+video: 10-14.5 ホールド2
+pleasure: +20
+tag: b0_hs
+nextStage: B1
+
+
+# ==========================================
 # 【B1】自己修復 稼働中 / チャージ0
 #   正解：ERODE → B2
 # ==========================================
