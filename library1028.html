@@ -1666,7 +1666,10 @@ async function loadCompanion2() {
       serifText,
 videoURLs: {
   "battle.mp4": "assets/book2_battle.mp4",
-  "kaiso.mp4": "assets/kaiso.mp4" // ★追加
+  "kaiso.mp4": "assets/kaiso.mp4",
+"at.mp4": "assets/at.mp4",
+"mg.mp4": "assets/mg.mp4",
+"up.mp4": "assets/up.mp4" // ★追加
 },
       imageURLs: {
         "chara.png": "assets/book2_chara.png",
@@ -1980,7 +1983,7 @@ if (companionData && companionBtn) {
 }
 
 // ★侵蝕書（敗北10回以上で表示）
-const ENDING_THRESHOLD = 10; // ★侵蝕書解禁に必要な敗北回数
+const ENDING_THRESHOLD = 900; // ★侵蝕書解禁に必要な敗北回数
 if (defeatedCount >= ENDING_THRESHOLD && companion2Data && companion2Btn) {
   companion2Btn.style.display = "flex";
   companion2Btn.onclick = () => {
