@@ -401,7 +401,7 @@ html,body{
 }
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
-html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'RocknRoll One','Potta One',-apple-system,sans-serif;overflow:hidden}
+html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'RocknRoll One','Potta One',-apple-system,sans-serif;overflow:hidden;touch-action:manipulation}
 
 #game {
   display: none;
@@ -837,6 +837,39 @@ html,body{width:100%;height:100%;background:#020005;color:#f0d0e8;font-family:'R
 #heroAvatarWrap.stage-3{ border-color:#ff6600; box-shadow:0 0 22px rgba(255,102,0,0.9); animation:avatarGlow 1s ease-in-out infinite alternate; }
 #heroAvatarWrap.stage-4{ border-color:#ff0033; box-shadow:0 0 25px rgba(255,0,51,1); animation:avatarGlow 0.3s ease-in-out infinite alternate; }
 
+#touchFx{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:24}
+#screen.touch-on{touch-action:none}
+.t-core{position:absolute;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;opacity:0;mix-blend-mode:screen;transition:opacity .12s,width .2s,height .2s,margin .2s;background:radial-gradient(circle,rgba(255,240,248,.95),rgba(255,42,133,.6) 42%,rgba(255,0,110,0) 75%)}
+.t-core.on{opacity:1}.t-core.t2{width:54px;height:54px;margin:-27px 0 0 -27px}.t-core.t3{width:68px;height:68px;margin:-34px 0 0 -34px}
+.t-heart{position:absolute;color:#ff7ab8;text-shadow:0 0 10px #ff3d95;animation:tRise 1s ease-out forwards}
+@keyframes tRise{0%{opacity:0;transform:translate(-50%,0) scale(.6)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-85px) scale(1.2)}}
+.t-ono{position:absolute;font-weight:800;white-space:nowrap;color:#fff2f8;text-shadow:0 0 6px #ff2a85,0 0 16px #ff006e,0 1px 3px #000;opacity:0;transform:translate(-50%,-50%);transition:opacity .14s}
+.t-ono.on{opacity:1;animation:tPop .26s cubic-bezier(.22,1.25,.36,1)}
+@keyframes tPop{0%{scale:.72}60%{scale:1.14}100%{scale:1}}
+.t-bolt{position:absolute;overflow:visible;mix-blend-mode:screen;animation:tZap .14s steps(2) forwards}
+.t-bolt polyline{fill:none;stroke:#ff6fb5;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+@keyframes tZap{0%{opacity:1}100%{opacity:0}}
+.t-ember{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;box-shadow:0 0 6px #ff2a85;mix-blend-mode:screen;animation:tEmber .32s ease-out forwards}
+@keyframes tEmber{to{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.2)}}
+#heroAvatarWrap{touch-action:none}
+#heroAvatarWrap.recovering{border-color:#68b8ff;box-shadow:0 0 22px #68b8ff,inset 0 0 16px rgba(143,243,255,.5)}
+#heroAvatarWrap.pulling{border-color:#ff3d95;box-shadow:0 0 24px #ff3d95;animation:tShake .14s infinite}
+@keyframes tShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-2.5px)}75%{transform:translateX(2.5px)}}
+.t-ghost{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;display:none;border:2px solid #ff7ab8;background:radial-gradient(circle,rgba(255,230,245,.9),rgba(255,42,133,.55) 55%,rgba(104,184,255,.25));box-shadow:0 0 16px #ff2a85;animation:tOrb .35s ease-in-out infinite alternate}
+.t-ghost.on{display:block}
+.t-ghost b{position:absolute;top:38px;left:50%;transform:translateX(-50%);white-space:nowrap;font:800 10px system-ui,sans-serif;color:#ffd6ea;background:rgba(25,4,18,.86);border:1px solid #ff5fa3;border-radius:99px;padding:2px 8px;display:none}
+.t-ghost.warn b{display:block}
+@keyframes tOrb{to{transform:scale(1.18)}}
+#screen,#screen *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none;-webkit-tap-highlight-color:transparent}
+#heroAvatarWrap,#heroAvatarWrap *{touch-action:none}
+.t-vid{position:absolute;width:150px;height:260px;margin:-130px 0 0 -75px;mix-blend-mode:screen;opacity:0;pointer-events:none;-webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 45%,transparent 100%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 45%,transparent 100%);transition:opacity .12s}
+.t-vid.on{opacity:1}
+.t-src{position:absolute;width:2px;height:2px;opacity:0;pointer-events:none}
+.t-bnd{position:absolute;left:50%;top:14%;transform:translateX(-50%);padding:6px 14px;border-radius:99px;background:rgba(25,4,18,.86);border:1px solid #ff5fa3;color:#ffd6ea;font:800 14px system-ui,sans-serif;letter-spacing:.1em;white-space:nowrap;display:none;box-shadow:0 0 14px rgba(255,30,130,.7)}
+.t-bnd.on{display:block;animation:tBnd .45s ease-in-out infinite alternate}
+@keyframes tBnd{to{transform:translateX(-50%) scale(1.07)}}
+.t-pull{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;pointer-events:none;opacity:0;z-index:5;transition:opacity .3s}
+.t-ghost.tagonly{display:block;background:none;border:0;box-shadow:none;animation:none}
 @keyframes avatarGlow{ 0%{ transform: scale(1); } 100%{ transform: scale(1.04); } }
 #heroAvatarSprite {
   width: 192px; height: 192px;
@@ -1983,7 +2016,7 @@ if (companionData && companionBtn) {
 }
 
 // ★侵蝕書（敗北10回以上で表示）
-const ENDING_THRESHOLD = 10; // ★侵蝕書解禁に必要な敗北回数
+const ENDING_THRESHOLD = 900; // ★侵蝕書解禁に必要な敗北回数
 if (defeatedCount >= ENDING_THRESHOLD && companion2Data && companion2Btn) {
   companion2Btn.style.display = "flex";
   companion2Btn.onclick = () => {
@@ -2743,9 +2776,11 @@ function parseSfxFile(text) {
       const tag = line.slice(1).trim().toUpperCase();
       if (tag === 'ATTACK') currentSection = 'attack';
       else if (tag === 'DEFEAT') currentSection = 'defeat';
+      else if (/^TOUCH_(CALL|SFX[123])$/.test(tag)) { currentSection = 't:' + tag; (data.touch = data.touch || {})[tag] = []; }
       else currentSection = null;
       return;
     }
+    if (currentSection && currentSection.startsWith('t:')) { data.touch[currentSection.slice(2)].push(line); return; }
     if (currentSection === 'attack') attackList.push(line);
     else if (currentSection === 'defeat') defeatList.push(line);
   });
@@ -2930,6 +2965,8 @@ if (currentContext === 'STAGE' && currentStage) {
   currentAction.ui = val; currentEventObj.ui = val;
 } else if (key === 'css') {                    // ★追加
   currentAction.css = val; currentEventObj.css = val;
+} else if (key === 'touch') {
+  currentAction.touch = val; currentEventObj.touch = val;
 } else if (key === 'goto') {
   currentAction.goto = val; currentEventObj.goto = val;
 } else {
@@ -3377,6 +3414,7 @@ const sfx = currentAction.sfxCount !== undefined ? currentAction.sfxCount : (act
     }
 
     handleEventSerifs(currentAction);
+    touchSet(currentAction.touch);
     startContinuousShake(currentAction.shake || 0);
 
     const targetSpeed = currentAction.speed || 1.0;
@@ -3780,6 +3818,7 @@ function enemyAttack(){
 
 // ★変更：コマンド実行の共通処理（BUTTON1〜3 と CLOSE で共用）
 function runCommand(evData, name) {
+  touchSet(null,true);
   gameState.playSessionId++;
   video.pause();
   video.onended = null;
@@ -3829,6 +3868,222 @@ btn1.onclick = () => handleButtonClick(1);
 btn2.onclick = () => handleButtonClick(2);
 btn3.onclick = () => handleButtonClick(3);
 
+// ===== touch（誘惑タッチ）：touch: tmp b3 50 =====
+const TC={rate:9,tier:[1.4,2.8],mul:[1,1.35,1.8],spark:[95,62,38],heart:[420,270,160],ono:[950,720,520]};
+const TC_DEF={CALL:['触って…♡','もっと…','いいよ…♡'],SFX1:['すり…','そっ…','ふわっ♡'],SFX2:['ぬるっ♡','ぞくっ','びくんっ'],SFX3:['ぞくぞくっ♡','あっ♡♡','だめ…っ','びくびくっ♡']};
+let touchSpec=null,T=null,tLast=0,B=null;
+const tFx=document.createElement('div');tFx.id='touchFx';
+const tCore=document.createElement('div');tCore.className='t-core';
+const tOno=document.createElement('div');tOno.className='t-ono';
+tFx.append(tCore,tOno);screenElem.appendChild(tFx);
+// 光・スパークの動画（段階1〜3）。黒を透明に変換して重ねる（iPhoneはvideoの合成が効かないため）
+// 動画の置き場所は TFX_DIR。TFX_ON=false にすると従来のCSS版
+const TFX_ON=true,TFX_DIR='assets/';
+const TFX_NAMES=['touch_fx1.mp4','touch_fx2.mp4','touch_fx3.mp4'],TFX_VID=TFX_ON?TFX_NAMES:null;
+// 敵フォルダに同名のmp4があればそれを使い、なければ TFX_DIR のものを使う（敵ごとに切り替わる）
+function tfxSrc(name){return(gameState.videoURLs&&gameState.videoURLs[name])||TFX_DIR+name;}
+let tVid=null,tVidAll=null,tCur=null,tCvLast=0;
+const tCv=document.createElement('canvas');tCv.className='t-vid';tCv.width=176;tCv.height=304;
+const tCx=tCv.getContext('2d',{willReadFrequently:true});
+if(TFX_VID){
+  tFx.appendChild(tCv);
+  tVid=tVidAll=TFX_VID.map(name=>{const v=document.createElement('video');v.className='t-src';v.dataset.n=name;v.dataset.s=tfxSrc(name);v.src=v.dataset.s;v.muted=true;v.loop=true;v.setAttribute('playsinline','');v.preload='auto';v.addEventListener('error',()=>{v.dataset.bad='1';tfxCheck();});v.addEventListener('loadeddata',()=>{delete v.dataset.bad;tfxCheck();});tFx.appendChild(v);return v;});
+}
+// 3本のうち1本でも読めなければ、従来のCSS版に戻す（敵が替わって読めるようになれば復帰する）
+function tfxCheck(){if(!tVidAll)return;const bad=tVidAll.some(v=>v.dataset.bad);tVid=bad?null:tVidAll;tCv.style.display=bad?'none':'';if(bad)tCore.style.visibility='visible';}
+function vidShow(tier){if(!tVid)return;tVid.forEach((v,i)=>{if(i===tier-1){tCur=v;try{v.currentTime=0;}catch(_){}v.play().catch(()=>{});}else v.pause();});tCv.classList.add('on');}
+function vidHide(){if(!tVid)return;tCur=null;tCv.classList.remove('on');tVid.forEach(v=>v.pause());}
+function vidFrame(n,x,y){
+  tCv.style.left=x+'px';tCv.style.top=y+'px';
+  if(!tCur||tCur.readyState<2||n-tCvLast<33)return;tCvLast=n;
+  tCx.drawImage(tCur,0,0,176,304);
+  const im=tCx.getImageData(0,0,176,304),d=im.data;
+  for(let i=0;i<d.length;i+=4){const m=Math.max(d[i],d[i+1],d[i+2]);if(m<10){d[i+3]=0;continue;}const f=255/m;d[i]=Math.min(255,d[i]*f);d[i+1]=Math.min(255,d[i+1]*f);d[i+2]=Math.min(255,d[i+2]*f);d[i+3]=m;}
+  tCx.putImageData(im,0,0);
+}
+function parseTouch(v){
+  if(!v)return null;
+  const p=String(v).trim().split(/\s+/),type={tmp:'tmp','誘惑':'tmp',bnd:'bnd','拘束':'bnd'}[p[0].toLowerCase()];
+  if(!type)return null;
+  let btn=0,at=type==='bnd'?4:50;
+  p.slice(1).forEach(x=>{const m=x.match(/^(?:b|ボタン)([1-3])$/i);if(m)btn=+m[1];else if(/^\d+$/.test(x))at=+x;});
+  return{type,btn,at};
+}
+function touchSet(v,quiet){
+  tfxSync();
+  if(B&&!B.done){if(quiet){B.done=true;bndHint.classList.remove('on');}else bndEnd(false);}   // 動画が終わった=時間切れ
+  touchSpec=parseTouch(v);
+  if(!touchSpec){endTouch();endRecover();}
+  B=null;if(touchSpec&&touchSpec.type==='bnd')bndStart();
+  screenElem.classList.toggle('touch-on',!!touchSpec);
+}
+function tPick(k){const a=gameState.sfxTexts?.touch?.['TOUCH_'+k]||TC_DEF[k];return a[Math.floor(Math.random()*a.length)];}
+function tAdd(el,ms){tFx.appendChild(el);setTimeout(()=>el.remove(),ms);}
+function tPos(e){const r=screenElem.getBoundingClientRect(),k=r.width/screenElem.offsetWidth||1;return[(e.clientX-r.left)/k,(e.clientY-r.top)/k];}
+function tOnoShow(tier){
+  tOno.textContent=Math.random()<.35?tPick('CALL'):tPick('SFX'+tier);
+  tOno.style.fontSize=(15+tier*3)+'px';
+  tOno.style.left=Math.max(70,Math.min(screenElem.offsetWidth-70,T.x))+'px';tOno.style.top=Math.max(30,T.y-54)+'px';
+  tOno.classList.remove('on');void tOno.offsetWidth;tOno.classList.add('on');
+}
+function tSpark(){
+  if(tVid)return;
+  const tier=T.tier;
+  for(let i=0;i<(tier===1?1:2);i++){
+    const a=Math.random()*6.283,d=22+Math.random()*14,len=20+Math.random()*(8+tier*6);
+    let pts='0,9';for(let j=1;j<4;j++)pts+=` ${(len/4*j).toFixed(1)},${(9+Math.random()*12-6).toFixed(1)}`;pts+=` ${len.toFixed(1)},9`;
+    const s=document.createElementNS('http://www.w3.org/2000/svg','svg');s.setAttribute('class','t-bolt');s.setAttribute('width',len);s.setAttribute('height',18);
+    s.style.cssText=`left:${T.x+Math.cos(a)*d}px;top:${T.y+Math.sin(a)*d-9}px;transform-origin:0 50%;transform:rotate(${a}rad)`;
+    s.innerHTML=`<polyline points="${pts}"/>`;tAdd(s,150);
+  }
+  for(let j=0;j<1+tier;j++){
+    const a=Math.random()*6.283,e=document.createElement('div'),f=16+Math.random()*(14+tier*6);e.className='t-ember';
+    e.style.cssText=`left:${T.x+Math.cos(a)*26}px;top:${T.y+Math.sin(a)*26}px;--dx:${Math.cos(a)*f}px;--dy:${Math.sin(a)*f}px`;tAdd(e,340);
+  }
+}
+function tHeart(){
+  const h=document.createElement('div');h.className='t-heart';h.textContent=T.tier===3&&Math.random()<.5?'♥':'♡';
+  h.style.cssText=`left:${T.x+Math.random()*48-24}px;top:${T.y-8}px;font-size:${20+T.tier*6}px`;tAdd(h,1000);
+}
+function endTouch(){if(!T)return;T=null;vidHide();tCore.className='t-core';tOno.classList.remove('on');}
+function touchTick(n){
+  if(!T)return;
+  if(tVid)vidFrame(n,T.x,T.y);
+  const dt=Math.min(.05,(n-tLast)/1000),held=(n-T.t0)/1000,tier=held>=TC.tier[1]?3:held>=TC.tier[0]?2:1;tLast=n;
+  if(tier!==T.tier){T.tier=tier;tCore.className='t-core on t'+tier;vidShow(tier);tOnoShow(tier);try{navigator.vibrate&&navigator.vibrate(30);}catch(_){}}
+  gameState.pleasure+=TC.rate*TC.mul[tier-1]*dt;updatePleasure();
+  if(n-T.ls>=TC.spark[tier-1]){T.ls=n;tSpark();}
+  if(n-T.lh>=TC.heart[tier-1]){T.lh=n;tHeart();}
+  if(n-T.lo>=TC.ono[tier-1]){T.lo=n;tOnoShow(tier);}
+  if(gameState.pleasure>=CONFIG.MAX_PLEASURE){touchSet(null);if(!gameState.battleEnded)defeat();return;}
+  if(touchSpec.btn&&gameState.pleasure>=touchSpec.at){const b=touchSpec.btn;touchSet(null);handleButtonClick(b);return;}
+  requestAnimationFrame(touchTick);
+}
+screenElem.addEventListener('pointerdown',e=>{
+  if(!touchSpec||touchSpec.type!=='tmp'||T||gameState.battleEnded||e.target.closest('#commands,#heroAvatarWrap,#mainGaugeContainer,#temptationPopup,button'))return;
+  try{screenElem.setPointerCapture(e.pointerId);}catch(_){}
+  const[x,y]=tPos(e);beginTouch(e.pointerId,x,y);
+});
+function beginTouch(id,x,y,forced){
+  const n=performance.now();
+  T={id,x,y,t0:n,ls:0,lh:0,lo:n,tier:1,forced:!!forced};tLast=n;
+  tCore.style.left=x+'px';tCore.style.top=y+'px';tCore.className='t-core on';tCore.style.visibility=tVid?'hidden':'visible';vidShow(1);tOnoShow(1);
+  requestAnimationFrame(touchTick);
+}
+screenElem.addEventListener('pointermove',e=>{if(!T||e.pointerId!==T.id)return;[T.x,T.y]=tPos(e);tCore.style.left=T.x+'px';tCore.style.top=T.y+'px';});
+['pointerup','pointercancel'].forEach(t=>screenElem.addEventListener(t,e=>{if(T&&e.pointerId===T.id)endTouch();}));
+// ===== 回復（アバター長押し）＋吸い寄せ =====
+Object.assign(TC,{recover:20,pullSpeed:.34,pullDecay:.12,pullDmg:18,pullBase:.5});  // pullBase: 押した直後の誘惑動画の濃さ(0〜1)。進行度とともに.95まで濃くなる
+let R=null,pull=0,pLast=0,pRun=false;
+const av=document.getElementById('heroAvatarWrap');
+const tGhost=document.createElement('div');tGhost.className='t-ghost';tGhost.innerHTML='<b>引き寄せ中…離せ！</b>';tFx.appendChild(tGhost);
+// 引き寄せが進むとアバターに重なる誘惑動画（黒を使わない通常の動画）。ファイルがなければ何も出ない
+let tPull=null;
+if(TFX_ON){tPull=document.createElement('video');tPull.className='t-pull';tPull.dataset.s=tfxSrc('touch_pull.mp4');tPull.src=tPull.dataset.s;tPull.muted=true;tPull.loop=true;tPull.setAttribute('playsinline','');tPull.preload='auto';tPull.addEventListener('error',()=>{tPull.style.display='none';});tPull.addEventListener('loadeddata',()=>{tPull.style.display='';});av.appendChild(tPull);}
+// 敵が替わったら、敵フォルダの動画に差し替える（同じ参照先なら何もしない）
+function tfxSync(){
+  if(tVidAll)tVidAll.forEach(v=>{const u=tfxSrc(v.dataset.n);if(v.dataset.s!==u){v.dataset.s=u;delete v.dataset.bad;v.src=u;v.load();}});
+  if(tPull){const u=tfxSrc('touch_pull.mp4');if(tPull.dataset.s!==u){tPull.dataset.s=u;tPull.style.display='';tPull.src=u;tPull.load();}}
+  tfxCheck();
+}
+function endRecover(keepPull){R=null;pull=0;tGhost.className='t-ghost';av.classList.remove('recovering','pulling');vidHide();tCv.style.filter='';if(tPull&&!keepPull){tPull.style.opacity=0;tPull.pause();}}
+// 吸い寄せ完了後も、指がアバターに乗っている間（強制タッチ中）は誘惑動画を出し続ける。終わったら消す
+function pullHold(){
+  if(!tPull)return;tPull.style.opacity=.95;if(tPull.paused)tPull.play().catch(()=>{});
+  (function chk(){if(T&&T.forced){requestAnimationFrame(chk);return;}if(!R){tPull.style.opacity=0;setTimeout(()=>{if(!R&&tPull)tPull.pause();},350);}})();
+}
+function pullTick(n){
+  const dt=Math.min(.05,(n-pLast)/1000),M=CONFIG.MAX_PLEASURE;pLast=n;
+  if(R){gameState.pleasure-=TC.recover*(1-.7*gameState.pleasure/M)*dt;updatePleasure();pull=Math.min(1,pull+TC.pullSpeed*dt);}
+  else pull=Math.max(0,pull-TC.pullDecay*dt);
+  av.classList.toggle('pulling',pull>=.6);
+  if(tPull){if(R){tPull.style.opacity=TC.pullBase+(.95-TC.pullBase)*pull;if(tPull.paused)tPull.play().catch(()=>{});}else tPull.style.opacity=0;}
+  if(R){
+    const k=screenElem.getBoundingClientRect().width/screenElem.offsetWidth||1,sr=screenElem.getBoundingClientRect(),ar=av.getBoundingClientRect();
+    const sx=(ar.left+ar.width/2-sr.left)/k,sy=(ar.top+ar.height*.45-sr.top)/k,tx=screenElem.offsetWidth*.5,ty=screenElem.offsetHeight*.55,e=Math.pow(pull,1.35);
+    R.gx=sx+(tx-sx)*e+Math.sin(n*.012)*(4+pull*8);R.gy=sy+(ty-sy)*e+Math.cos(n*.015)*(3+pull*6);
+    tGhost.style.left=R.gx+'px';tGhost.style.top=R.gy+'px';
+    tGhost.className='t-ghost '+(tVid?'tagonly':'on')+(pull>=.6?' warn':'');
+    if(tVid){tCv.style.filter='hue-rotate('+(-130*(1-pull)).toFixed(0)+'deg)';vidFrame(n,R.gx,R.gy);}
+    if(pull>=1)return pulledIn();
+  }
+  if(R||pull>0)requestAnimationFrame(pullTick);else pRun=false;
+}
+function pulledIn(){
+  const id=R.id,x=R.gx,y=R.gy;endRecover(true);pRun=false;
+  gameState.pleasure+=TC.pullDmg;updatePleasure();doFlash(false);spawnOno('快楽 +'+TC.pullDmg,1);
+  try{navigator.vibrate&&navigator.vibrate([45,35,65]);}catch(_){}
+  if(gameState.pleasure>=CONFIG.MAX_PLEASURE){touchSet(null);if(!gameState.battleEnded)defeat();return;}
+  beginTouch(id,x,y,true);pullHold();
+}
+av.addEventListener('pointerdown',e=>{
+  if(!touchSpec||touchSpec.type!=='tmp'||R||T||gameState.battleEnded)return;
+  const id=e.pointerId;
+  try{av.setPointerCapture(id);}catch(_){}
+  clearTimeout(av._h);
+  av._h=setTimeout(()=>{
+    if(!touchSpec||touchSpec.type!=='tmp'||R||T||gameState.battleEnded)return;
+    R={id,gx:0,gy:0};av.classList.add('recovering');tGhost.className='t-ghost '+(tVid?'tagonly':'on');vidShow(1);
+    pLast=performance.now();if(!pRun){pRun=true;requestAnimationFrame(pullTick);}
+  },200);
+});
+av.addEventListener('pointermove',e=>{if(T&&T.forced&&e.pointerId===T.id){[T.x,T.y]=tPos(e);tCore.style.left=T.x+'px';tCore.style.top=T.y+'px';}});
+['pointerup','pointercancel'].forEach(t=>av.addEventListener(t,e=>{
+  clearTimeout(av._h);
+  if(R&&e.pointerId===R.id){R=null;tGhost.className='t-ghost';av.classList.remove('recovering');vidHide();tCv.style.filter='';if(tPull){tPull.style.opacity=0;setTimeout(()=>{if(!R&&tPull)tPull.pause();},350);}}
+  if(T&&T.forced&&e.pointerId===T.id)endTouch();
+}));
+['contextmenu','selectstart','dragstart'].forEach(t=>screenElem.addEventListener(t,e=>e.preventDefault()));
+// iPhoneのダブルタップ／ピンチ拡大を止める
+document.addEventListener('gesturestart',e=>e.preventDefault());
+// ===== 拘束（touch: bnd b3 4）：左右に振りほどく。動画が終わるまでに間に合わなければ失敗 =====
+Object.assign(TC,{bndPx:60,bndReward:5,bndPenalty:10});
+const bndHint=document.createElement('div');bndHint.className='t-bnd';tFx.appendChild(bndHint);
+function bndShow(){bndHint.textContent='↔ 振りほどけ！ '+'●'.repeat(B.n)+'○'.repeat(Math.max(0,B.need-B.n));}
+function bndStart(){
+  endTouch();endRecover();
+  B={need:touchSpec.at,btn:touchSpec.btn,n:0,dir:0,done:false,id:null,x0:0};
+  bndShow();bndHint.classList.add('on');try{navigator.vibrate&&navigator.vibrate([30,30,30]);}catch(_){}
+}
+function bndEnd(ok){
+  if(!B||B.done)return;B.done=true;const b=B;bndHint.classList.remove('on');
+  if(ok){
+    gameState.pleasure=Math.max(0,gameState.pleasure-TC.bndReward);updatePleasure();spawnOno('振りほどいた！',1);
+    try{navigator.vibrate&&navigator.vibrate([20,30,20]);}catch(_){}
+  }else{
+    gameState.pleasure+=TC.bndPenalty;updatePleasure();doFlash(false);spawnOno('捕らわれた…',1);
+    setTimeout(()=>{ // いま再生を始めた次の動画に割り込まないよう、少し遅らせる
+      if(gameState.battleEnded)return;
+      if(gameState.pleasure>=CONFIG.MAX_PLEASURE)defeat();
+      else if(b.btn)handleButtonClick(b.btn);
+    },0);
+  }
+}
+screenElem.addEventListener('pointerdown',e=>{
+  if(!B||B.done||e.target.closest('button,#commands'))return;
+  try{screenElem.setPointerCapture(e.pointerId);}catch(_){}
+  B.id=e.pointerId;B.x0=e.clientX;
+});
+screenElem.addEventListener('pointermove',e=>{
+  if(!B||B.done||e.pointerId!==B.id)return;
+  const k=screenElem.getBoundingClientRect().width/screenElem.offsetWidth||1,dx=(e.clientX-B.x0)/k;
+  if(Math.abs(dx)<TC.bndPx)return;
+  const dir=dx>0?1:-1;B.x0=e.clientX;
+  if(dir===B.dir)return;                     // 同じ向きは数えない（左右交互）
+  B.dir=dir;B.n++;bndShow();try{navigator.vibrate&&navigator.vibrate(12);}catch(_){}
+  if(B.n>=B.need)bndEnd(true);
+});
+['pointerup','pointercancel'].forEach(t=>screenElem.addEventListener(t,e=>{if(B&&e.pointerId===B.id)B.id=null;}));
+
+document.addEventListener('gesturechange',e=>e.preventDefault());
+let _lt=0;
+document.addEventListener('touchend',e=>{const n=Date.now();if(n-_lt<350&&!e.target.closest('button,#commands'))e.preventDefault();_lt=n;},{passive:false});
+if(window.visualViewport)visualViewport.addEventListener('resize',()=>{
+  if(visualViewport.scale>1.02){const m=document.querySelector('meta[name=viewport]'),c=m.content;m.content='width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1';setTimeout(()=>{m.content=c;},300);}
+});
+
+
+
 mainGaugeContainer.onclick = (e) => {
   if (!gameState.battleStarted) return;
   const rect = mainGaugeContainer.getBoundingClientRect();
@@ -3844,6 +4099,7 @@ mainGaugeContainer.onclick = (e) => {
 
 function defeat(){
   if (gameState.battleEnded) return;
+  touchSet(null,true);
   gameState.battleEnded = true;
   setCloseMode(false); // ★追加
   
